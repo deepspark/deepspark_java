@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.acl</groupId>
+	<artifactId>deepspark</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>deepspark</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<junit.version>4.12</junit.version>
+		<nd4j.version>0.0.3.5.5.3-SNAPSHOT</nd4j.version>
+		<canova.version>0.0.0.2-SNAPSHOT</canova.version>  
+	</properties>
+    
+	<dependencyManagement>
+		<dependencies>
+			
+			<dependency>
+			      <groupId>org.nd4j</groupId>
+			      <artifactId>canova-api</artifactId>
+			      <version>${canova.version}</version>
+			      <scope>test</scope>
+			</dependency>
+			<dependency>
+			      <groupId>junit</groupId>
+			      <artifactId>junit</artifactId>
+			      <version>${junit.version}</version>
+			      <scope>test</scope>
+			</dependency>
+		</dependencies>
+		
+		
+		
+	</dependencyManagement>
+</project>

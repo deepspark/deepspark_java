@@ -10,30 +10,186 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<junit.version>4.12</junit.version>
+		<dl4j.version>0.0.3.3.2.alpha1</dl4j.version>
 		<nd4j.version>0.0.3.5.5.3-SNAPSHOT</nd4j.version>
-		<canova.version>0.0.0.2-SNAPSHOT</canova.version>  
+		<canova.version>0.0.0.2-SNAPSHOT</canova.version>
+		<scala.binary.version>2.10</scala.binary.version>
+		<spark.version>1.2.1</spark.version>
+		<junit.version>4.12</junit.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.10.1</version>
+					<configuration>
+						<additionalparam>-Xdoclint:none</additionalparam>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.18.1</version>
+					<configuration>
+						<argLine>-Ddtype=float</argLine>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.1</version>
+					<configuration>
+						<source>1.7</source>
+						<target>1.7</target>
+					</configuration>
+				</plugin>
+
+				<plugin>
+	                <groupId>org.scala-tools</groupId>
+	                <artifactId>maven-scala-plugin</artifactId>
+	                <executions>
+	                    <execution>
+	                        <goals>
+	                            <goal>compile</goal>
+	                            <goal>testCompile</goal>
+	                        </goals>
+	                    </execution>
+	                </executions>
+	                <configuration>
+	                    <scalaVersion>${scala.version}</scalaVersion>
+	                </configuration>
+	            </plugin>
+
+			</plugins>
+		
+		</pluginManagement>
+	</build>
     
 	<dependencyManagement>
 		<dependencies>
+		
+			<dependency>
+				<groupId>org.deeplearning4j</groupId>
+				<artifactId>deeplearning4j-core</artifactId>
+				<version>${dl4j.version}</version>
+			</dependency>
 			
 			<dependency>
-			      <groupId>org.nd4j</groupId>
-			      <artifactId>canova-api</artifactId>
-			      <version>${canova.version}</version>
-			      <scope>test</scope>
+				<groupId>org.deeplearning4j</groupId>
+				<artifactId>deeplearning4j-scaleout-api</artifactId>
+				<version>${dl4j.version}</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>org.deeplearning4j</groupId>
+				<artifactId>dl4j-spark</artifactId>
+				<version>${dl4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.spark</groupId>
+				<artifactId>spark-mllib_${scala.binary.version}</artifactId>
+				<version>${spark.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.apache.spark</groupId>
+				<artifactId>spark-core_${scala.binary.version}</artifactId>
+				<version>${spark.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
 			<dependency>
 			      <groupId>junit</groupId>
 			      <artifactId>junit</artifactId>
 			      <version>${junit.version}</version>
 			      <scope>test</scope>
 			</dependency>
+			
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-math3</artifactId>
+				<version>3.4.1</version>
+			</dependency>
+	
 		</dependencies>
-		
-		
-		
 	</dependencyManagement>
+	
+	<dependencies>
+		<dependency>
+		      <groupId>org.deeplearning4j</groupId>
+		      <artifactId>deeplearning4j-core</artifactId>
+		</dependency>
+			
+		<dependency>
+		      <groupId>org.deeplearning4j</groupId>
+		      <artifactId>dl4j-spark</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-mllib_${scala.binary.version}</artifactId>
+			<version>${spark.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_${scala.binary.version}</artifactId>
+			<version>${spark.version}</version>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+		</dependency>
+		
+		<dependency>
+		      <groupId>junit</groupId>
+		      <artifactId>junit</artifactId>
+		      <scope>test</scope>
+		</dependency>
+		
+	</dependencies>
+	
+	
 </project>

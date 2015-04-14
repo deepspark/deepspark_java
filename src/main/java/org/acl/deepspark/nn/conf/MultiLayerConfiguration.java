@@ -17,6 +17,7 @@
 package org.acl.deepspark.nn.conf;
 
 
+
 public class MultiLayerConfiguration {
 
     

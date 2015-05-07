@@ -66,7 +66,7 @@ public class ConvolutionLayer extends BaseLayer{
 	}
 
 	@Override
-	public void update(double[] weights) {
+	public void update(DoubleMatrix[] weights) {
 		// TODO Auto-generated method stub
 		
 	}

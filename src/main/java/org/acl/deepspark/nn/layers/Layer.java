@@ -1,5 +1,7 @@
 package org.acl.deepspark.nn.layers;
 
-public interface Layer {
+import org.jblas.DoubleMatrix;
 
+public interface Layer {
+	public DoubleMatrix activate();
 }

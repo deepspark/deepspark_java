@@ -1,5 +1,8 @@
 package org.acl.deepspark.nn.layers;
 
-public class BaseLayer {
+import org.jblas.DoubleMatrix;
 
+public abstract class BaseLayer {
+	public abstract double[] getOutput();
+	public abstract void update(DoubleMatrix[] weights); 
 }

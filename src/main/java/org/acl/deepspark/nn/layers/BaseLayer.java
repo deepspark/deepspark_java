@@ -1,62 +1,55 @@
 package org.acl.deepspark.nn.layers;
 
-import org.acl.deepspark.nn.params.Activations;
-import org.acl.deepspark.nn.weights.WeightInit;
+import org.acl.deepspark.nn.functions.Activator;
+import org.acl.deepspark.nn.weights.WeightInitUtil;
 import org.jblas.DoubleMatrix;
 
 public abstract class BaseLayer {
 	protected int nIn;
 	protected int nOut;
 	protected DoubleMatrix weight;
+	protected DoubleMatrix output;
 	protected double bias;
 	
 	public double dropOutRate;
-	private int activationMethod = Activations.SIGMOID;
+	private int activationMethod = Activator.SIGMOID;
 	
 	public BaseLayer() { }
 	
 	public BaseLayer(int nIn, int nOut) {
 		this.nIn = nIn;
 		this.nOut = nOut;
-		this.weight = initRandWeights();
+		initWeights();
 	}
 	
+	protected void initWeights() {		
+		weight = WeightInitUtil.randInitWeights(nOut, nIn);
+		bias = 0;
+	}
 	
-	
-	protected DoubleMatrix initRandWeights() {
-		int fanIn;
-		int fanOut;
-		
-		return DoubleMatrix.rand(nOut, nIn);
-/*		switch(activationMethod) {
-		
-		// TODO: modify weights elements
-		case Activations.SIGMOID:
-			break;
-			
-		case Activations.TANH:
-			break;
-			
-		case Activations.RELU:
-			break;
-		}*/
+	public void setWeight(DoubleMatrix weight) {
+		this.weight = weight;
 	}
 	
 	public DoubleMatrix getWeight() {
 		return weight;
 	}
 	
-	// Apply Sigmoid activation
-	// TODO : add tanh, RELU activation
+	// Apply activation
 	public DoubleMatrix activate(DoubleMatrix matrix) {
-		double activation;
-		for(int m = 0; m < matrix.rows; m++) {
-			for(int n = 0; n < matrix.columns; n++) {
-				activation = 1.0 / (1.0 + Math.exp(-1.0 * matrix.get(m, n)));
-				matrix.put(m, n, activation);
-			}
+		if(matrix == null)
+			return null;
+		switch(activationMethod) {
+		case Activator.SIGMOID:
+			return Activator.sigmoid(matrix);
+			
+		case Activator.TANH:
+			return Activator.tanh(matrix);
+			
+		case Activator.RELU:
+			return Activator.relu(matrix);
 		}
-		return matrix;
+		return Activator.sigmoid(matrix);
 	}
 		
 	public DoubleMatrix[] activate(DoubleMatrix[] matrix) {

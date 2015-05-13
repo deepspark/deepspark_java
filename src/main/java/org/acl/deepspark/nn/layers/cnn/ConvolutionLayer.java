@@ -2,6 +2,7 @@ package org.acl.deepspark.nn.layers.cnn;
 
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.layers.HiddenLayer;
+import org.acl.deepspark.nn.weights.WeightInitUtil;
 import org.jblas.DoubleMatrix;
 import org.jblas.SimpleBlas;
 import org.jblas.ranges.RangeUtils;
@@ -22,12 +23,7 @@ public class ConvolutionLayer extends BaseLayer{
 	private int[] stride;
 	private int[] poolSize;
 	private int zeroPadding;
-	
-	public ConvolutionLayer(double[][] input) {
-		
-	}
-	
-	
+
 	public ConvolutionLayer(DoubleMatrix[] input, int filterRows, int filterCols, int numFilters) {
 		super();
 		this.input = input;
@@ -44,7 +40,7 @@ public class ConvolutionLayer extends BaseLayer{
 		bias = new double[numFilters];
 		
 		for(int i = 0; i < numFilters; i++) {
-			W[i] = randInitWeights(filterRows, filterCols);
+			W[i] = WeightInitUtil.randInitWeights(filterRows, filterCols);
 			bias[i] = 0;
 		}
 	}
@@ -64,14 +60,9 @@ public class ConvolutionLayer extends BaseLayer{
 		bias = new double[numFilters];
 		
 		for(int i = 0; i < numFilters; i++) {
-			W[i] = randInitWeights(filterRows, filterCols);
+			W[i] = WeightInitUtil.randInitWeights(filterRows, filterCols);
 			bias[i] = 0;
 		}
-	}
-	
-	/* TODO: apply initialization method */
-	private DoubleMatrix randInitWeights(int dimRow, int dimCol) {
-		return DoubleMatrix.rand(dimRow, dimCol);
 	}
 
 	public int getNumOfFilter() {
@@ -178,21 +169,21 @@ public class ConvolutionLayer extends BaseLayer{
 		return null;
 	}
 	
-	public DoubleMatrix feedForward() {
+	public void feedForward() {
 		outputLayer = new HiddenLayer(convolutionDownSample(), dimOut);
-		return outputLayer.feedForward();
+		outputLayer.feedForward();
 	}
 	
 	@Override
 	public double[] getOutput() {
-		// TODO Auto-generated method stub
+		if(outputLayer != null)
+			outputLayer.getOutput();
 		return null;
 	}
 
 	@Override
 	public void update(DoubleMatrix[] weights) {
 		// TODO Auto-generated method stub
-		
 	}
 	
 	public static void main(String[] args) {

@@ -23,14 +23,17 @@ public class HiddenLayer extends BaseLayer {
 		this.input = new DoubleMatrix(input);
 	}
 	
-	public DoubleMatrix feedForward() {
-		return activate(weight.mmul(input).add(bias));
+	public void feedForward() {
+		if (input != null) {
+			output = activate(weight.mmul(input).add(bias));
+		}
 	}
 	
 	
 	@Override
 	public double[] getOutput() {
-		// TODO Auto-generated method stub
+		if (output != null)
+			return output.toArray();
 		return null;
 	}
 

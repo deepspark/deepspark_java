@@ -1,14 +1,14 @@
 package org.acl.deepspark.nn.layers;
 
 import org.acl.deepspark.nn.functions.Activator;
-import org.acl.deepspark.nn.weights.WeightInitUtil;
+import org.acl.deepspark.nn.weights.WeightUtil;
 import org.jblas.DoubleMatrix;
 
 public abstract class BaseLayer {
 	protected int nIn;
 	protected int nOut;
+	protected DoubleMatrix input;
 	protected DoubleMatrix weight;
-	protected DoubleMatrix output;
 	protected double bias;
 	
 	public double dropOutRate;
@@ -23,7 +23,7 @@ public abstract class BaseLayer {
 	}
 	
 	protected void initWeights() {		
-		weight = WeightInitUtil.randInitWeights(nOut, nIn);
+		weight = WeightUtil.randInitWeights(nOut, nIn);
 		bias = 0;
 	}
 	
@@ -60,6 +60,10 @@ public abstract class BaseLayer {
 		return matrix;
 	}
 	
-	public abstract double[] getOutput();
+	public void applyDropOut() {
+		
+	}
+	
+	public abstract DoubleMatrix[] getOutput();
 	public abstract void update(DoubleMatrix[] weights); 
 }

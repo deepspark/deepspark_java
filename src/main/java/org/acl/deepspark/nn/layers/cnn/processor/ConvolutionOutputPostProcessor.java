@@ -1,5 +1,5 @@
 
-package org.acl.deepspark.nn.layers.convolution.processor;
+package org.acl.deepspark.nn.layers.cnn.processor;
 
 
 /**

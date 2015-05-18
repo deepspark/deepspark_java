@@ -1,10 +1,10 @@
 
-package org.acl.deepspark.nn.layers.convolution.processor;
+package org.acl.deepspark.nn.layers.cnn.processor;
 
 /**
  * A convolution input pre processor.
  * When passing things in to a convolutional net, a 4d tensor is expected of shape:
- * batch size,1,rows,cols
+ * batch size, 1, rows, cols
  *
  * For a typical flattened dataset of images which are of:
  * batch size x rows * cols in size, this gives the equivalent transformation for a convolutional layer of:

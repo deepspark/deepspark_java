@@ -3,14 +3,14 @@ package org.acl.deepspark.nn.layers;
 import org.jblas.DoubleMatrix;
 
 // Fully Connected HiddenLayer
-public class HiddenLayer extends BaseLayer {
+public class FullyConnLayer extends BaseLayer {
 	private DoubleMatrix input;
 	
-	public HiddenLayer(DoubleMatrix input, int nOut) {
+	public FullyConnLayer(DoubleMatrix input, int nOut) {
 		this(input, input.length, nOut);
 	}
 	
-	public HiddenLayer(DoubleMatrix input, int nIn, int nOut) {
+	public FullyConnLayer(DoubleMatrix input, int nIn, int nOut) {
 		super(nIn, nOut);
 		if(!input.isColumnVector()) {
 			this.input = new DoubleMatrix(input.data);
@@ -18,22 +18,23 @@ public class HiddenLayer extends BaseLayer {
 		this.input = input;
 	}
 	
-	public HiddenLayer(double[] input, int nIn, int nOut) {
+	public FullyConnLayer(double[] input, int nIn, int nOut) {
 		super(nIn, nOut);
 		this.input = new DoubleMatrix(input);
 	}
 	
 	public void feedForward() {
-		if (input != null) {
-			output = activate(weight.mmul(input).add(bias));
-		}
+		
 	}
 	
 	
 	@Override
-	public double[] getOutput() {
-		if (output != null)
-			return output.toArray();
+	public DoubleMatrix[] getOutput() {
+		if (input != null && weight != null) {
+			DoubleMatrix[] matrix = new DoubleMatrix[1];
+			matrix[0] = weight.mmul(input);
+			return matrix;
+		}
 		return null;
 	}
 
@@ -42,5 +43,6 @@ public class HiddenLayer extends BaseLayer {
 		// TODO Auto-generated method stub
 		
 	}
+
 	
 }

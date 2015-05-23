@@ -39,7 +39,8 @@ public class FullyConnLayer extends BaseLayer {
 	}
 
 	@Override
-	public void update(DoubleMatrix[] weights) {
+	public DoubleMatrix[] update(DoubleMatrix[] deltas) {
+		return deltas;
 		// TODO Auto-generated method stub
 		
 	}

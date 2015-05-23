@@ -63,8 +63,8 @@ public class PoolingLayer extends BaseLayer {
 	}
 
 	@Override
-	public void update(DoubleMatrix[] weights) {
+	public DoubleMatrix[] update(DoubleMatrix[] deltas) {
 		// TODO Auto-generated method stub
-		
+		return deltas;
 	}
 }

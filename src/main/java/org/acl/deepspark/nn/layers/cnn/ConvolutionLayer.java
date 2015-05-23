@@ -226,7 +226,48 @@ public class ConvolutionLayer extends BaseLayer {
 	}
 
 	@Override
-	public void update(DoubleMatrix[] weights) {
+	public DoubleMatrix[] update(DoubleMatrix[] deltas) {
 		// TODO Auto-generated method stub
+		
+		
+		
+		return deriveDelta(deltas);
+	}
+	
+	public DoubleMatrix[] deriveDelta(DoubleMatrix[] deltas) {
+		if (deltas == null || deltas.length <=0 ) {
+			
+			DoubleMatrix[] inputDeltas = new DoubleMatrix[numChannel];
+			DoubleMatrix temp = new DoubleMatrix(imageRows, imageCols);
+			DoubleMatrix filter;
+			
+			// check: dims(image) > dims(filter)
+			int conv = 0;
+			for (int j = 0; j < numChannel; j++) {
+				inputDeltas[j] = new DoubleMatrix(imageRows, imageCols);
+				for (int i = 0; i < numFilters; i++) {
+					filter = new DoubleMatrix(W[i][j].toArray2());
+					
+					temp.fill(0.0);
+					// calculate convolution
+					for (int r = 0; r < imageRows; r++) {
+						for (int c = 0; c < imageCols ; c++) {
+							for (int m = 0; m < filterRows; m++) {
+								for (int n = 0; n < filterCols; n++) {
+									if (r-m < 0 || c-n < 0)
+										continue;
+									conv += deltas[i].get(r-m, c-n) * filter.get(m,n);
+								}
+							}
+							conv = 0;
+							temp.put(r, c, conv);
+						}
+					}
+					inputDeltas[j].addi(temp);
+				}
+			}
+			return inputDeltas;
+		}
+		return null;
 	}
 }

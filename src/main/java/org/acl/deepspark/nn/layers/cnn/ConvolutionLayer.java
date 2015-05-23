@@ -230,6 +230,7 @@ public class ConvolutionLayer extends BaseLayer {
 		// TODO Auto-generated method stub
 		DoubleMatrix deltaWeight = new DoubleMatrix(filterRows, filterCols);
 		
+		// update Weights
 		for (int i = 0; i < numFilters; i++) {
 			for (int j = 0; j < numChannels; j++) {
 				deltaWeight.fill(0.0);
@@ -243,6 +244,7 @@ public class ConvolutionLayer extends BaseLayer {
 				W[i][j].addi(deltaWeight);
 			}
 		}
+		// return inputLayer delta
 		return deriveDelta (outputDelta);
 	}
 	

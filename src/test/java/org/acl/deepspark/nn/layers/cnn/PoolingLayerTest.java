@@ -58,7 +58,7 @@ public class PoolingLayerTest {
 			System.out.println(matrix);
 		
 		DoubleMatrix[] update2 = poolingLayer2.update(result2);
-		System.out.println("poolingLayer1 update check");
+		System.out.println("poolingLayer2 update check");
 		for(DoubleMatrix matrix : update2)
 			System.out.println(matrix);
 		

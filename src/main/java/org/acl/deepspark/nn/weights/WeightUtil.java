@@ -19,7 +19,25 @@ public class WeightUtil {
 		return result;
 	}
 	
-	public static DoubleMatrix flip(DoubleMatrix matrix) {
-		return matrix;
+	public static DoubleMatrix flat2Vec(DoubleMatrix matrix) {
+		if (matrix != null)
+			return new DoubleMatrix(matrix.toArray());
+		return null;
+	}
+	
+	public static DoubleMatrix flat2Vec(DoubleMatrix[] matrices) {
+		if (matrices != null) {
+			int length = matrices.length;
+			int dim = matrices[0].length;
+			
+			double[] data = new double[length * dim];
+			for(int i = 0 ; i < length; i++) {
+				for (int j = 0; j < dim; j++) {
+					data[i * dim + j] = matrices[i].get(j);
+				}
+			}
+			return new DoubleMatrix(data);
+		}
+		return null;
 	}
 }

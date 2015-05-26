@@ -7,9 +7,6 @@ import org.jblas.SimpleBlas;
 import org.jblas.ranges.RangeUtils;
 
 public class ConvolutionLayer extends BaseLayer {
-	private int dimIn, dimOut; // in/out spec.
-	private DoubleMatrix[] input;
-	private int imageRows, imageCols, numChannels;
 	private int filterRows, filterCols, numFilters; // filter spec.
 	private DoubleMatrix[][] W; // filterId, x, y
 	private double[] bias;
@@ -19,73 +16,23 @@ public class ConvolutionLayer extends BaseLayer {
 	private boolean useZeroPadding = true;
 
 	public ConvolutionLayer(DoubleMatrix input, int filterRows, int filterCols, int numFilters) {
-		super();
-		this.input = new DoubleMatrix[1];
-		this.input[0] = input;
-		
-		this.imageRows = input.rows;
-		this.imageCols = input.columns;
-		this.numChannels = 1;
-		
+		super(input);
 		this.filterRows = filterRows;
 		this.filterCols = filterCols;
 		this.numFilters = numFilters;
 		
-		W = new DoubleMatrix[numFilters][numChannels];
-		bias = new double[numFilters];
-		
-		for(int i = 0; i < numFilters; i++) {
-			for(int j = 0; j < numChannels; j++) {
-				W[i][j] = WeightUtil.randInitWeights(filterRows, filterCols);
-			}
-			bias[i] = 0;
-		}
+		initWeights();
 	}
 	
 	public ConvolutionLayer(DoubleMatrix[] input, int filterRows, int filterCols, int numFilters) {
-		super();
-		this.input = input;
-		
-		this.imageRows = input[0].rows;
-		this.imageCols = input[0].columns;
-		this.numChannels = input.length;
-		
+		super(input);
 		this.filterRows = filterRows;
 		this.filterCols = filterCols;
 		this.numFilters = numFilters;
 		
-		W = new DoubleMatrix[numFilters][numChannels];
-		bias = new double[numFilters];
-		
-		for(int i = 0; i < numFilters; i++) {
-			for(int j = 0; j < numChannels; j++) {
-				W[i][j] = WeightUtil.randInitWeights(filterRows, filterCols);
-			}
-			bias[i] = 0;
-		}
+		initWeights();
 	}
 	
-	public ConvolutionLayer(int row, int col, int channel, int filterRows, int filterCols, int numFilters) {
-		super();
-		
-		this.imageRows = row;
-		this.imageCols = col;
-		this.numChannels = channel;
-		
-		this.filterRows = filterRows;
-		this.filterCols = filterCols;
-		this.numFilters = numFilters;
-		
-		W = new DoubleMatrix[numFilters][channel];
-		bias = new double[numFilters];
-		
-		for(int i = 0; i < numFilters; i++) {
-			for(int j = 0; j < numChannels; j++) {
-				W[i][j] = WeightUtil.randInitWeights(filterRows, filterCols);
-			}
-			bias[i] = 0;
-		}
-	}
 	
 	public void setFilterWeights(DoubleMatrix[][] filters) {
 		W = filters;
@@ -94,85 +41,38 @@ public class ConvolutionLayer extends BaseLayer {
 	public DoubleMatrix[][] getFilterWeights() {
 		return W;
 	}
-
-	public int getNumOfFilter() {
-		return numFilters;
-	}
-
-	public DoubleMatrix[] convolution(DoubleMatrix filter) {
-		DoubleMatrix[] data = new DoubleMatrix[numFilters];
-		DoubleMatrix temp = new DoubleMatrix(imageRows - filterRows + 1, imageCols - filterCols + 1);;
+	
+	@Override
+	public void initWeights() {
+		W = new DoubleMatrix[numFilters][numChannels];
+		bias = new double[numFilters];
 		
 		for(int i = 0; i < numFilters; i++) {
-			data[i] = new DoubleMatrix(imageRows - filterRows + 1, imageCols -filterCols + 1);
 			for(int j = 0; j < numChannels; j++) {
-				//flip for 2d-convolution
-				for(int k = 0; k < filter.rows / 2 ; k++)
-					filter.swapRows(k, filter.rows - 1 - k);
-				for(int k = 0; k < filter.columns / 2 ; k++)
-					filter.swapColumns(k, filter.columns - 1 - k);
-				
-				temp.fill(0.0);
-				// calculate convolutions
-				for(int r = 0; r < temp.rows; r++) {
-					for(int c = 0; c < temp.columns ; c++) {
-						temp.put(r, c, SimpleBlas.dot
-								(input[j].get(RangeUtils.interval(r, r + filter.rows),
-										   	  RangeUtils.interval(c, c + filter.columns)), filter));
-					}
-				}
-				data[i].addi(temp);
+				W[i][j] = WeightUtil.randInitWeights(filterRows, filterCols);
 			}
-			data[i].addi(bias[i]);
+			bias[i] = 0;
 		}
-		return data;
+	}
+
+	public int getNumOfChannels() {
+		return numChannels;
 	}
 	
-	public DoubleMatrix[] convolution(DoubleMatrix[] filters) {
-		int numFilters = filters.length;
-		DoubleMatrix[] data = new DoubleMatrix[numFilters];
-		DoubleMatrix filter;
-		DoubleMatrix temp = new DoubleMatrix(imageRows - filterRows + 1, imageCols -filterCols + 1);;
-		
-		// check: dims(image) > dims(filter)
-		
-		for(int i = 0; i < numFilters; i++) {
-			data[i] = new DoubleMatrix(imageRows - filterRows + 1, imageCols -filterCols + 1);
-			for(int j = 0; j < numChannels; j++) {
-				filter = new DoubleMatrix(filters[i].toArray2());
-				
-				//flip for 2d-convolution
-				for(int k = 0; k < filter.rows / 2 ; k++)
-					filter.swapRows(k, filter.rows - 1 - k);
-				for(int k = 0; k < filter.columns / 2 ; k++)
-					filter.swapColumns(k, filter.columns - 1 - k);
-				
-				temp.fill(0.0);
-				// calculate convolution
-				for(int r = 0; r < temp.rows; r++) {
-					for(int c = 0; c < temp.columns ; c++) {
-						temp.put(r, c, SimpleBlas.dot
-								(input[j].get(RangeUtils.interval(r, r + filter.rows),
-										   	  RangeUtils.interval(c, c + filter.columns)), filter));
-					}
-				}
-				data[i].addi(temp);
-			}
-			data[i].addi(bias[i]);
-		}
-		return data;
+	public int getNumOfFilter() {
+		return numFilters;
 	}
 	
 	// convolution for multiple channel input
 	public DoubleMatrix[] convolution() {
 		DoubleMatrix[] data = new DoubleMatrix[numFilters];
 		DoubleMatrix filter;
-		DoubleMatrix temp = new DoubleMatrix(imageRows - filterRows + 1, imageCols - filterCols + 1);
+		DoubleMatrix temp = new DoubleMatrix(dimRows-filterRows+1, dimCols-filterCols+1);
 		
 		// check: dims(image) > dims(filter)
 
 		for(int i = 0; i < numFilters; i++) {
-			data[i] = new DoubleMatrix(imageRows - filterRows + 1, imageCols - filterCols + 1);
+			data[i] = new DoubleMatrix(dimRows - filterRows + 1, dimCols - filterCols + 1);
 			for(int j = 0; j < numChannels; j++) {
 				filter = new DoubleMatrix(W[i][j].toArray2());
 				
@@ -249,39 +149,46 @@ public class ConvolutionLayer extends BaseLayer {
 	}
 	
 	public DoubleMatrix[] deriveDelta(DoubleMatrix[] outputDelta) {
-		if (outputDelta == null || outputDelta.length <=0 ) {
-			
-			DoubleMatrix[] inputDelta = new DoubleMatrix[numChannels];
-			DoubleMatrix temp = new DoubleMatrix(imageRows, imageCols);
-			DoubleMatrix filter;
-			
-			// check: dims(image) > dims(filter)
-			int conv = 0;
-			for (int j = 0; j < numChannels; j++) {
-				inputDelta[j] = new DoubleMatrix(imageRows, imageCols);
-				for (int i = 0; i < numFilters; i++) {
-					filter = new DoubleMatrix(W[i][j].toArray2());
-					
-					temp.fill(0.0);
-					// calculate convolution
-					for (int r = 0; r < imageRows; r++) {
-						for (int c = 0; c < imageCols ; c++) {
-							for (int m = 0; m < filterRows; m++) {
-								for (int n = 0; n < filterCols; n++) {
-									if (r-m < 0 || c-n < 0)
-										continue;
-									conv += outputDelta[i].get(r-m, c-n) * filter.get(m,n);
-								}
+		if (outputDelta == null || outputDelta.length <= 0)
+			return null;
+		
+		DoubleMatrix[] inputDelta = new DoubleMatrix[numChannels];
+		DoubleMatrix temp = new DoubleMatrix(dimRows, dimCols);
+		DoubleMatrix filter;
+		
+		// check: dims(image) > dims(filter)
+		int conv;
+		for (int j = 0; j < numChannels; j++) {
+			inputDelta[j] = new DoubleMatrix(dimRows, dimCols);
+			for (int i = 0; i < numFilters; i++) {
+				filter = new DoubleMatrix(W[i][j].toArray2());
+				
+				temp.fill(0.0);
+				// calculate convolution
+				for (int r = 0; r < dimRows; r++) {
+					for (int c = 0; c < dimCols ; c++) {
+						conv = 0;
+						for (int m = 0; m < filterRows; m++) {
+							for (int n = 0; n < filterCols; n++) {
+								if (r-m < 0 || c-n < 0)
+									continue;
+								conv += outputDelta[i].get(r-m, c-n) * filter.get(m,n);
 							}
-							conv = 0;
-							temp.put(r, c, conv);
 						}
+						temp.put(r, c, conv);
 					}
-					inputDelta[j].addi(temp);
 				}
+				inputDelta[j].addi(temp);
 			}
-			return inputDelta;
 		}
-		return null;
+		return inputDelta;
+	}
+
+	
+
+	@Override
+	public void applyDropOut() {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -5,36 +5,26 @@ import org.jblas.DoubleMatrix;
 import org.jblas.ranges.RangeUtils;
 
 public class PoolingLayer extends BaseLayer {
-	private DoubleMatrix[] input;
-	private int inputRows;
-	private int inputCols;
 	private int outputRows;
 	private int outputCols;
 
 	public int[][] maxIndices;
 	private int poolSize;
 	
-	public PoolingLayer(DoubleMatrix[] input, int poolSize) {
-		super();
-		this.input = input;
-		this.inputRows = input[0].rows;
-		this.inputCols = input[0].columns;
+	public PoolingLayer(DoubleMatrix input, int poolSize) {
+		super(input);
 		this.poolSize = poolSize;
-		this.outputRows = inputRows / poolSize;
-		this.outputCols = inputCols / poolSize;
-		maxIndices = new int [input.length][outputRows * outputCols];
+		this.outputRows = dimRows / poolSize;
+		this.outputCols = dimCols / poolSize;
+		maxIndices = new int [numChannels][outputRows * outputCols];
 	}
 	
-	public PoolingLayer(DoubleMatrix input, int poolSize) {
-		super();
-		this.input = new DoubleMatrix[1];
-		this.input[0] = input;
-		this.inputRows = input.rows;
-		this.inputCols = input.columns;
+	public PoolingLayer(DoubleMatrix[] input, int poolSize) {
+		super(input);
 		this.poolSize = poolSize;
-		this.outputRows = inputRows / poolSize;
-		this.outputCols = inputCols / poolSize;
-		maxIndices = new int [input.length][outputRows * outputCols];
+		this.outputRows = dimRows / poolSize;
+		this.outputCols = dimCols / poolSize;
+		maxIndices = new int [numChannels][outputRows * outputCols];
 	}
 	
 	// Apply maxPooling on the featureMap
@@ -65,12 +55,12 @@ public class PoolingLayer extends BaseLayer {
 	}
 	
 	public DoubleMatrix[] pooling() {
-		DoubleMatrix[] data = new DoubleMatrix[input.length];
+		DoubleMatrix[] data = new DoubleMatrix[numChannels];
 		double max;
 		int maxIdx = 0;
 		int idx;
 		
-		for (int i = 0 ; i < input.length; i++) {
+		for (int i = 0 ; i < numChannels; i++) {
 			data[i] = new DoubleMatrix(outputRows, outputCols);
 			idx = 0;
 			for (int m = 0; m < outputRows; m++) {
@@ -96,7 +86,7 @@ public class PoolingLayer extends BaseLayer {
 	@Override
 	public DoubleMatrix[] getOutput() {
 		// TODO Auto-generated method stub
-		return activate(pooling());
+		return pooling();
 	}
 	
 	private int getMaxIndex(int size, int outputRowIdx, int outputColIdx) {
@@ -104,15 +94,20 @@ public class PoolingLayer extends BaseLayer {
 		return (size * dimOut) + outputRowIdx * outputCols + outputColIdx; 
 	}
 	
+	@Override
+	public DoubleMatrix[] deriveDelta(DoubleMatrix[] outputDelta) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 
 	@Override
 	public DoubleMatrix[] update(DoubleMatrix[] outputDelta) {
 		// TODO Auto-generated method stub
-		int size = outputDelta.length;
-		DoubleMatrix[] inputDelta = new DoubleMatrix[size];
+		DoubleMatrix[] inputDelta = new DoubleMatrix[numChannels];
 		
-		for (int i = 0; i < size; i++) {
-			inputDelta[i] = new DoubleMatrix(inputRows, inputCols);
+		for (int i = 0; i < numChannels; i++) {
+			inputDelta[i] = new DoubleMatrix(dimRows, dimCols);
 			int idx = 0;
 			for (int m = 0; m < outputRows; m++) {
 				for (int n = 0; n < outputCols; n++) {
@@ -122,4 +117,18 @@ public class PoolingLayer extends BaseLayer {
 		}
 		return inputDelta;
 	}
+
+	@Override
+	public void initWeights() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void applyDropOut() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 }

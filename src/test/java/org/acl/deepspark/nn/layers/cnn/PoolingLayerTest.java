@@ -13,9 +13,11 @@ public class PoolingLayerTest {
 		DoubleMatrix inputMat2 = new DoubleMatrix(input2);
 		DoubleMatrix[] inputMatrices = {inputMat, inputMat2};
 		
+		// pooling layer constructor
 		PoolingLayer poolingLayer = new PoolingLayer(inputMatrices, 2);
 		PoolingLayer poolingLayer2 = new PoolingLayer(inputMatrices, 3);
 		
+		// pooling a single image
 		System.out.println(poolingLayer.pooling(inputMat).toString());
 		System.out.println(poolingLayer.pooling(inputMat2).toString());
 		System.out.println();
@@ -24,6 +26,7 @@ public class PoolingLayerTest {
 		System.out.println(poolingLayer2.pooling(inputMat2).toString());
 		System.out.println();
 		
+		// overall pooling check
 		DoubleMatrix[] result = poolingLayer.pooling();
 		DoubleMatrix[] result2 = poolingLayer2.pooling();
 		
@@ -31,6 +34,35 @@ public class PoolingLayerTest {
 			System.out.println(matrix.toString());
 		for(DoubleMatrix matrix : result2)
 			System.out.println(matrix.toString());
+		
+		// maxIndices check
+		int[][] layer1 = poolingLayer.maxIndices;
+		int[][] layer2 = poolingLayer2.maxIndices;
+		
+		System.out.println("poolingLayer1 maxIdices:");
+		for(int idx : layer1[0])
+			System.out.println(String.valueOf(idx));
+		for(int idx : layer1[1])
+			System.out.println(String.valueOf(idx));
+		System.out.println("poolingLayer2 maxIdices:");
+		for(int idx : layer2[0])
+			System.out.println(String.valueOf(idx));
+		for(int idx : layer2[1])
+			System.out.println(String.valueOf(idx));
+		
+		
+		// update 
+		DoubleMatrix[] update1 = poolingLayer.update(result);
+		System.out.println("poolingLayer1 update check");
+		for(DoubleMatrix matrix : update1)
+			System.out.println(matrix);
+		
+		DoubleMatrix[] update2 = poolingLayer2.update(result2);
+		System.out.println("poolingLayer1 update check");
+		for(DoubleMatrix matrix : update2)
+			System.out.println(matrix);
+		
+		
 	}
 	
 }

@@ -65,5 +65,5 @@ public abstract class BaseLayer {
 	}
 	
 	public abstract DoubleMatrix[] getOutput();
-	public abstract void update(DoubleMatrix[] weights); 
+	public abstract DoubleMatrix[] update(DoubleMatrix[] outputDelta); 
 }

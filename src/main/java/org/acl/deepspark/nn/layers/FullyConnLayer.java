@@ -65,14 +65,12 @@ public class FullyConnLayer extends BaseLayer {
 
 	@Override
 	public void initWeights() {
-		// TODO Auto-generated method stub
 		W = WeightUtil.randInitWeights(dimOut, dimIn);
 	}
 
 	@Override
 	public void applyDropOut() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	

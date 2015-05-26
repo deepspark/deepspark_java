@@ -63,6 +63,9 @@ public class PoolingLayerTest {
 			System.out.println(matrix);
 		
 		
+		
+		// feedforward test complete
+		// update test complete
 	}
 	
 }

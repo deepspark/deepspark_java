@@ -63,6 +63,15 @@ public class ConvolutionLayer extends BaseLayer {
 		return numFilters;
 	}
 	
+	private int getOutputRows() {
+		return  dimRows - filterRows + 1;
+	}
+	
+	private int getOutputCols() {
+		return  dimCols - filterCols + 1;
+	}
+	
+	
 	// convolution for multiple channel input
 	public DoubleMatrix[] convolution() {
 		DoubleMatrix[] data = new DoubleMatrix[numFilters];
@@ -77,11 +86,11 @@ public class ConvolutionLayer extends BaseLayer {
 				filter = new DoubleMatrix(W[i][j].toArray2());
 				
 				//flip for 2d-convolution
-				for(int k = 0; k < filter.rows / 2 ; k++)
+/*				for(int k = 0; k < filter.rows / 2 ; k++)
 					filter.swapRows(k, filter.rows - 1 - k);
 				for(int k = 0; k < filter.columns / 2 ; k++)
 					filter.swapColumns(k, filter.columns - 1 - k);
-				
+*/				
 				temp.fill(0.0);
 				// calculate convolutions
 				for(int r = 0; r < temp.rows; r++) {
@@ -170,7 +179,7 @@ public class ConvolutionLayer extends BaseLayer {
 						conv = 0;
 						for (int m = 0; m < filterRows; m++) {
 							for (int n = 0; n < filterCols; n++) {
-								if (r-m < 0 || c-n < 0)
+								if (r-m < 0 || r-m >= getOutputRows() || c-n < 0 || c-n >= getOutputCols())
 									continue;
 								conv += outputDelta[i].get(r-m, c-n) * filter.get(m,n);
 							}

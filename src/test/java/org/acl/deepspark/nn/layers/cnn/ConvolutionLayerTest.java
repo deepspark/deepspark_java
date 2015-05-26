@@ -4,22 +4,14 @@ import org.jblas.DoubleMatrix;
 
 
 public class ConvolutionLayerTest {
+	
+	// FeedForward Test
 	public static void main(String[] args) {
 		double[][] a = {{1,3,5,7,9,11}, {13,11,9,7,5,3}, {10,6,8,4,2,1}, {9,7,5,3,1,3}, {14,12,10,8,6,4}, {16,14,7,9,8,3}};
 		double[][] b = {{1,2,4,3,-1,0}, {2,4,3,5,7,-3}, {-2,1,-4,2,0,-3}, {0,-1,-2,2,3,-4}, {1,2,-3,-2,1,-1}, {3,2,1,-1,-2,3}};
-		double[][] c = {{1,3,5,7,9,11}, {13,11,9,7,5,3}, {10,6,8,4,2,1}, {9,7,5,3,1,3}, {14,12,10,8,6,4}, {16,14,7,9,8,3}};
-		double[][] d = {{1,2,4,3,-1,0}, {2,4,3,5,7,-3}, {-2,1,-4,2,0,-3}, {0,-1,-2,2,3,-4}, {1,2,-3,-2,1,-1}, {3,2,1,-1,-2,3}};
-		
-		double[][] filter1_1 = {{1,2,1}, {0,0,0}, {-1,-2,-1}};
-		double[][] filter1_2 = {{-1,-2,3}, {-2,-1,0}, {0,1,-1}};
-		double[][] filter1_3 = {{-1,-2,3}, {-2,-1,0}, {0,1,-1}};
-		double[][] filter1_4 = {{-1,-2,3}, {-2,-1,0}, {0,1,-1}};
-		
-		double[][] filter2_1 = {{1,2,1}, {0,0,0}, {-1,-2,-1}};
-		double[][] filter2_2 = {{-1,-2,3}, {-2,-1,0}, {0,1,-1}};
-		double[][] filter2_3 = {{-1,-2,3}, {-2,-1,0}, {0,1,-1}};
-		double[][] filter2_4 = {{-1,-2,3}, {-2,-1,0}, {0,1,-1}};
-		
+		double[][] c = {{2,3,5,7,9,6}, {1,11,3,7,5,3}, {10,6,4,4,2,1}, {9,7,6,3,1,3}, {8,12,10,8,1,4}, {16,2,7,9,8,3}};
+		double[][] d = {{0,2,4,3,-1,0}, {2,2,3,5,7,-3}, {-2,1,-4,3,0,-3}, {0,-1,-2,2,3,-4}, {4,2,-3,-2,1,-1}, {3,2,4,-1,-2,3}};
+
 		DoubleMatrix input1 = new DoubleMatrix(a);
 		DoubleMatrix input2 = new DoubleMatrix(b);
 		DoubleMatrix input3 = new DoubleMatrix(c);
@@ -44,5 +36,13 @@ public class ConvolutionLayerTest {
 		for (DoubleMatrix matrix : result) {
 			System.out.println(matrix.toString());
 		}
+		
+		DoubleMatrix[] inputDelta = convLayer.update(result); 
+		System.out.println("Derive inputDelta");
+		for (DoubleMatrix matrix : inputDelta) {
+			System.out.println(matrix.toString());
+		}
+		
+		// feedforward test complete
 	}
 }

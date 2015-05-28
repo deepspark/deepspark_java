@@ -30,6 +30,11 @@ public abstract class BaseLayer {
 		this.learningRate = 1.0;
 	}
 	
+	public void setInput(DoubleMatrix[] input) {
+		this.input = input;
+	}
+	
+	
 	public BaseLayer(DoubleMatrix[] input) {
 		this.input = input;
 

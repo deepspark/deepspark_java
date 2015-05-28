@@ -33,7 +33,7 @@ public class FullyConnLayer extends BaseLayer {
 			DoubleMatrix[] output = new DoubleMatrix[1];
 			output[0] = W.mmul(WeightUtil.flat2Vec(input));
 			output[0].add(bias);
-			return output;
+			return activate(output);
 		}
 		return null;
 	}

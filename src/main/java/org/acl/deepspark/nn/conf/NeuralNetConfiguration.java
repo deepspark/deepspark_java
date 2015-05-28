@@ -1,23 +1,29 @@
-/*
- * Copyright 2015 Skymind,Inc.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.acl.deepspark.nn.conf;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.acl.deepspark.nn.layers.BaseLayer;
+import org.jblas.DoubleMatrix;
 
 
 public class NeuralNetConfiguration {
-
-
+	private List<BaseLayer> layerList;
+	private int numLayer;
+	private List<DoubleMatrix[]> outputList;
+	private List<DoubleMatrix[]> deltaList;
+	private double learningRate;
+	
+	public NeuralNetConfiguration(double learningRate) {
+		this.learningRate = learningRate;
+		layerList = new ArrayList<BaseLayer>();
+		numLayer = 0;
+	}
+	
+	public void addLayer(BaseLayer l) {
+		layerList.add(l);
+		numLayer++;
+	}
+	
+	
 }

@@ -12,14 +12,16 @@ import org.jblas.DoubleMatrix;
 public class NeuralNetConfiguration {
 	private List<BaseLayer> layerList;
 	
+	/*
 	private List<DoubleMatrix[]> outputList;
 	private List<DoubleMatrix[]> deltaList;
 	private double learningRate;
 	private double momentum;
+	*/
 	
 	public NeuralNetConfiguration(double learningRate, double momentum) {
-		this.learningRate = learningRate;
-		this.momentum = momentum;
+		// this.learningRate = learningRate;
+		// this.momentum = momentum;
 		layerList = new ArrayList<BaseLayer>();
 	}
 	
@@ -32,8 +34,8 @@ public class NeuralNetConfiguration {
 	}
 	
 	public void training(DoubleMatrix[] data, DoubleMatrix[] label) {
-		outputList = new ArrayList<DoubleMatrix[]>();
-		deltaList = new ArrayList<DoubleMatrix[]>();
+		// outputList = new ArrayList<DoubleMatrix[]>();
+		// deltaList = new ArrayList<DoubleMatrix[]>();
 		
 		//feed forward
 		DoubleMatrix[] f = getOutput(data);

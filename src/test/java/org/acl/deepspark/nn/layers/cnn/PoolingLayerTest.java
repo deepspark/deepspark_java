@@ -64,8 +64,8 @@ public class PoolingLayerTest {
 		
 		
 		
-		// feedforward test complete
-		// update test complete
+		/*** feedforward test complete ***/
+		/*** update test complete ***/
 	}
 	
 }

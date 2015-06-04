@@ -43,6 +43,6 @@ public class ConvolutionLayerTest {
 			System.out.println(matrix.toString());
 		}
 		
-		// feedforward test complete
+		/** feedforward test complete **/
 	}
 }

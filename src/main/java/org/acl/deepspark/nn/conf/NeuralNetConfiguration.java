@@ -53,7 +53,6 @@ public class NeuralNetConfiguration {
 			
 			delta = a.update(delta);
 		}
-			
 	}
 	
 	public DoubleMatrix[] getOutput(DoubleMatrix[] data) {

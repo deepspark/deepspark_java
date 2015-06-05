@@ -32,6 +32,12 @@ public abstract class BaseLayer {
 	
 	public void setInput(DoubleMatrix[] input) {
 		this.input = input;
+		
+		this.dimRows = input[0].rows;
+		this.dimCols = input[0].columns;
+		this.numChannels = input.length;
+		this.dimIn = dimRows * dimCols * numChannels;
+		this.learningRate = 1.0;
 	}
 	
 	

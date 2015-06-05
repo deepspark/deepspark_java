@@ -1,6 +1,7 @@
 package org.acl.deepspark.nn.layers.cnn;
 
 import org.acl.deepspark.nn.layers.FullyConnLayer;
+import org.acl.deepspark.nn.weights.WeightUtil;
 import org.jblas.DoubleMatrix;
 
 public class FullyConnLayerTest {
@@ -16,15 +17,25 @@ public class FullyConnLayerTest {
 		DoubleMatrix input4 = new DoubleMatrix(d);
 		DoubleMatrix[] inputArr = {input1, input2, input3, input4};
 		
-		FullyConnLayer fullyConnLayer = new FullyConnLayer(inputArr, 10);
+		FullyConnLayer fullyConnLayer = new FullyConnLayer(inputArr, 10);		
+		System.out.println(WeightUtil.flat2Vec(inputArr));
+		
+		System.out.println(fullyConnLayer.getWeight());
+		
 		
 		DoubleMatrix[] output = fullyConnLayer.getOutput();
 		for(DoubleMatrix matrix : output)
 			System.out.println(matrix);
 		
-		
+		System.out.println(input1);
 		DoubleMatrix[] inputDelta = fullyConnLayer.update(output);
 		for(DoubleMatrix matrix : inputDelta)
 			System.out.println(matrix);
+		
+		
+		System.out.println((input1.mul(input1.mul(-1.0).add(1.0))));
+		
+		/** FullyConn feedforward complete **/
+		
 	}
 }

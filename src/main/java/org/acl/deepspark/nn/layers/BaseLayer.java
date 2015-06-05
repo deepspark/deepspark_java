@@ -87,12 +87,11 @@ public abstract class BaseLayer {
 		return Activator.sigmoid(matrix);
 	}
 		
-	public DoubleMatrix[] activate(DoubleMatrix[] matrix) {
-		int size = matrix.length;
-		for (int i = 0; i < size; i++) {
-			matrix[i] = activate(matrix[i]);
+	public DoubleMatrix[] activate(DoubleMatrix[] matrices) {
+		for (DoubleMatrix matrix : matrices) {
+			matrix = activate(matrix);
 		}
-		return matrix;
+		return matrices;
 	}
 	
 	public abstract void initWeights(); 

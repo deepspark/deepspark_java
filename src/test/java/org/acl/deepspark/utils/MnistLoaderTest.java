@@ -24,5 +24,7 @@ public class MnistLoaderTest {
 		
 		for(int i = 0 ; i < 5;i++)
 			System.out.println(mnist_test_label[i]);
+		
+		
 	}
 }

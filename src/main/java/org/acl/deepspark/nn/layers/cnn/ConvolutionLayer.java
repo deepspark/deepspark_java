@@ -15,6 +15,17 @@ public class ConvolutionLayer extends BaseLayer {
 	private int zeroPadding = 0;
 	private boolean useZeroPadding = true;
 
+	
+	/** Modified **/
+	public ConvolutionLayer(int filterRows, int filterCols, int numFilters) {
+		super();
+		this.filterRows = filterRows;
+		this.filterCols = filterCols;
+		this.numFilters = numFilters;
+		
+		//initWeights();
+	}
+	
 	public ConvolutionLayer(DoubleMatrix input, int filterRows, int filterCols, int numFilters) {
 		super(input);
 		this.filterRows = filterRows;
@@ -51,7 +62,7 @@ public class ConvolutionLayer extends BaseLayer {
 			for(int j = 0; j < numChannels; j++) {
 				W[i][j] = WeightUtil.randInitWeights(filterRows, filterCols);
 			}
-			bias[i] = 0;
+			bias[i] = 0.1;
 		}
 	}
 
@@ -79,7 +90,11 @@ public class ConvolutionLayer extends BaseLayer {
 		DoubleMatrix temp = new DoubleMatrix(dimRows-filterRows+1, dimCols-filterCols+1);
 		
 		// check: dims(image) > dims(filter)
-
+		/** Modified **/
+		if(W == null)
+			initWeights();
+		
+		
 		for(int i = 0; i < numFilters; i++) {
 			data[i] = new DoubleMatrix(dimRows - filterRows + 1, dimCols - filterCols + 1);
 			for(int j = 0; j < numChannels; j++) {
@@ -104,7 +119,7 @@ public class ConvolutionLayer extends BaseLayer {
 			}
 			data[i].addi(bias[i]);
 		}
-		return data;
+		return activate(data);
 	}
 	
 	/*
@@ -150,7 +165,7 @@ public class ConvolutionLayer extends BaseLayer {
 										   	  RangeUtils.interval(c, c + outputDelta[i].columns)), outputDelta[i]));
 					}
 				}
-				W[i][j].addi(deltaWeight);
+				W[i][j].subi(deltaWeight.mul(learningRate));
 			}
 		}
 		// return inputLayer delta

@@ -18,22 +18,26 @@ public class FullyConnLayerTest {
 		DoubleMatrix[] inputArr = {input1, input2, input3, input4};
 		
 		FullyConnLayer fullyConnLayer = new FullyConnLayer(inputArr, 10);		
+		System.out.println("FullyConn input flat vector");
 		System.out.println(WeightUtil.flat2Vec(inputArr));
 		
+		// FullyConn weight
+		System.out.println("FullyConn Weight");
 		System.out.println(fullyConnLayer.getWeight());
 		
-		
+		// FullyConn feedforward
+		System.out.println("FullyConn feedforward");
 		DoubleMatrix[] output = fullyConnLayer.getOutput();
 		for(DoubleMatrix matrix : output)
 			System.out.println(matrix);
 		
-		System.out.println(input1);
+		System.out.println("FullyConn weight update");
 		DoubleMatrix[] inputDelta = fullyConnLayer.update(output);
 		for(DoubleMatrix matrix : inputDelta)
 			System.out.println(matrix);
 		
 		
-		System.out.println((input1.mul(input1.mul(-1.0).add(1.0))));
+		
 		
 		/** FullyConn feedforward complete **/
 		

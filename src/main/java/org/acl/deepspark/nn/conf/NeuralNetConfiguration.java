@@ -19,10 +19,13 @@ public class NeuralNetConfiguration {
 	private double momentum;
 	*/
 	
-	public NeuralNetConfiguration(double learningRate, double momentum) {
+	private int epoch;
+	
+	public NeuralNetConfiguration(int epoch) {
 		// this.learningRate = learningRate;
 		// this.momentum = momentum;
 		layerList = new ArrayList<BaseLayer>();
+		this.epoch = epoch;
 	}
 	
 	public void addLayer(BaseLayer l) {
@@ -38,33 +41,41 @@ public class NeuralNetConfiguration {
 		// deltaList = new ArrayList<DoubleMatrix[]>();
 		
 		//feed forward
-		DoubleMatrix[] f = getOutput(data);
-		DoubleMatrix[] delta = new DoubleMatrix[1];
+		DoubleMatrix[] f;
+		final DoubleMatrix[] sample = new DoubleMatrix[1];
+		sample[0] = data[0];
 		
-		delta[0] = f[0].sub(label[0]);
-		
-		backpropagate(delta);
-	}
-	
-	public void backpropagate(DoubleMatrix[] delta) {
-		ListIterator<BaseLayer> it = layerList.listIterator(getNumberOfLayers());
-		while(it.hasPrevious()) {
-			BaseLayer a = it.previous();
-			
-			delta = a.update(delta);
+		for(int i = 0 ; i < epoch ; i++) {
+			System.out.println("epoch " + String.valueOf(i));
+			f = getOutput(sample);
+			DoubleMatrix[] delta = new DoubleMatrix[1];
+			delta[0] = f[0].sub(label[0]);
+			backpropagate(delta);
 		}
 	}
 	
+	public void backpropagate(DoubleMatrix[] delta) {
+		System.out.println("backprop start");
+		ListIterator<BaseLayer> it = layerList.listIterator(getNumberOfLayers());
+		while(it.hasPrevious()) {
+			BaseLayer a = it.previous();
+			delta = a.update(delta);
+		}
+		System.out.println("backprop end");
+	}
+	
 	public DoubleMatrix[] getOutput(DoubleMatrix[] data) {
+		System.out.println("feedforward start");
 		Iterator<BaseLayer> itLayer = layerList.iterator();
 		DoubleMatrix[] output = data;
 		
 		//feed-forward
-		while(itLayer.hasNext()) {
+		while (itLayer.hasNext()) {
 			BaseLayer l = itLayer.next();
 			l.setInput(output);
 			output = l.getOutput();
 		}
+		System.out.println("feedforward end");
 		return output;
 	}
 }

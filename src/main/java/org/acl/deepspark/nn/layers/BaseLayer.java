@@ -11,7 +11,7 @@ public abstract class BaseLayer {
 	protected int dimIn;
 	protected int dimOut;
 	
-	protected double learningRate;
+	protected double learningRate = 0.0001;
 	protected DoubleMatrix[] input;
 	
 	public double dropOutRate;
@@ -19,7 +19,23 @@ public abstract class BaseLayer {
 	
 	public BaseLayer() { }
 	
+	public BaseLayer(int dimRows, int dimCols, int numChannels, int dimIn, double learningRate) {
+		
+	}
+	
 	public BaseLayer(DoubleMatrix input) {
+		this.input = new DoubleMatrix[1];
+		this.input[0] = input;
+		
+		this.dimRows = input.rows;
+		this.dimCols = input.columns;
+		this.numChannels = 1;
+		this.dimIn = dimRows * dimCols * numChannels;
+		this.learningRate = 1.0;
+		
+	}
+	
+	public void setInput(DoubleMatrix input) {
 		this.input = new DoubleMatrix[1];
 		this.input[0] = input;
 		

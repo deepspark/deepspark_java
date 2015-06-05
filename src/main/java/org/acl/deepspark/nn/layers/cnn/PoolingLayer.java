@@ -11,6 +11,13 @@ public class PoolingLayer extends BaseLayer {
 	public int[][] maxIndices;
 	private int poolSize;
 	
+	
+	/** Modified **/
+	public PoolingLayer(int poolSize) {
+		super();
+		this.poolSize = poolSize;
+	}
+	
 	public PoolingLayer(DoubleMatrix input, int poolSize) {
 		super(input);
 		this.poolSize = poolSize;
@@ -59,6 +66,13 @@ public class PoolingLayer extends BaseLayer {
 		double max;
 		int maxIdx = 0;
 		int idx;
+		
+		
+		/** Modified **/
+		int outputRows = dimRows / poolSize;
+		int outputCols = dimCols / poolSize;
+		if(maxIndices == null)
+			maxIndices = new int [numChannels][outputRows * outputCols];
 		
 		for (int i = 0 ; i < numChannels; i++) {
 			data[i] = new DoubleMatrix(outputRows, outputCols);

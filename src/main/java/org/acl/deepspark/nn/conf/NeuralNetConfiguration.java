@@ -7,10 +7,12 @@ import java.util.ListIterator;
 
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.jblas.DoubleMatrix;
+import org.jblas.util.Random;
 
 
 public class NeuralNetConfiguration {
 	private List<BaseLayer> layerList;
+	private int size;
 	
 	/*
 	private List<DoubleMatrix[]> outputList;
@@ -42,30 +44,35 @@ public class NeuralNetConfiguration {
 		
 		//feed forward
 		DoubleMatrix[] f;
+		this.size = data.length;
 		final DoubleMatrix[] sample = new DoubleMatrix[1];
-		sample[0] = data[0];
 		
+		int j = 0;
 		for(int i = 0 ; i < epoch ; i++) {
+			j = Random.nextInt(size);
+			sample[0] = data[j];
+			//System.out.println(String.valueOf(j));
 			System.out.println("epoch " + String.valueOf(i));
 			f = getOutput(sample);
 			DoubleMatrix[] delta = new DoubleMatrix[1];
-			delta[0] = f[0].sub(label[0]);
+			//System.out.println(String.valueOf(j));
+			delta[0] = f[0].sub(label[j]);
 			backpropagate(delta);
 		}
 	}
 	
 	public void backpropagate(DoubleMatrix[] delta) {
-		System.out.println("backprop start");
+	//	System.out.println("backprop start");
 		ListIterator<BaseLayer> it = layerList.listIterator(getNumberOfLayers());
 		while(it.hasPrevious()) {
 			BaseLayer a = it.previous();
 			delta = a.update(delta);
 		}
-		System.out.println("backprop end");
+	//	System.out.println("backprop end");
 	}
 	
 	public DoubleMatrix[] getOutput(DoubleMatrix[] data) {
-		System.out.println("feedforward start");
+		//System.out.println("feedforward start");
 		Iterator<BaseLayer> itLayer = layerList.iterator();
 		DoubleMatrix[] output = data;
 		
@@ -75,7 +82,7 @@ public class NeuralNetConfiguration {
 			l.setInput(output);
 			output = l.getOutput();
 		}
-		System.out.println("feedforward end");
+		//System.out.println("feedforward end");
 		return output;
 	}
 }

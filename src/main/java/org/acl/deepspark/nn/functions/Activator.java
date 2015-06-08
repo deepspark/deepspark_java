@@ -9,7 +9,7 @@ public class Activator {
 	
 	public static double sigmoid(double x) {
 		double temp = Math.exp(-x);
-		return (1 - temp) / (1 + temp);
+		return 1 / (1 + temp);
 	}
 	
 	public static DoubleMatrix sigmoid(DoubleMatrix matrix) {

@@ -36,17 +36,14 @@ public class FullyConnLayer extends BaseLayer {
 	// output: dimOut x 1 column Vector
 	@Override
 	public DoubleMatrix[] getOutput() {
-		DoubleMatrix[] preActivation = new DoubleMatrix[1];
-		
 		/** Modified **/
 		if(W == null)
 			initWeights();
 		
-		
-		preActivation[0] = W.mmul(WeightUtil.flat2Vec(input));
-		preActivation[0].add(bias);
-		output = activate(preActivation[0]);
-		return preActivation;
+		output = activate(W.mmul(WeightUtil.flat2Vec(input)).add(bias));
+
+		DoubleMatrix[] postActivation = { output };
+		return postActivation;
 	}
 	
 	@Override
@@ -82,7 +79,7 @@ public class FullyConnLayer extends BaseLayer {
 	@Override
 	public void initWeights() {
 		W = WeightUtil.randInitWeights(dimOut, dimIn);
-		bias = 0.1;
+		bias = 0.01;
 	}
 
 	@Override

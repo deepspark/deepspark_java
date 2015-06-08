@@ -17,7 +17,7 @@ public class ConvolutionLayerTest {
 		DoubleMatrix input3 = new DoubleMatrix(c);
 		DoubleMatrix input4 = new DoubleMatrix(d);
 		DoubleMatrix[] inputArr = {input1, input2, input3, input4};
-		
+				
 //		DoubleMatrix filter = new DoubleMatrix(d);
 //		DoubleMatrix filter2 = new DoubleMatrix(e);
 //		DoubleMatrix[] filterArr = {filter, filter2};
@@ -37,12 +37,36 @@ public class ConvolutionLayerTest {
 			System.out.println(matrix.toString());
 		}
 		
-		DoubleMatrix[] inputDelta = convLayer.update(result); 
-		System.out.println("Derive inputDelta");
-		for (DoubleMatrix matrix : inputDelta) {
-			System.out.println(matrix.toString());
+		
+		double[][] filterArr = {{2,3,5}, {1,11,3}, {10,6,4}};
+		DoubleMatrix filter = new DoubleMatrix(filterArr);
+		int dimRows = 8;
+		int dimCols = 8;
+		DoubleMatrix temp = new DoubleMatrix(dimRows, dimCols);
+		
+		
+		System.out.println(filter);
+		
+		temp.fill(0.0);
+		double conv = 0;
+		// calculate convolution
+		for (int r = 0; r < dimRows; r++) {
+			for (int cc = 0; cc < dimCols ; cc++) {
+				conv = 0;
+				for (int m = 0; m < 3; m++) {
+					for (int n = 0; n < 3; n++) {
+						if (r-m < 0 || r-m >= 6 || cc-n < 0 || cc-n >= 6)
+							continue;
+						conv += input1.get(r-m, cc-n) * filter.get(m,n);
+					}
+				}
+				temp.put(r, cc, conv);
+			}
 		}
+		System.out.println("derive Delta Result");
+		System.out.println(temp);
+	}
 		
 		/** feedforward test complete **/
-	}
+	
 }

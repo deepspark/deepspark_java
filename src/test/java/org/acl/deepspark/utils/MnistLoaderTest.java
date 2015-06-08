@@ -26,5 +26,6 @@ public class MnistLoaderTest {
 			System.out.println(mnist_test_label[i]);
 		
 		
+		/** MnistLoader Test Complete **/
 	}
 }

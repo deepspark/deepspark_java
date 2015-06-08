@@ -7,13 +7,11 @@ import org.jblas.DoubleMatrix;
 public class FullyConnLayer extends BaseLayer {
 	private DoubleMatrix W;
 	private DoubleMatrix output;
-	private double bias;
+	private double bias = 0.01;
 
-	/** Modified **/
 	public FullyConnLayer(int nOut) {
 		this.dimOut = nOut;
 	}
-	
 	
 	public FullyConnLayer(DoubleMatrix input, int nOut) {
 		super(input, nOut);
@@ -33,15 +31,10 @@ public class FullyConnLayer extends BaseLayer {
 		return W;
 	}
 	
-	// output: dimOut x 1 column Vector
 	@Override
 	public DoubleMatrix[] getOutput() {
-		/** Modified **/
-		if(W == null)
-			initWeights();
-		
+		// output: dimOut x 1 column Vector
 		output = activate(W.mmul(WeightUtil.flat2Vec(input)).add(bias));
-
 		DoubleMatrix[] postActivation = { output };
 		return postActivation;
 	}
@@ -65,21 +58,21 @@ public class FullyConnLayer extends BaseLayer {
 
 	@Override
 	public DoubleMatrix[] update(DoubleMatrix[] propDelta) {
-		DoubleMatrix delta = propDelta[0].mul(output.mul(output.mul(-1.0).add(1.0)));
-		DoubleMatrix deltaW = delta.mmul(WeightUtil.flat2Vec(input).transpose());
-		
+		propDelta[0].muli(output.mul(output.mul(-1.0).add(1.0)));
+		DoubleMatrix deltaW = propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose());
+		bias -= propDelta[0].sum();
 		// weight update
 		W.subi(deltaW.mul(learningRate));
 		
-		// propagate delta
-		DoubleMatrix[] deltas = {delta};
-		return deriveDelta(deltas);
+		// propagate delta to the previous layer
+		return deriveDelta(propDelta);
 	}
 
 	@Override
 	public void initWeights() {
-		W = WeightUtil.randInitWeights(dimOut, dimIn);
-		bias = 0.01;
+		if (W == null) {
+			W = WeightUtil.randInitWeights(dimOut, dimIn);
+		}
 	}
 
 	@Override

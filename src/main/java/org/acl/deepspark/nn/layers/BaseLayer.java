@@ -11,17 +11,14 @@ public abstract class BaseLayer {
 	protected int dimIn;
 	protected int dimOut;
 	
-	protected double learningRate = 0.01;
+	protected double learningRate = 0.1;
 	protected DoubleMatrix[] input;
+	protected DoubleMatrix[] output;
 	
 	public double dropOutRate;
 	private int activationMethod = Activator.SIGMOID;
 	
 	public BaseLayer() { }
-	
-	public BaseLayer(int dimRows, int dimCols, int numChannels, int dimIn, double learningRate) {
-		
-	}
 	
 	public BaseLayer(DoubleMatrix input) {
 		this.input = new DoubleMatrix[1];
@@ -31,8 +28,6 @@ public abstract class BaseLayer {
 		this.dimCols = input.columns;
 		this.numChannels = 1;
 		this.dimIn = dimRows * dimCols * numChannels;
-		this.learningRate = 0.1;
-		
 	}
 	
 	public void setInput(DoubleMatrix input) {
@@ -43,7 +38,17 @@ public abstract class BaseLayer {
 		this.dimCols = input.columns;
 		this.numChannels = 1;
 		this.dimIn = dimRows * dimCols * numChannels;
-		this.learningRate = 0.1;
+		
+		initWeights();
+	}
+	
+	public BaseLayer(DoubleMatrix[] input) {
+		this.input = input;
+
+		this.dimRows = input[0].rows;
+		this.dimCols = input[0].columns;
+		this.numChannels = input.length;
+		this.dimIn = dimRows * dimCols * numChannels;
 	}
 	
 	public void setInput(DoubleMatrix[] input) {
@@ -53,18 +58,8 @@ public abstract class BaseLayer {
 		this.dimCols = input[0].columns;
 		this.numChannels = input.length;
 		this.dimIn = dimRows * dimCols * numChannels;
-		this.learningRate = 0.1;
-	}
-	
-	
-	public BaseLayer(DoubleMatrix[] input) {
-		this.input = input;
-
-		this.dimRows = input[0].rows;
-		this.dimCols = input[0].columns;
-		this.numChannels = input.length;
-		this.dimIn = dimRows * dimCols * numChannels;
-		this.learningRate = 1.0;
+		
+		initWeights();
 	}
 	
 	public BaseLayer(DoubleMatrix input, int dimOut) {
@@ -76,37 +71,26 @@ public abstract class BaseLayer {
 		this(input);
 		this.dimOut = dimOut;
 	}
-		
-	public BaseLayer(int dimRows, int dimCols, int numChannels, int dimOut) {
-		this.dimRows = dimRows;
-		this.dimCols = dimCols;
-		this.numChannels = numChannels;
-		this.dimIn = dimRows * dimCols * numChannels;
-		this.dimOut = dimOut;
-		this.learningRate = 1.0;
-	}
-	
+
 	// Apply activation
 	public DoubleMatrix activate(DoubleMatrix matrix) {
-		if(matrix == null)
-			return null;
+		DoubleMatrix activated = null;
 		switch(activationMethod) {
 		case Activator.SIGMOID:
-			return Activator.sigmoid(matrix);
+			activated = Activator.sigmoid(matrix);
 			
 		case Activator.TANH:
-			return Activator.tanh(matrix);
+			activated = Activator.tanh(matrix);
 			
 		case Activator.RELU:
-			return Activator.relu(matrix);
+			activated = Activator.relu(matrix);
 		}
-		return Activator.sigmoid(matrix);
+		return activated;
 	}
 		
 	public DoubleMatrix[] activate(DoubleMatrix[] matrices) {
-		for (DoubleMatrix matrix : matrices) {
+		for (DoubleMatrix matrix : matrices)
 			matrix = activate(matrix);
-		}
 		return matrices;
 	}
 	

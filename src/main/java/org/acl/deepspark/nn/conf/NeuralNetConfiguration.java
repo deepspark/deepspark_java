@@ -11,21 +11,13 @@ import org.jblas.util.Random;
 
 
 public class NeuralNetConfiguration {
-	private List<BaseLayer> layerList;
-	private int size;
-	
-	/*
-	private List<DoubleMatrix[]> outputList;
-	private List<DoubleMatrix[]> deltaList;
-	private double learningRate;
-	private double momentum;
-	*/
-	
+	private double learningRate;	
 	private int epoch;
+	private double momentum;
 	
-	public NeuralNetConfiguration(int epoch) {
-		// this.learningRate = learningRate;
-		// this.momentum = momentum;
+	private List<BaseLayer> layerList;
+	
+	public NeuralNetConfiguration(double learningRate, int epoch) {
 		layerList = new ArrayList<BaseLayer>();
 		this.epoch = epoch;
 	}
@@ -39,50 +31,66 @@ public class NeuralNetConfiguration {
 	}
 	
 	public void training(DoubleMatrix[] data, DoubleMatrix[] label) {
-		// outputList = new ArrayList<DoubleMatrix[]>();
-		// deltaList = new ArrayList<DoubleMatrix[]>();
+		if (data.length != label.length) {
+			System.err.println("Mismatch of the number of data and labels");
+			return;
+		}
 		
-		//feed forward
-		DoubleMatrix[] f;
-		this.size = data.length;
-		final DoubleMatrix[] sample = new DoubleMatrix[1];
+		final DoubleMatrix[] delta = new DoubleMatrix[1];
+		final DoubleMatrix[] sample = new DoubleMatrix[1]; 
+		int size = data.length;
 		
-		int j = 0;
+		int sampleIdx;
 		for(int i = 0 ; i < epoch ; i++) {
-			j = Random.nextInt(size);
-			sample[0] = data[j];
-			//System.out.println(String.valueOf(j));
-			System.out.println("epoch " + String.valueOf(i));
-			f = getOutput(sample);
-			DoubleMatrix[] delta = new DoubleMatrix[1];
-			//System.out.println(String.valueOf(j));
-			delta[0] = f[0].sub(label[j]);
+			sampleIdx = Random.nextInt(size);
+			//System.out.println("epoch " + String.valueOf(i));
+			sample[0] = data[sampleIdx];
+			delta[0] = getOutput(sample)[0].sub(label[sampleIdx]);
 			backpropagate(delta);
 		}
 	}
 	
 	public void backpropagate(DoubleMatrix[] delta) {
-	//	System.out.println("backprop start");
 		ListIterator<BaseLayer> it = layerList.listIterator(getNumberOfLayers());
+		// Back-propagation
 		while(it.hasPrevious()) {
 			BaseLayer a = it.previous();
 			delta = a.update(delta);
 		}
-	//	System.out.println("backprop end");
 	}
 	
 	public DoubleMatrix[] getOutput(DoubleMatrix[] data) {
-		//System.out.println("feedforward start");
 		Iterator<BaseLayer> itLayer = layerList.iterator();
 		DoubleMatrix[] output = data;
 		
-		//feed-forward
+		// Feed-forward
 		while (itLayer.hasNext()) {
 			BaseLayer l = itLayer.next();
 			l.setInput(output);
 			output = l.getOutput();
 		}
-		//System.out.println("feedforward end");
 		return output;
+	}
+	
+	public static class Builder {
+		private double learningRate;	
+		private int epoch;
+		private double momentum;
+		
+		public void learningRate(double learningRates) {
+			this.learningRate = learningRates;
+		}
+		
+		public void epoch(int epoch) {
+			this.epoch = epoch;
+		}
+		
+		public void momentum(double momentum) {
+			this.momentum = momentum;
+		}
+		
+		public void addLayer(BaseLayer l) {
+			
+		}
 	}
 }

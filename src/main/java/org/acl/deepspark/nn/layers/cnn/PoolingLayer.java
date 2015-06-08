@@ -67,13 +67,6 @@ public class PoolingLayer extends BaseLayer {
 		int maxIdx = 0;
 		int idx;
 		
-		
-		/** Modified **/
-		int outputRows = dimRows / poolSize;
-		int outputCols = dimCols / poolSize;
-		if(maxIndices == null)
-			maxIndices = new int [numChannels][outputRows * outputCols];
-		
 		for (int i = 0 ; i < numChannels; i++) {
 			data[i] = new DoubleMatrix(outputRows, outputCols);
 			idx = 0;
@@ -103,10 +96,6 @@ public class PoolingLayer extends BaseLayer {
 		return pooling();
 	}
 	
-	private int getMaxIndex(int size, int outputRowIdx, int outputColIdx) {
-		int dimOut = outputRowIdx * outputColIdx;
-		return (size * dimOut) + outputRowIdx * outputCols + outputColIdx; 
-	}
 	
 	@Override
 	public DoubleMatrix[] deriveDelta(DoubleMatrix[] outputDelta) {
@@ -116,7 +105,7 @@ public class PoolingLayer extends BaseLayer {
 	
 
 	@Override
-	public DoubleMatrix[] update(DoubleMatrix[] outputDelta) {
+	public DoubleMatrix[] update(DoubleMatrix[] propDelta) {
 		// TODO Auto-generated method stub
 		DoubleMatrix[] inputDelta = new DoubleMatrix[numChannels];
 		
@@ -125,7 +114,7 @@ public class PoolingLayer extends BaseLayer {
 			int idx = 0;
 			for (int m = 0; m < outputRows; m++) {
 				for (int n = 0; n < outputCols; n++) {
-					inputDelta[i].put(maxIndices[i][idx++], outputDelta[i].get(m,n));
+					inputDelta[i].put(maxIndices[i][idx++], propDelta[i].get(m,n));
 				}
 			}
 		}
@@ -134,8 +123,11 @@ public class PoolingLayer extends BaseLayer {
 
 	@Override
 	public void initWeights() {
-		// TODO Auto-generated method stub
-		
+		if (maxIndices == null) {
+			outputRows = dimRows / poolSize;
+			outputCols = dimCols / poolSize;
+			maxIndices = new int [numChannels][outputRows * outputCols];
+		}
 	}
 
 	@Override

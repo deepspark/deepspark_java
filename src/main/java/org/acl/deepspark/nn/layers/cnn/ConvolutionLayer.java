@@ -10,21 +10,16 @@ public class ConvolutionLayer extends BaseLayer {
 	private int filterRows, filterCols, numFilters; // filter spec.
 	private DoubleMatrix[][] W; // filterId, x, y
 	private double[] bias;
-	private DoubleMatrix[] output;
 		
 	private int[] stride = {1, 1};
 	private int zeroPadding = 0;
 	private boolean useZeroPadding = true;
 
-	
-	/** Modified **/
 	public ConvolutionLayer(int filterRows, int filterCols, int numFilters) {
 		super();
 		this.filterRows = filterRows;
 		this.filterCols = filterCols;
 		this.numFilters = numFilters;
-		
-		//initWeights();
 	}
 	
 	public ConvolutionLayer(DoubleMatrix input, int filterRows, int filterCols, int numFilters) {
@@ -32,7 +27,6 @@ public class ConvolutionLayer extends BaseLayer {
 		this.filterRows = filterRows;
 		this.filterCols = filterCols;
 		this.numFilters = numFilters;
-		
 		initWeights();
 	}
 	
@@ -41,10 +35,8 @@ public class ConvolutionLayer extends BaseLayer {
 		this.filterRows = filterRows;
 		this.filterCols = filterCols;
 		this.numFilters = numFilters;
-		
 		initWeights();
 	}
-	
 	
 	public void setFilterWeights(DoubleMatrix[][] filters) {
 		W = filters;
@@ -56,14 +48,16 @@ public class ConvolutionLayer extends BaseLayer {
 	
 	@Override
 	public void initWeights() {
-		W = new DoubleMatrix[numFilters][numChannels];
-		bias = new double[numFilters];
-		
-		for(int i = 0; i < numFilters; i++) {
-			for(int j = 0; j < numChannels; j++) {
-				W[i][j] = WeightUtil.randInitWeights(filterRows, filterCols);
+		if (W == null || bias == null) {
+			W = new DoubleMatrix[numFilters][numChannels];
+			bias = new double[numFilters];
+			
+			for(int i = 0; i < numFilters; i++) {
+				for(int j = 0; j < numChannels; j++) {
+					W[i][j] = WeightUtil.randInitWeights(filterRows, filterCols);
+				}
+				bias[i] = 0.01;
 			}
-			bias[i] = 0.01;
 		}
 	}
 
@@ -83,30 +77,17 @@ public class ConvolutionLayer extends BaseLayer {
 		return  dimCols - filterCols + 1;
 	}
 	
-	
-	// convolution for multiple channel input
+	// Convolution of multiple channel input images
 	public DoubleMatrix[] convolution() {
 		DoubleMatrix[] data = new DoubleMatrix[numFilters];
 		DoubleMatrix filter;
-		DoubleMatrix temp = new DoubleMatrix(dimRows-filterRows+1, dimCols-filterCols+1);
+		DoubleMatrix temp = new DoubleMatrix(getOutputRows(), getOutputCols());
 		
 		// check: dims(image) > dims(filter)
-		/** Modified **/
-		if(W == null)
-			initWeights();
-		
-		
 		for(int i = 0; i < numFilters; i++) {
-			data[i] = new DoubleMatrix(dimRows - filterRows + 1, dimCols - filterCols + 1);
+			data[i] = new DoubleMatrix(getOutputRows(), getOutputCols());
 			for(int j = 0; j < numChannels; j++) {
 				filter = new DoubleMatrix(W[i][j].toArray2());
-				
-				//flip for 2d-convolution
-/*				for(int k = 0; k < filter.rows / 2 ; k++)
-					filter.swapRows(k, filter.rows - 1 - k);
-				for(int k = 0; k < filter.columns / 2 ; k++)
-					filter.swapColumns(k, filter.columns - 1 - k);
-*/				
 				temp.fill(0.0);
 				// calculate convolutions
 				for(int r = 0; r < temp.rows; r++) {
@@ -123,28 +104,6 @@ public class ConvolutionLayer extends BaseLayer {
 		return data;
 	}
 	
-	/*
-	
-	public DoubleMatrix convolutionDownSample() {
-		if(input != null) {
-			output = pooling(activate(convolution(input)));
-			
-			DoubleMatrix temp = output[0]; 
-			for(int i = 1; i < output.length; i++) {
-				DoubleMatrix.concatVertically(temp, output[i]);
-			}
-			return temp;
-		}
-		return null;
-	}
-	
-	
-	public void feedForward() {
-		outputLayer = new FullyConnLayer(convolutionDownSample(), dimOut);
-		outputLayer.feedForward();
-	}
-	*/
-	
 	@Override
 	public DoubleMatrix[] getOutput() {
 		output = activate(convolution());
@@ -153,11 +112,8 @@ public class ConvolutionLayer extends BaseLayer {
 
 	@Override
 	public DoubleMatrix[] update(DoubleMatrix[] propDelta) {
-		// TODO Auto-generated method stub
-		DoubleMatrix[] delta = new DoubleMatrix[propDelta.length];
 		for(int i = 0 ; i < propDelta.length; i++)
 			propDelta[i].muli(output[i].mul(output[i].mul(-1.0).add(1.0)));
-			//delta[i] = propDelta[i].mul(output[i].mul(output[i].mul(-1.0).add(1.0)));
 		
 		DoubleMatrix deltaWeight = new DoubleMatrix(filterRows, filterCols);
 		// update Weights
@@ -172,9 +128,10 @@ public class ConvolutionLayer extends BaseLayer {
 					}
 				}
 				W[i][j].subi(deltaWeight.mul(learningRate));
+				bias[i] -= propDelta[i].sum();
 			}
 		}
-		// return inputLayer delta
+		// propagate delta to previous layer
 		return deriveDelta (propDelta);
 	}
 	
@@ -213,8 +170,6 @@ public class ConvolutionLayer extends BaseLayer {
 		}
 		return delta;
 	}
-
-	
 
 	@Override
 	public void applyDropOut() {

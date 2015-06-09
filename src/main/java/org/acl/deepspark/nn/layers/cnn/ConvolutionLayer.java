@@ -10,6 +10,11 @@ public class ConvolutionLayer extends BaseLayer {
 	private int filterRows, filterCols, numFilters; // filter spec.
 	private DoubleMatrix[][] W; // filterId, x, y
 	private double[] bias;
+	
+	// momentum 
+	private double momentumFactor = 0.95;
+	private DoubleMatrix[][] prevDeltaW;
+	private double[] prevDeltaBias;
 		
 	private int[] stride = {1, 1};
 	private int zeroPadding = 0;
@@ -38,6 +43,16 @@ public class ConvolutionLayer extends BaseLayer {
 		initWeights();
 	}
 	
+	public ConvolutionLayer(DoubleMatrix input, int filterRows, int filterCols, int numFilters, double momentum) {
+		this(input, filterRows, filterCols, numFilters);
+		momentumFactor = momentum;
+	}
+	
+	public ConvolutionLayer(DoubleMatrix[] input, int filterRows, int filterCols, int numFilters,double momentum) {
+		this(input, filterRows, filterCols, numFilters);
+		momentumFactor = momentum;
+	}
+	
 	public void setFilterWeights(DoubleMatrix[][] filters) {
 		W = filters;
 	}
@@ -50,13 +65,18 @@ public class ConvolutionLayer extends BaseLayer {
 	public void initWeights() {
 		if (W == null || bias == null) {
 			W = new DoubleMatrix[numFilters][numChannels];
+			prevDeltaW = new DoubleMatrix[numFilters][numChannels];
+			
 			bias = new double[numFilters];
+			prevDeltaBias = new double[numFilters];
 			
 			for(int i = 0; i < numFilters; i++) {
 				for(int j = 0; j < numChannels; j++) {
 					W[i][j] = WeightUtil.randInitWeights(filterRows, filterCols);
+					prevDeltaW[i][j] = DoubleMatrix.zeros(filterRows, filterCols);
 				}
 				bias[i] = 0.01;
+				prevDeltaBias[i] = 0;
 			}
 		}
 	}
@@ -128,8 +148,13 @@ public class ConvolutionLayer extends BaseLayer {
 					}
 				}
 				//W[i][j].subi(W[i][j].mul(0.00001).mul(learningRate));
-				W[i][j].subi(deltaWeight.mul(learningRate));
-				bias[i] -= propDelta[i].sum() * learningRate;
+				
+				prevDeltaW[i][j].muli(momentumFactor);
+				prevDeltaW[i][j].addi(deltaWeight.muli(learningRate));
+				prevDeltaBias[i] = propDelta[i].sum() * learningRate + prevDeltaBias[i] * momentumFactor;
+				
+				W[i][j].subi(prevDeltaW[i][j]);
+				bias[i] -= prevDeltaBias[i];
 			}
 		}
 		// propagate delta to previous layer

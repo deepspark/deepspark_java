@@ -7,6 +7,9 @@ import org.jblas.DoubleMatrix;
 public class FullyConnLayer extends BaseLayer {
 	private DoubleMatrix W;
 	private DoubleMatrix output;
+	private double momentumFactor = 0.95;
+	private DoubleMatrix prevDeltaW;
+	private double prevDeltaBias;
 	private double bias = 0.01;
 
 	public FullyConnLayer(int nOut) {
@@ -21,6 +24,17 @@ public class FullyConnLayer extends BaseLayer {
 	public FullyConnLayer(DoubleMatrix[] input, int nOut) {
 		super(input, nOut);
 		initWeights();
+	}
+	
+	
+	public FullyConnLayer(DoubleMatrix input, int nOut, double momentum) {
+		this(input, nOut);
+		momentumFactor = momentum;
+	}
+	
+	public FullyConnLayer(DoubleMatrix[] input, int nOut, double momentum) {
+		this(input, nOut);
+		momentumFactor = momentum;
 	}
 	
 	public void setWeight(DoubleMatrix weight) {
@@ -59,12 +73,14 @@ public class FullyConnLayer extends BaseLayer {
 	@Override
 	public DoubleMatrix[] update(DoubleMatrix[] propDelta) {
 		propDelta[0].muli(output.mul(output.mul(-1.0).add(1.0)));
-		DoubleMatrix deltaW = propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose());
 		
+		prevDeltaW.muli(momentumFactor);
+		prevDeltaW.addi(propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose()).muli(learningRate));
+		prevDeltaBias = propDelta[0].sum() * learningRate + prevDeltaBias * momentumFactor; 
+		 
 		// weight update
-		//W.subi(W.mul(0.00001).mul(learningRate));
-		W.subi(deltaW.mul(learningRate));
-		bias -= propDelta[0].sum() * learningRate;
+		W.subi(prevDeltaW);
+		bias -= prevDeltaBias;
 		// propagate delta to the previous layer
 		return deriveDelta(propDelta);
 	}
@@ -73,6 +89,8 @@ public class FullyConnLayer extends BaseLayer {
 	public void initWeights() {
 		if (W == null) {
 			W = WeightUtil.randInitWeights(dimOut, dimIn);
+			prevDeltaW = DoubleMatrix.zeros(dimOut, dimIn);
+			prevDeltaBias = 0;
 		}
 	}
 

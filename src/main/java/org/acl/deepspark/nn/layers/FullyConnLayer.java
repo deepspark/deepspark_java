@@ -76,7 +76,7 @@ public class FullyConnLayer extends BaseLayer {
 		propDelta[0].muli(output.mul(output.mul(-1.0).add(1.0)));
 		
 		prevDeltaW.muli(momentumFactor);
-		prevDeltaW.addi(propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose()).muli(learningRate));
+		prevDeltaW.addi(propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose()).mul(learningRate));
 		prevDeltaW.addi(W.mul(learningRate * decayLambda ));
 		prevDeltaBias = propDelta[0].sum() * learningRate + prevDeltaBias * momentumFactor; 
 		 

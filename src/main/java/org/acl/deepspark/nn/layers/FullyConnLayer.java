@@ -11,6 +11,7 @@ public class FullyConnLayer extends BaseLayer {
 	private DoubleMatrix prevDeltaW;
 	private double prevDeltaBias;
 	private double bias = 0.01;
+	private double decayLambda = 1e-5;
 
 	public FullyConnLayer(int nOut) {
 		this.dimOut = nOut;
@@ -76,6 +77,7 @@ public class FullyConnLayer extends BaseLayer {
 		
 		prevDeltaW.muli(momentumFactor);
 		prevDeltaW.addi(propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose()).muli(learningRate));
+		prevDeltaW.addi(W.mul(learningRate * decayLambda ));
 		prevDeltaBias = propDelta[0].sum() * learningRate + prevDeltaBias * momentumFactor; 
 		 
 		// weight update

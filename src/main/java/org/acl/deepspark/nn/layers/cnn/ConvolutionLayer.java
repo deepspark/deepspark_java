@@ -16,6 +16,9 @@ public class ConvolutionLayer extends BaseLayer {
 	private DoubleMatrix[][] prevDeltaW;
 	private double[] prevDeltaBias;
 		
+	// weight decay
+	private double decayLambda = 1e-5;
+	
 	private int[] stride = {1, 1};
 	private int zeroPadding = 0;
 	private boolean useZeroPadding = true;
@@ -150,7 +153,7 @@ public class ConvolutionLayer extends BaseLayer {
 				//W[i][j].subi(W[i][j].mul(0.00001).mul(learningRate));
 				
 				prevDeltaW[i][j].muli(momentumFactor);
-				prevDeltaW[i][j].addi(deltaWeight.muli(learningRate));
+				prevDeltaW[i][j].addi(deltaWeight.muli(learningRate)).addi(W[i][j].mul(learningRate * decayLambda));
 				prevDeltaBias[i] = propDelta[i].sum() * learningRate + prevDeltaBias[i] * momentumFactor;
 				
 				W[i][j].subi(prevDeltaW[i][j]);

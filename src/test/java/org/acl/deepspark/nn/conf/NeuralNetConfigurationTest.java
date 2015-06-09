@@ -19,22 +19,24 @@ public class NeuralNetConfigurationTest {
 		DoubleMatrix[] test_label = MnistLoader.loadLabel("C:\\Users\\Jaehong\\Downloads\\mnist\\mnist_test.txt");
 		
 		int reportIter = 1000;
-		int trIter = 1200000;
+		int trIter = 60000;
 		int maxTr = trIter / reportIter;
 		
 		NeuralNetConfiguration net = new NeuralNetConfiguration(0.1, reportIter);
-		net.addLayer(new ConvolutionLayer(5, 5, 10));
+		net.addLayer(new ConvolutionLayer(9, 9, 10));
 		net.addLayer(new PoolingLayer(2));
 		net.addLayer(new FullyConnLayer(10));
+		
 		
 		Date startTime = new Date();
 		for(int i = 0; i < maxTr ; i++) {
 			net.training(train_data, train_label);
 			DoubleMatrix[] matrix = new DoubleMatrix[1];
-			System.out.print(String.format("%dth epoch", i+1));
+			
 			int count = 0;
 			int ITERATION = 10000;
 			for(int j = 0 ; j < ITERATION; j++) {
+				//System.out.println(String.valueOf(i) + "th data");
 				matrix[0] = test_data[j];
 				if(test_label[j].argmax() == net.getOutput(matrix)[0].argmax())
 					count++;

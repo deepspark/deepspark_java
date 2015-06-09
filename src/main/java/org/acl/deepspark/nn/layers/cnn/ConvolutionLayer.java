@@ -127,8 +127,9 @@ public class ConvolutionLayer extends BaseLayer {
 										   	  RangeUtils.interval(c, c + propDelta[i].columns)), propDelta[i]));
 					}
 				}
+				//W[i][j].subi(W[i][j].mul(0.00001).mul(learningRate));
 				W[i][j].subi(deltaWeight.mul(learningRate));
-				bias[i] -= propDelta[i].sum();
+				bias[i] -= propDelta[i].sum() * learningRate;
 			}
 		}
 		// propagate delta to previous layer

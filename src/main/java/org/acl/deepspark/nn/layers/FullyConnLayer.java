@@ -60,10 +60,11 @@ public class FullyConnLayer extends BaseLayer {
 	public DoubleMatrix[] update(DoubleMatrix[] propDelta) {
 		propDelta[0].muli(output.mul(output.mul(-1.0).add(1.0)));
 		DoubleMatrix deltaW = propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose());
-		bias -= propDelta[0].sum();
-		// weight update
-		W.subi(deltaW.mul(learningRate));
 		
+		// weight update
+		//W.subi(W.mul(0.00001).mul(learningRate));
+		W.subi(deltaW.mul(learningRate));
+		bias -= propDelta[0].sum() * learningRate;
 		// propagate delta to the previous layer
 		return deriveDelta(propDelta);
 	}

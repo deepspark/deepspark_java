@@ -12,7 +12,7 @@ public class ConvolutionLayer extends BaseLayer {
 	private double[] bias;
 	
 	// momentum 
-	private double momentumFactor = 0.95;
+	private double momentumFactor = 0.0;
 	private DoubleMatrix[][] prevDeltaW;
 	private double[] prevDeltaBias;
 		
@@ -152,12 +152,14 @@ public class ConvolutionLayer extends BaseLayer {
 				}
 				//W[i][j].subi(W[i][j].mul(0.00001).mul(learningRate));
 				
+				//prevDeltaW[i][j].muli(momentumFactor);
+				//prevDeltaW[i][j].addi(W[i][j].mul(learningRate * decayLambda));
 				prevDeltaW[i][j].muli(momentumFactor);
-				prevDeltaW[i][j].addi(deltaWeight.mul(learningRate));
 				prevDeltaW[i][j].addi(W[i][j].mul(learningRate * decayLambda));
+				prevDeltaW[i][j].addi(deltaWeight.muli(learningRate));
 				
-				prevDeltaBias[i] = propDelta[i].sum() * learningRate + prevDeltaBias[i] * momentumFactor;
-				
+				prevDeltaBias[i] *= momentumFactor;
+				prevDeltaBias[i] += (propDelta[i].sum()  + bias[i] * decayLambda)* learningRate;
 				W[i][j].subi(prevDeltaW[i][j]);
 				bias[i] -= prevDeltaBias[i];
 			}

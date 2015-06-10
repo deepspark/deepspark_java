@@ -7,7 +7,7 @@ import org.jblas.DoubleMatrix;
 public class FullyConnLayer extends BaseLayer {
 	private DoubleMatrix W;
 	private DoubleMatrix output;
-	private double momentumFactor = 0.95;
+	private double momentumFactor = 0.0;
 	private DoubleMatrix prevDeltaW;
 	private double prevDeltaBias;
 	private double bias = 0.01;
@@ -75,10 +75,18 @@ public class FullyConnLayer extends BaseLayer {
 	public DoubleMatrix[] update(DoubleMatrix[] propDelta) {
 		propDelta[0].muli(output.mul(output.mul(-1.0).add(1.0)));
 		
+		//prevDeltaW.muli(momentumFactor);
+		//prevDeltaW.addi(propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose()).mul(learningRate));
+		//prevDeltaW.addi(W.mul(learningRate * decayLambda ));
+		// prevDeltaBias * momentumFactor;
+		//prevDeltaW.muli(momentumFactor);
 		prevDeltaW.muli(momentumFactor);
-		prevDeltaW.addi(propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose()).mul(learningRate));
 		prevDeltaW.addi(W.mul(learningRate * decayLambda ));
-		prevDeltaBias = propDelta[0].sum() * learningRate + prevDeltaBias * momentumFactor; 
+		prevDeltaW.addi(propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose()).muli(learningRate));
+		
+		prevDeltaBias *= momentumFactor;
+		prevDeltaBias += bias * decayLambda * learningRate;
+		prevDeltaBias += propDelta[0].sum() * learningRate;
 		 
 		// weight update
 		W.subi(prevDeltaW);

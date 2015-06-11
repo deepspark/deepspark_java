@@ -1,6 +1,8 @@
 package org.acl.deepspark.utils;
 
 import org.jblas.DoubleMatrix;
+import org.jblas.SimpleBlas;
+import org.jblas.ranges.RangeUtils;
 
 public class MathUtils {
 	public static final int FULL_CONV = 0;
@@ -15,22 +17,39 @@ public class MathUtils {
 		int nCols, nRows;
 		switch(option) {
 		case FULL_CONV:
-			nRows = data.getRows() + filter.getRows() + 1;
-			nCols = data.getColumns() + filter.getColumns() + 1;
+			nRows = data.getRows() + filter.getRows() - 1;
+			nCols = data.getColumns() + filter.getColumns() - 1;
+			input = DoubleMatrix.zeros(nRows+ filter.getRows() -1, nCols + filter.getColumns() - 1);
+			input.put(RangeUtils.interval(filter.getRows() - 1, filter.getRows() + data.getRows() - 1), 
+					RangeUtils.interval(filter.getColumns() - 1, filter.getColumns() + data.getColumns() - 1),
+					data);
 			break;
 		case SAME_CONV:
 			nRows = data.getRows();
 			nCols = data.getColumns();
-			input = data;
+			input = DoubleMatrix.zeros(nRows+ filter.getRows() - 1 , nCols + filter.getColumns() - 1);
+			input.put(RangeUtils.interval(filter.getRows() / 2, filter.getRows() / 2 + data.getRows()), 
+					RangeUtils.interval(filter.getColumns() / 2, filter.getColumns() /2  + data.getColumns()),
+					data);
 			break;
 		case VALID_CONV:
-			nRows = data.getRows();
-			nCols = data.getColumns();
+			nRows = data.getRows() - filter.getRows() + 1;
+			nCols = data.getColumns() - filter.getColumns() + 1;
+			input = data;
 			break;
 		default:
 			return null;
 		}
+		
 		result = new DoubleMatrix(nRows, nCols);
+		for(int r = 0; r < nRows ; r++) {
+			for(int c = 0 ; c < nCols ; c++) {
+				result.put(r,c,
+						SimpleBlas.dot(input.get(RangeUtils.interval(r, r + filter.getRows()),
+								   	  RangeUtils.interval(c, c + filter.getColumns())), filter));
+			}
+		}
+		
 		return result;
 	}
 }

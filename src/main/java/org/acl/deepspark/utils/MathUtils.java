@@ -52,4 +52,13 @@ public class MathUtils {
 		
 		return result;
 	}
+	
+	public static DoubleMatrix flip(DoubleMatrix d) {
+		for(int k = 0; k < d.getRows() / 2 ; k++)
+			d.swapRows(k, d.getRows() - 1 -k);
+		for(int k = 0; k < d.getColumns() / 2 ; k++)
+			d.swapRows(k, d.getRows() - 1 -k);
+
+		return d;
+	}
 }

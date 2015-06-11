@@ -32,7 +32,8 @@ public class FullyConnLayerTest {
 			System.out.println(matrix);
 		
 		System.out.println("FullyConn weight update");
-		DoubleMatrix[] inputDelta = fullyConnLayer.update(output);
+		fullyConnLayer.setDelta(output);
+		DoubleMatrix[] inputDelta = fullyConnLayer.deriveDelta();
 		for(DoubleMatrix matrix : inputDelta)
 			System.out.println(matrix);
 		

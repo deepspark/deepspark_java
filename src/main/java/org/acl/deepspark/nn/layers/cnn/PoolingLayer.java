@@ -97,6 +97,9 @@ public class PoolingLayer extends BaseLayer {
 	}
 	
 	@Override
+	public DoubleMatrix[] getDelta() {return null;}
+	
+	@Override
 	public void setDelta(DoubleMatrix[] propDelta) {
 		delta = propDelta;
 	}

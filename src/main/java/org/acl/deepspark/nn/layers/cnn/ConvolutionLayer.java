@@ -2,6 +2,7 @@ package org.acl.deepspark.nn.layers.cnn;
 
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.weights.WeightUtil;
+import org.acl.deepspark.utils.MathUtils;
 import org.jblas.DoubleMatrix;
 import org.jblas.SimpleBlas;
 import org.jblas.ranges.RangeUtils;
@@ -103,24 +104,10 @@ public class ConvolutionLayer extends BaseLayer {
 	// Convolution of multiple channel input images
 	public DoubleMatrix[] convolution() {
 		DoubleMatrix[] data = new DoubleMatrix[numFilters];
-		DoubleMatrix filter;
-		DoubleMatrix temp = new DoubleMatrix(getOutputRows(), getOutputCols());
-		
 		// check: dims(image) > dims(filter)
 		for(int i = 0; i < numFilters; i++) {
-			data[i] = new DoubleMatrix(getOutputRows(), getOutputCols());
 			for(int j = 0; j < numChannels; j++) {
-				filter = new DoubleMatrix(W[i][j].toArray2());
-				temp.fill(0.0);
-				// calculate convolutions
-				for(int r = 0; r < temp.rows; r++) {
-					for(int c = 0; c < temp.columns ; c++) {
-						temp.put(r, c, SimpleBlas.dot
-								(input[j].get(RangeUtils.interval(r, r + filter.rows),
-										   	  RangeUtils.interval(c, c + filter.columns)), filter));
-					}
-				}
-				data[i].addi(temp);
+				data[i] = MathUtils.convolution(input[j], W[i][j], MathUtils.VALID_CONV);
 			}
 			data[i].addi(bias[i]);
 		}

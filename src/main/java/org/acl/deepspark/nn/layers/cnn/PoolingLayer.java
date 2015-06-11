@@ -96,29 +96,34 @@ public class PoolingLayer extends BaseLayer {
 		return pooling();
 	}
 	
-	
 	@Override
-	public DoubleMatrix[] deriveDelta(DoubleMatrix[] outputDelta) {
-		// TODO Auto-generated method stub
-		return null;
+	public void setDelta(DoubleMatrix[] propDelta) {
+		delta = propDelta;
 	}
 	
-
 	@Override
-	public DoubleMatrix[] update(DoubleMatrix[] propDelta) {
+	public DoubleMatrix[] deriveDelta() {
 		// TODO Auto-generated method stub
 		DoubleMatrix[] inputDelta = new DoubleMatrix[numChannels];
-		
+
 		for (int i = 0; i < numChannels; i++) {
 			inputDelta[i] = new DoubleMatrix(dimRows, dimCols);
 			int idx = 0;
 			for (int m = 0; m < outputRows; m++) {
 				for (int n = 0; n < outputCols; n++) {
-					inputDelta[i].put(maxIndices[i][idx++], propDelta[i].get(m,n));
+					inputDelta[i].put(maxIndices[i][idx++],
+							delta[i].get(m, n));
 				}
 			}
 		}
 		return inputDelta;
+	}
+	
+
+	@Override
+	public void update(DoubleMatrix[][] propDelta, double[] gradB) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -134,6 +139,12 @@ public class PoolingLayer extends BaseLayer {
 	public void applyDropOut() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public DoubleMatrix[][] deriveGradientW() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

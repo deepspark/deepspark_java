@@ -148,7 +148,7 @@ public class ConvolutionLayer extends BaseLayer {
 			for (int j = 0; j < numChannels; j++) {				
 				prevDeltaW[i][j].muli(momentumFactor);
 				prevDeltaW[i][j].addi(W[i][j].mul(learningRate * decayLambda));
-				prevDeltaW[i][j].addi(gradW[i][j].mul(learningRate));
+				prevDeltaW[i][j].addi(gradW[i][j].muli(learningRate));
 				
 				prevDeltaBias[i] *= momentumFactor;
 				prevDeltaBias[i] += (gradB[i]  + bias[i] * decayLambda)* learningRate;

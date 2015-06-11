@@ -110,7 +110,7 @@ public class FullyConnLayer extends BaseLayer {
 
 	@Override
 	public DoubleMatrix[][] deriveGradientW() {
-		DoubleMatrix[][] grad = new DoubleMatrix[0][0];
+		DoubleMatrix[][] grad = new DoubleMatrix[1][1];
 		grad[0][0] = delta[0].mmul(WeightUtil.flat2Vec(input).transpose());
 		return grad;
 	}

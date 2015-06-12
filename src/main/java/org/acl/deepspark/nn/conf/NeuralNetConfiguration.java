@@ -17,7 +17,10 @@ public class NeuralNetConfiguration {
 	
 	private List<BaseLayer> layerList;
 	private DoubleMatrix[][][] gradWList;
-	private double[][] gradBList;	
+	private double[][] gradBList;
+	
+	//running options	
+	private boolean verbosity = true; 
 	
 	public NeuralNetConfiguration(double learningRate, int epoch, int minibatchSize) {
 		layerList = new ArrayList<BaseLayer>();
@@ -25,6 +28,11 @@ public class NeuralNetConfiguration {
 		this.minibatchSize = minibatchSize;
 	}
 	
+	public NeuralNetConfiguration(double d, int i, int j, boolean b) {
+		this(d,i,j);
+		verbosity =b;
+	}
+
 	public void addLayer(BaseLayer l) {
 		layerList.add(l);
 	}
@@ -43,10 +51,11 @@ public class NeuralNetConfiguration {
 		final DoubleMatrix[] sample = new DoubleMatrix[1]; 
 				
 		for(int i = 0 ; i < epoch ; i++) {
-			
+			System.out.println(String.format("%d epoch...", i+1));
 			// per epoch
 			for(int j = 0; j < data.length; j += minibatchSize) {
-				System.out.println(String.format("%d - epoch, %d minibatch",i+1, j / minibatchSize + 1));
+				if(verbosity)
+					System.out.println(String.format("%d - epoch, %d minibatch",i+1, j / minibatchSize + 1));
 				// per minibatch
 				initGradList();
 

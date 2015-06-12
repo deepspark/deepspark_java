@@ -1,7 +1,6 @@
 package org.acl.deepspark.nn.layers;
 
 import org.acl.deepspark.nn.functions.Activator;
-import org.acl.deepspark.nn.weights.WeightUtil;
 import org.jblas.DoubleMatrix;
 
 public abstract class BaseLayer {

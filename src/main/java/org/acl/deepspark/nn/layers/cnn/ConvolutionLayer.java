@@ -2,6 +2,7 @@ package org.acl.deepspark.nn.layers.cnn;
 
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.weights.WeightUtil;
+import org.acl.deepspark.utils.MathUtils;
 import org.jblas.DoubleMatrix;
 import org.jblas.SimpleBlas;
 import org.jblas.ranges.RangeUtils;
@@ -12,7 +13,7 @@ public class ConvolutionLayer extends BaseLayer {
 	private double[] bias;
 	
 	// momentum 
-	private double momentumFactor = 0.95;
+	private double momentumFactor = 0.0;
 	private DoubleMatrix[][] prevDeltaW;
 	private double[] prevDeltaBias;
 		
@@ -103,24 +104,10 @@ public class ConvolutionLayer extends BaseLayer {
 	// Convolution of multiple channel input images
 	public DoubleMatrix[] convolution() {
 		DoubleMatrix[] data = new DoubleMatrix[numFilters];
-		DoubleMatrix filter;
-		DoubleMatrix temp = new DoubleMatrix(getOutputRows(), getOutputCols());
-		
-		// check: dims(image) > dims(filter)
+		// TODO: check dims(image) > dims(filter)
 		for(int i = 0; i < numFilters; i++) {
-			data[i] = new DoubleMatrix(getOutputRows(), getOutputCols());
 			for(int j = 0; j < numChannels; j++) {
-				filter = new DoubleMatrix(W[i][j].toArray2());
-				temp.fill(0.0);
-				// calculate convolutions
-				for(int r = 0; r < temp.rows; r++) {
-					for(int c = 0; c < temp.columns ; c++) {
-						temp.put(r, c, SimpleBlas.dot
-								(input[j].get(RangeUtils.interval(r, r + filter.rows),
-										   	  RangeUtils.interval(c, c + filter.columns)), filter));
-					}
-				}
-				data[i].addi(temp);
+				data[i] = MathUtils.convolution(input[j], W[i][j], MathUtils.VALID_CONV);
 			}
 			data[i].addi(bias[i]);
 		}
@@ -132,15 +119,33 @@ public class ConvolutionLayer extends BaseLayer {
 		output = activate(convolution());
 		return output;
 	}
-
+	
 	@Override
-	public DoubleMatrix[] update(DoubleMatrix[] propDelta) {
-		for(int i = 0 ; i < propDelta.length; i++)
-			propDelta[i].muli(output[i].mul(output[i].mul(-1.0).add(1.0)));
+	public void setDelta(DoubleMatrix[] propDelta) {
+		delta = propDelta;
+		for(int i = 0 ; i < delta.length; i++)
+			delta[i].mul(output[i].mul(output[i].mul(-1.0).add(1.0)));
+	}
+	
+	// TODO:
+	@Override
+	public DoubleMatrix[][] deriveGradientW() {
+		DoubleMatrix[][] gradient = new DoubleMatrix[numFilters][numChannels];
 		
-		DoubleMatrix deltaWeight = new DoubleMatrix(filterRows, filterCols);
 		// update Weights
+		for (int i = 0; i < numFilters; i++)
+			for (int j = 0; j < numChannels; j++)
+				gradient[i][j] = MathUtils.convolution(input[j], getDelta()[i], MathUtils.VALID_CONV);
+		
+		return gradient;
+	}
+	
+	
+	
+	@Override
+	public void update(DoubleMatrix[][] gradW, double[] gradB) {
 		for (int i = 0; i < numFilters; i++) {
+<<<<<<< HEAD
 			for (int j = 0; j < numChannels; j++) {
 				deltaWeight.fill(0.0);
 				for(int r = 0; r < filterRows; r++) {
@@ -154,46 +159,40 @@ public class ConvolutionLayer extends BaseLayer {
 				W[i][j].subi(deltaWeight.mul(learningRate));
 				bias[i] -= propDelta[i].sum() * learningRate;
 
+=======
+			for (int j = 0; j < numChannels; j++) {				
+				prevDeltaW[i][j].muli(momentumFactor);
+				prevDeltaW[i][j].addi(W[i][j].mul(learningRate * decayLambda));
+				prevDeltaW[i][j].addi(gradW[i][j].muli(learningRate));
+				
+				prevDeltaBias[i] *= momentumFactor;
+				prevDeltaBias[i] += (gradB[i]  + bias[i] * decayLambda)* learningRate;
+				W[i][j].subi(prevDeltaW[i][j]);
+				bias[i] -= prevDeltaBias[i];
+>>>>>>> 596b43065f4736c4da0183fab2ec95a7352da691
 			}
 		}
-		// propagate delta to previous layer
-		return deriveDelta (propDelta);
 	}
 	
-	public DoubleMatrix[] deriveDelta(DoubleMatrix[] propDelta) {
-		if (propDelta == null || propDelta.length <= 0)
+	@Override
+	public DoubleMatrix[] deriveDelta() {
+		if (delta == null || delta.length <= 0)
 			return null;
 		
-		DoubleMatrix[] delta = new DoubleMatrix[numChannels];
-		DoubleMatrix temp = new DoubleMatrix(dimRows, dimCols);
+		DoubleMatrix[] propDelta = new DoubleMatrix[numChannels];
 		DoubleMatrix filter;
 		
-		// check: dims(image) > dims(filter)
-		int conv;
+		// TODO: check dims(image) > dims(filter)
 		for (int j = 0; j < numChannels; j++) {
-			delta[j] = new DoubleMatrix(dimRows, dimCols);
+			propDelta[j] = new DoubleMatrix(dimRows, dimCols);
 			for (int i = 0; i < numFilters; i++) {
 				filter = new DoubleMatrix(W[i][j].toArray2());
 				
-				temp.fill(0.0);
-				// calculate convolution
-				for (int r = 0; r < dimRows; r++) {
-					for (int c = 0; c < dimCols ; c++) {
-						conv = 0;
-						for (int m = 0; m < filterRows; m++) {
-							for (int n = 0; n < filterCols; n++) {
-								if (r-m < 0 || r-m >= getOutputRows() || c-n < 0 || c-n >= getOutputCols())
-									continue;
-								conv += propDelta[i].get(r-m, c-n) * filter.get(m,n);
-							}
-						}
-						temp.put(r, c, conv);
-					}
-				}
-				delta[j].addi(temp);
+				MathUtils.flip(filter);
+				propDelta[j].addi(MathUtils.convolution(delta[i], filter, MathUtils.FULL_CONV));
 			}
 		}
-		return delta;
+		return propDelta;
 	}
 
 	@Override

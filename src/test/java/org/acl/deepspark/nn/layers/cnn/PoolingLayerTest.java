@@ -52,12 +52,14 @@ public class PoolingLayerTest {
 		
 		
 		// update 
-		DoubleMatrix[] update1 = poolingLayer.update(result);
+		poolingLayer.setDelta(result);
+		DoubleMatrix[] update1 = poolingLayer.deriveDelta();
 		System.out.println("poolingLayer1 update check");
 		for(DoubleMatrix matrix : update1)
 			System.out.println(matrix);
 		
-		DoubleMatrix[] update2 = poolingLayer2.update(result2);
+		poolingLayer2.setDelta(result2);
+		DoubleMatrix[] update2 = poolingLayer2.deriveDelta();
 		System.out.println("poolingLayer2 update check");
 		for(DoubleMatrix matrix : update2)
 			System.out.println(matrix);

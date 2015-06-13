@@ -7,7 +7,7 @@ import org.jblas.DoubleMatrix;
 public class WeightUtil {
 	
 	public static DoubleMatrix randInitWeights(int dimRow, int dimCol) {
-		return DoubleMatrix.rand(dimRow, dimCol).mul(0.2).subi(0.1);
+		return DoubleMatrix.randn(dimRow, dimCol).divi(10);
 	}
 	
 	public static DoubleMatrix accum(DoubleMatrix[] matrices) {

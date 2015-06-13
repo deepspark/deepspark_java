@@ -7,7 +7,7 @@ import org.jblas.DoubleMatrix;
 public class FullyConnLayer extends BaseLayer {
 	private DoubleMatrix W;
 	private DoubleMatrix output;
-	private double momentumFactor = 0.95;
+	private double momentumFactor = 0.0;
 	private DoubleMatrix prevDeltaW;
 	private double prevDeltaBias;
 	private double bias = 0.01;
@@ -55,7 +55,7 @@ public class FullyConnLayer extends BaseLayer {
 	}
 	
 	@Override
-	public DoubleMatrix[] deriveDelta(DoubleMatrix[] delta) {
+	public DoubleMatrix[] deriveDelta() {
 		double[] input = delta[0].transpose().mmul(W).toArray();
 		DoubleMatrix[] propDelta = new DoubleMatrix[numChannels];
 		
@@ -72,19 +72,26 @@ public class FullyConnLayer extends BaseLayer {
 	}
 
 	@Override
-	public DoubleMatrix[] update(DoubleMatrix[] propDelta) {
-		propDelta[0].muli(output.mul(output.mul(-1.0).add(1.0)));
+	public void setDelta(DoubleMatrix[] delta) {
+		this.delta = delta;
 		
+		delta[0].muli(output.mul(output.mul(-1.0).add(1.0)));
+	}
+	
+	@Override
+	public void update(DoubleMatrix[][] gradW, double[] gradB) {
 		prevDeltaW.muli(momentumFactor);
-		prevDeltaW.addi(propDelta[0].mmul(WeightUtil.flat2Vec(input).transpose()).mul(learningRate));
 		prevDeltaW.addi(W.mul(learningRate * decayLambda ));
-		prevDeltaBias = propDelta[0].sum() * learningRate + prevDeltaBias * momentumFactor; 
+		prevDeltaW.addi(gradW[0][0].muli(learningRate));
+		
+		prevDeltaBias *= momentumFactor;
+		prevDeltaBias += bias * decayLambda * learningRate;
+		prevDeltaBias += gradB[0] * learningRate;
 		 
 		// weight update
 		W.subi(prevDeltaW);
 		bias -= prevDeltaBias;
 		// propagate delta to the previous layer
-		return deriveDelta(propDelta);
 	}
 
 	@Override
@@ -101,7 +108,10 @@ public class FullyConnLayer extends BaseLayer {
 		// TODO Auto-generated method stub
 	}
 
-	
-
-	
+	@Override
+	public DoubleMatrix[][] deriveGradientW() {
+		DoubleMatrix[][] grad = new DoubleMatrix[1][1];
+		grad[0][0] = delta[0].mmul(WeightUtil.flat2Vec(input).transpose());
+		return grad;
+	}
 }

@@ -7,21 +7,32 @@ import java.util.ListIterator;
 
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.jblas.DoubleMatrix;
-import org.jblas.util.Random;
 
 
 public class NeuralNetConfiguration {
 	private double learningRate;	
 	private int epoch;
 	private double momentum;
+	private int minibatchSize;
 	
 	private List<BaseLayer> layerList;
+	private DoubleMatrix[][][] gradWList;
+	private double[][] gradBList;
 	
-	public NeuralNetConfiguration(double learningRate, int epoch) {
+	//running options	
+	private boolean verbosity = true; 
+	
+	public NeuralNetConfiguration(double learningRate, int epoch, int minibatchSize) {
 		layerList = new ArrayList<BaseLayer>();
 		this.epoch = epoch;
+		this.minibatchSize = minibatchSize;
 	}
 	
+	public NeuralNetConfiguration(double d, int i, int j, boolean b) {
+		this(d,i,j);
+		verbosity =b;
+	}
+
 	public void addLayer(BaseLayer l) {
 		layerList.add(l);
 	}
@@ -38,24 +49,92 @@ public class NeuralNetConfiguration {
 		
 		final DoubleMatrix[] delta = new DoubleMatrix[1];
 		final DoubleMatrix[] sample = new DoubleMatrix[1]; 
-		int size = data.length;
-		
-		int sampleIdx;
+				
 		for(int i = 0 ; i < epoch ; i++) {
-			sampleIdx = Random.nextInt(size);
-			//System.out.println("epoch " + String.valueOf(i));
-			sample[0] = data[sampleIdx];
-			delta[0] = getOutput(sample)[0].sub(label[sampleIdx]);
-			backpropagate(delta);
+			System.out.println(String.format("%d epoch...", i+1));
+			// per epoch
+			for(int j = 0; j < data.length; j += minibatchSize) {
+				if(verbosity)
+					System.out.println(String.format("%d - epoch, %d minibatch",i+1, j / minibatchSize + 1));
+				// per minibatch
+				initGradList();
+
+				int batchIter = Math.min(data.length, j+ minibatchSize);
+				for(int k = j; k < batchIter; k++) {
+					sample[0] = data[k];
+					delta[0] = getOutput(sample)[0].sub(label[k]);
+					
+					backpropagate(delta);
+				}
+				
+				update();
+			}
 		}
 	}
 	
+	private void update() {
+		ListIterator<BaseLayer> it = layerList.listIterator(getNumberOfLayers());
+		int layerIdx = layerList.size();
+		
+		while(it.hasPrevious()) {
+			layerIdx--;
+			
+			BaseLayer a = it.previous();
+			DoubleMatrix[][] gradW = gradWList[layerIdx];
+			double[] gradB = gradBList[layerIdx];
+			
+			if(gradW != null && gradB != null) {
+				for(int i = 0; i < gradW.length ; i++)
+					for(int j = 0; j < gradW[i].length ; j++)
+						gradW[i][j].divi(minibatchSize);
+				for(int i = 0; i < gradB.length ; i++)
+					gradB[i] /= minibatchSize;
+				
+				a.update(gradWList[layerIdx], gradBList[layerIdx]);
+			}
+		}
+	}
+	
+	private void initGradList() {
+		gradWList = new DoubleMatrix[layerList.size()][][];
+		gradBList = new double[layerList.size()][];
+	}
+	
+	
 	public void backpropagate(DoubleMatrix[] delta) {
 		ListIterator<BaseLayer> it = layerList.listIterator(getNumberOfLayers());
+		int layerIdx = layerList.size();
 		// Back-propagation
 		while(it.hasPrevious()) {
+			layerIdx--;
+			
 			BaseLayer a = it.previous();
-			delta = a.update(delta);
+			a.setDelta(delta);
+			
+			if(gradWList[layerIdx] == null)
+				gradWList[layerIdx] = a.deriveGradientW();
+			else {
+				DoubleMatrix[][] deltaW = a.deriveGradientW();
+				for(int i = 0; i < gradWList[layerIdx].length; i++)
+					for(int j = 0; j < gradWList[layerIdx][i].length ; j++)
+						gradWList[layerIdx][i][j].addi(deltaW[i][j]);
+			}
+			
+			
+			
+			if(gradBList[layerIdx] == null) {
+				if(a.getDelta() != null) {			
+					double[] b = new double[a.getDelta().length];
+					for(int i = 0; i < a.getDelta().length; i++)
+						b[i] = a.getDelta()[i].sum();
+					gradBList[layerIdx] = b;
+				}
+			}
+			else
+				for(int i = 0; i < a.getDelta().length; i++)
+					gradBList[layerIdx][i] += a.getDelta()[i].sum();
+			
+			delta = a.deriveDelta();
 		}
 	}
 	

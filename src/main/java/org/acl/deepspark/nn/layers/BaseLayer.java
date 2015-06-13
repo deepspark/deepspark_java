@@ -1,7 +1,6 @@
 package org.acl.deepspark.nn.layers;
 
 import org.acl.deepspark.nn.functions.Activator;
-import org.acl.deepspark.nn.weights.WeightUtil;
 import org.jblas.DoubleMatrix;
 
 public abstract class BaseLayer {
@@ -14,6 +13,8 @@ public abstract class BaseLayer {
 	protected double learningRate = 0.1;
 	protected DoubleMatrix[] input;
 	protected DoubleMatrix[] output;
+	
+	protected DoubleMatrix[] delta;
 	
 	public double dropOutRate;
 	private int activationMethod = Activator.SIGMOID;
@@ -94,9 +95,16 @@ public abstract class BaseLayer {
 		return matrices;
 	}
 	
+	public DoubleMatrix[] getDelta() {
+		return delta;
+	}
+	public abstract void setDelta(DoubleMatrix[] delta);
+	
 	public abstract void initWeights(); 
 	public abstract void applyDropOut();
+	
+	public abstract DoubleMatrix[][] deriveGradientW();
 	public abstract DoubleMatrix[] getOutput();
-	public abstract DoubleMatrix[] deriveDelta(DoubleMatrix[] outputDelta);
-	public abstract DoubleMatrix[] update(DoubleMatrix[] outputDelta);
+	public abstract DoubleMatrix[] deriveDelta();
+	public abstract void update(DoubleMatrix[][] gradW, double[] gradB);
 };

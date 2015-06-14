@@ -145,21 +145,7 @@ public class ConvolutionLayer extends BaseLayer {
 	@Override
 	public void update(DoubleMatrix[][] gradW, double[] gradB) {
 		for (int i = 0; i < numFilters; i++) {
-<<<<<<< HEAD
-			for (int j = 0; j < numChannels; j++) {
-				deltaWeight.fill(0.0);
-				for(int r = 0; r < filterRows; r++) {
-					for(int c = 0; c < filterCols ; c++) {
-						deltaWeight.put(r, c, SimpleBlas.dot
-								(input[j].get(RangeUtils.interval(r, r + propDelta[i].rows),
-										   	  RangeUtils.interval(c, c + propDelta[i].columns)), propDelta[i]));
-					}
-				}
 
-				W[i][j].subi(deltaWeight.mul(learningRate));
-				bias[i] -= propDelta[i].sum() * learningRate;
-
-=======
 			for (int j = 0; j < numChannels; j++) {				
 				prevDeltaW[i][j].muli(momentumFactor);
 				prevDeltaW[i][j].addi(W[i][j].mul(learningRate * decayLambda));
@@ -169,7 +155,6 @@ public class ConvolutionLayer extends BaseLayer {
 				prevDeltaBias[i] += (gradB[i]  + bias[i] * decayLambda)* learningRate;
 				W[i][j].subi(prevDeltaW[i][j]);
 				bias[i] -= prevDeltaBias[i];
->>>>>>> 596b43065f4736c4da0183fab2ec95a7352da691
 			}
 		}
 	}

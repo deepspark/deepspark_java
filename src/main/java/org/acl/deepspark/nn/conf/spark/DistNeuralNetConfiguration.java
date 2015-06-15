@@ -74,7 +74,15 @@ public class DistNeuralNetConfiguration implements Serializable {
 				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new OutputFunction(this));
 				
 				//backpropagation
-				JavaRDD<DeltaWeight> dWeight = delta.map(new BackPropagation(this));
+				JavaRDD<DeltaWeight> dWeight = delta.map(new Function<DoubleMatrix, DeltaWeight>() {
+
+					@Override
+					public DeltaWeight call(DoubleMatrix arg0) throws Exception {
+						DoubleMatrix[] error = new DoubleMatrix[0];
+						error[0] = arg0;
+						return backpropagate(error);
+					}
+				});
 				
 				
 				// reduce weight

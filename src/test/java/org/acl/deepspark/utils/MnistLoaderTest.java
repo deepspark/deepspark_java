@@ -1,7 +1,5 @@
 package org.acl.deepspark.utils;
 
-import java.util.ArrayList;
-
 import org.jblas.DoubleMatrix;
 
 public class MnistLoaderTest {

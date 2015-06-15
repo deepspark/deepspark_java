@@ -23,12 +23,14 @@ public class DistNeuralNetConfigurationTest {
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		
 		System.out.println("Data Loading...");
-		
+				
 		Sample[] train_samples = MnistLoader.loadFromHDFS("mnist_data/train_data.txt",true);
 		Sample[] test_samples = MnistLoader.loadFromHDFS("mnist_data/test_data.txt",true);
 		
+		System.out.println(String.format("%d samples loaded...", train_samples.length));
+		
 		// configure network
-		DistNeuralNetConfiguration net = new DistNeuralNetConfiguration(0.1, 3, 1000, sc, true);
+		DistNeuralNetConfiguration net = new DistNeuralNetConfiguration(0.1, 3, minibatch, sc, true);
 		net.addLayer(new ConvolutionLayer(9, 9, 20)); // conv with 20 filters (9x9)
 		net.addLayer(new PoolingLayer(2)); // max pool
 		net.addLayer(new FullyConnLayer(200)); // hidden

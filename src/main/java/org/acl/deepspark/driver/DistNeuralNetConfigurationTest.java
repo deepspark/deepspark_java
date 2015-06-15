@@ -1,4 +1,4 @@
-package org.acl.deepspark.nn.conf;
+package org.acl.deepspark.driver;
 
 import java.util.Date;
 

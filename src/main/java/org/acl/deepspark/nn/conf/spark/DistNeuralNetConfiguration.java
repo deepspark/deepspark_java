@@ -72,9 +72,6 @@ public class DistNeuralNetConfiguration implements Serializable {
 				// per minibatch
 				//get output
 				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new Function<Sample, DoubleMatrix>() {
-					/**
-					 * 
-					 */
 					private static final long serialVersionUID = 7864025980071700556L;
 
 					@Override

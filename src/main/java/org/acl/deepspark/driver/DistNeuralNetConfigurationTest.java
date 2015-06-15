@@ -1,5 +1,6 @@
 package org.acl.deepspark.driver;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.acl.deepspark.data.Sample;
@@ -13,7 +14,12 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.jblas.DoubleMatrix;
 
 
-public class DistNeuralNetConfigurationTest {
+public class DistNeuralNetConfigurationTest implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8811812248690041287L;
 	
 	public static final int nTest = 1000;
 	public static final int minibatch = 1000;

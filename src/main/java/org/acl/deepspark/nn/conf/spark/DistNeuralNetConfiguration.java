@@ -78,7 +78,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 
 					@Override
 					public DeltaWeight call(DoubleMatrix arg0) throws Exception {
-						DoubleMatrix[] error = new DoubleMatrix[0];
+						DoubleMatrix[] error = new DoubleMatrix[1];
 						error[0] = arg0;
 						return backpropagate(error);
 					}

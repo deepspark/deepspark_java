@@ -32,7 +32,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 	
 	//running options	
 	private boolean verbosity = true;
-	private JavaSparkContext sc; 
+	private transient JavaSparkContext sc = null; 
 	
 	public DistNeuralNetConfiguration(double learningRate, int epoch, int minibatchSize, JavaSparkContext sc) {
 		layerList = new ArrayList<BaseLayer>();

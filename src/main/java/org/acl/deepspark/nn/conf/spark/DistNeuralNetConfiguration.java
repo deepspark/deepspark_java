@@ -6,10 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
 import org.jblas.DoubleMatrix;
 
 
@@ -20,8 +22,6 @@ public class DistNeuralNetConfiguration {
 	private int minibatchSize;
 	
 	private List<BaseLayer> layerList;
-	private DoubleMatrix[][][] gradWList;
-	private double[][] gradBList;
 	
 	//running options	
 	private boolean verbosity = true;
@@ -47,14 +47,14 @@ public class DistNeuralNetConfiguration {
 		return layerList.size();
 	}
 	
-	public void training(DoubleMatrix[] data, DoubleMatrix[] label) {
-		if (data.length != label.length) {
-			System.err.println("Mismatch of the number of data and labels");
-			return;
-		}
-		
-		List<DoubleMatrix> data_list = Arrays.asList(data);
-		JavaRDD<DoubleMatrix> rdd_data = sc.parallelize(data_list);
+	public void training(Sample[] data) {
+		List<Sample> data_list = Arrays.asList(data);
+		JavaRDD<Sample> rdd_data = sc.parallelize(data_list);
+		int numMinibatch = (int) Math.ceil((double) data.length / minibatchSize); 
+		double[] batchWeight = new double[numMinibatch];
+		for(int i = 0; i < numMinibatch; i++)
+			batchWeight[i] = 1.0 / numMinibatch;		
+		JavaRDD<Sample>[] rdd_minibatch = rdd_data.randomSplit(batchWeight);
 		
 		final DoubleMatrix[] delta = new DoubleMatrix[1];
 		final DoubleMatrix[] sample = new DoubleMatrix[1]; 
@@ -62,12 +62,22 @@ public class DistNeuralNetConfiguration {
 		for(int i = 0 ; i < epoch ; i++) {
 			System.out.println(String.format("%d epoch...", i+1));
 			// per epoch
-			for(int j = 0; j < data.length; j += minibatchSize) {
+			for(int j = 0; j < rdd_minibatch.length; j++) {
 				if(verbosity)
 					System.out.println(String.format("%d - epoch, %d minibatch",i+1, j / minibatchSize + 1));
 				// per minibatch
 				initGradList();
-
+				
+				//get output
+				JavaRDD<DoubleMatrix> output = rdd_minibatch[j].map(new Function<Sample, DoubleMatrix>() {
+					@Override
+					public DoubleMatrix call(Sample arg0) throws Exception {
+						return getOutput(arg0.data)[0];
+					}
+				});
+				
+				
+						
 				int batchIter = Math.min(data.length, j+ minibatchSize);
 				for(int k = j; k < batchIter; k++) {
 					sample[0] = data[k];

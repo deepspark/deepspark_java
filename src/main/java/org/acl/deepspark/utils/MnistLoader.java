@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.acl.deepspark.data.Sample;
 import org.jblas.DoubleMatrix;
 
 public class MnistLoader {
@@ -67,6 +68,56 @@ public class MnistLoader {
 		this.data = data.toArray(this.data);
 		this.label = new DoubleMatrix[labelList.size()];
 		this.label = labelList.toArray(this.label);	
+	}
+	
+	public static Sample[] loadIntoSamples(String path, boolean normalize) {
+		BufferedReader reader = null;
+		double label;
+		ArrayList<Sample> samples = new ArrayList<Sample>();
+		
+		double[] featureVec = new double[dimRows * dimRows];
+		try {
+			reader = new BufferedReader(new FileReader(path));
+			String line = null;
+			String[] feature = null;
+			while((line = reader.readLine()) != null) {
+				feature = line.split("\t");
+				label = Double.parseDouble(feature[dimRows * dimRows]);
+				double[] labelVec = new double[dimLabel];		
+				for(int i = 0; i < dimLabel; i++) {
+					labelVec[i] = (label == i) ?  1.0 : 0.0;
+				}
+				DoubleMatrix sampleLabel = new DoubleMatrix(labelVec);
+				
+				for(int i = 0; i < feature.length -1;i++)
+					featureVec[i] = Double.parseDouble(feature[i]);
+				
+				Sample s = new Sample();
+				DoubleMatrix[] sample = new DoubleMatrix[1];
+				sample[0] = new DoubleMatrix(dimRows, dimRows, featureVec.clone()).transpose();
+				
+				if(normalize)
+					sample[0].divi(256);
+				
+				s.data = sample;
+				s.label = sampleLabel;
+				
+				samples.add(s);
+			}
+		} catch(IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch(IOException e) {}
+			}
+		}
+		
+		Sample[] arr = new Sample[samples.size()];
+		arr = samples.toArray(arr);
+		
+		return arr;
 	}
 	
 	public static DoubleMatrix[] loadData(String path) {

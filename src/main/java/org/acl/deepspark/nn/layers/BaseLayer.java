@@ -1,9 +1,15 @@
 package org.acl.deepspark.nn.layers;
 
+import java.io.Serializable;
+
 import org.acl.deepspark.nn.functions.Activator;
 import org.jblas.DoubleMatrix;
 
-public abstract class BaseLayer {
+public abstract class BaseLayer implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6281205493824547766L;
 	protected int dimRows;
 	protected int dimCols;
 	protected int numChannels;

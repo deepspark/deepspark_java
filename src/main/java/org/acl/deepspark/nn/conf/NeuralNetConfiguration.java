@@ -1,5 +1,6 @@
 package org.acl.deepspark.nn.conf;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,7 +10,11 @@ import org.acl.deepspark.nn.layers.BaseLayer;
 import org.jblas.DoubleMatrix;
 
 
-public class NeuralNetConfiguration {
+public class NeuralNetConfiguration implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2798664570482111852L;
 	private double learningRate;	
 	private int epoch;
 	private double momentum;

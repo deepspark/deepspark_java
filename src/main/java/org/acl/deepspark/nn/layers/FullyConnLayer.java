@@ -102,11 +102,9 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public void initWeights() {
-		if (W == null) {
-			W = WeightUtil.randInitWeights(dimOut, dimIn);
-			prevDeltaW = DoubleMatrix.zeros(dimOut, dimIn);
-			prevDeltaBias = 0;
-		}
+		W = WeightUtil.randInitWeights(dimOut, dimIn);
+		prevDeltaW = DoubleMatrix.zeros(dimOut, dimIn);
+		prevDeltaBias = 0;
 	}
 
 	@Override

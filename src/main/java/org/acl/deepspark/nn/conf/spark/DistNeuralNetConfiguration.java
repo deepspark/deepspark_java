@@ -72,6 +72,11 @@ public class DistNeuralNetConfiguration implements Serializable {
 				// per minibatch
 				//get output
 				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new Function<Sample, DoubleMatrix>() {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 7864025980071700556L;
+
 					@Override
 					public DoubleMatrix call(Sample arg0) throws Exception {
 						return getOutput(arg0.data)[0].sub(arg0.label);
@@ -81,6 +86,11 @@ public class DistNeuralNetConfiguration implements Serializable {
 				
 				//backpropagation
 				JavaRDD<DeltaWeight> dWeight = delta.map(new Function<DoubleMatrix, DeltaWeight>() {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 7623058973015796084L;
+
 					@Override
 					public DeltaWeight call(DoubleMatrix arg0) throws Exception {
 						DoubleMatrix[] error = new DoubleMatrix[0];
@@ -92,6 +102,11 @@ public class DistNeuralNetConfiguration implements Serializable {
 				// reduce weight
 				DeltaWeight gradient = dWeight.reduce(new Function2<DeltaWeight, DeltaWeight, DeltaWeight>() {
 					
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 8486768340399892033L;
+
 					@Override
 					public DeltaWeight call(DeltaWeight arg0, DeltaWeight arg1)	throws Exception {
 						DeltaWeight result = new DeltaWeight(arg0.gradBList.length);

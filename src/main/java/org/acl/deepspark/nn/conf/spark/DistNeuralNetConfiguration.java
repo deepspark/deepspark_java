@@ -142,7 +142,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 				for(int i = 0; i < gradB.length ; i++)
 					gradB[i] /= minibatchSize;
 				
-				a.update(gradient.gradWList[layerIdx], gradient.gradBList[layerIdx]);
+				a.update(gradW, gradB);
 			}
 		}
 	}

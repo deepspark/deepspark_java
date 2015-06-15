@@ -1,10 +1,17 @@
 package org.acl.deepspark.nn.layers.cnn;
 
+import java.io.Serializable;
+
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.jblas.DoubleMatrix;
 import org.jblas.ranges.RangeUtils;
 
-public class PoolingLayer extends BaseLayer {
+public class PoolingLayer extends BaseLayer  implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4318643106939173007L;
+	
 	private int outputRows;
 	private int outputCols;
 

@@ -1,11 +1,17 @@
 package org.acl.deepspark.nn.layers.cnn;
 
+import java.io.Serializable;
+
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.weights.WeightUtil;
 import org.acl.deepspark.utils.MathUtils;
 import org.jblas.DoubleMatrix;
 
-public class ConvolutionLayer extends BaseLayer {
+public class ConvolutionLayer extends BaseLayer  implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 140807767171115076L;
 	private int filterRows, filterCols, numFilters; // filter spec.
 	private DoubleMatrix[][] W; // filterId, x, y
 	private double[] bias;

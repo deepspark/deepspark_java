@@ -1,8 +1,14 @@
 package org.acl.deepspark.nn.functions;
 
+import java.io.Serializable;
+
 import org.jblas.DoubleMatrix;
 
-public class Activator {
+public class Activator implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3874185953299398816L;
 	public static final int SIGMOID = 0;
 	public static final int TANH = 1;
 	public static final int RELU = 2;

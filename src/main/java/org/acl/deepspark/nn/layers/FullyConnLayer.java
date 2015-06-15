@@ -1,10 +1,16 @@
 package org.acl.deepspark.nn.layers;
 
+import java.io.Serializable;
+
 import org.acl.deepspark.nn.weights.WeightUtil;
 import org.jblas.DoubleMatrix;
 
 // Fully Connected HiddenLayer
-public class FullyConnLayer extends BaseLayer {
+public class FullyConnLayer extends BaseLayer implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7250079452692054259L;
 	private DoubleMatrix W;
 	private DoubleMatrix output;
 	private double momentumFactor = 0.0;

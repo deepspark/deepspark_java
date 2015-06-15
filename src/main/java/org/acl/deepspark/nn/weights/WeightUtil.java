@@ -1,11 +1,18 @@
 
 package org.acl.deepspark.nn.weights;
 
+import java.io.Serializable;
+
 import org.jblas.DoubleMatrix;
 
 
-public class WeightUtil {
+public class WeightUtil implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1196601489934475280L;
+
 	public static DoubleMatrix randInitWeights(int dimRow, int dimCol) {
 		return DoubleMatrix.randn(dimRow, dimCol).divi(10);
 	}

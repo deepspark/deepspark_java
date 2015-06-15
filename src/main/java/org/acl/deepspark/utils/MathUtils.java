@@ -1,10 +1,16 @@
 package org.acl.deepspark.utils;
 
+import java.io.Serializable;
+
 import org.jblas.DoubleMatrix;
 import org.jblas.SimpleBlas;
 import org.jblas.ranges.RangeUtils;
 
-public class MathUtils {
+public class MathUtils  implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3873474318160905207L;
 	public static final int FULL_CONV = 0;
 	public static final int SAME_CONV = 1;
 	public static final int VALID_CONV = 2;

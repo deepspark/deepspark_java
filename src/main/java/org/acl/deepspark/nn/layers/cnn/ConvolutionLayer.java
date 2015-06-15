@@ -4,8 +4,6 @@ import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.weights.WeightUtil;
 import org.acl.deepspark.utils.MathUtils;
 import org.jblas.DoubleMatrix;
-import org.jblas.SimpleBlas;
-import org.jblas.ranges.RangeUtils;
 
 public class ConvolutionLayer extends BaseLayer {
 	private int filterRows, filterCols, numFilters; // filter spec.
@@ -145,7 +143,6 @@ public class ConvolutionLayer extends BaseLayer {
 	@Override
 	public void update(DoubleMatrix[][] gradW, double[] gradB) {
 		for (int i = 0; i < numFilters; i++) {
-
 			for (int j = 0; j < numChannels; j++) {				
 				prevDeltaW[i][j].muli(momentumFactor);
 				prevDeltaW[i][j].addi(W[i][j].mul(learningRate * decayLambda));

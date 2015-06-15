@@ -63,7 +63,7 @@ public class MathUtils  implements Serializable{
 		for(int k = 0; k < d.getRows() / 2 ; k++)
 			d.swapRows(k, d.getRows() - 1 -k);
 		for(int k = 0; k < d.getColumns() / 2 ; k++)
-			d.swapRows(k, d.getRows() - 1 -k);
+			d.swapColumns(k, d.getColumns() - 1 -k);
 
 		return d;
 	}

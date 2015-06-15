@@ -98,20 +98,20 @@ public class DistNeuralNetConfiguration implements Serializable {
 						DeltaWeight result = new DeltaWeight(arg0.gradBList.length);
 											
 						for(int i = 0; i < result.gradWList.length; i++) {
-							result.gradWList[i] = new DoubleMatrix[arg0.gradWList[i].length][];
-							for(int j = 0; j < result.gradWList[i].length; j++) {
-								result.gradWList[i][j] = new DoubleMatrix[arg0.gradWList[i][j].length];
-								for(int k = 0; k < result.gradWList[i][j].length;k++) {
-									result.gradWList[i][j][k] = arg0.gradWList[i][j][k].add(arg1.gradWList[i][j][k]);
+							if(arg0.gradWList[i] != null && arg1.gradWList[i] != null) {
+								result.gradWList[i] = new DoubleMatrix[arg0.gradWList[i].length][];
+								for(int j = 0; j < result.gradWList[i].length; j++) {
+									result.gradWList[i][j] = new DoubleMatrix[arg0.gradWList[i][j].length];
+									for(int k = 0; k < result.gradWList[i][j].length;k++) {
+										result.gradWList[i][j][k] = arg0.gradWList[i][j][k].add(arg1.gradWList[i][j][k]);
+									}
 								}
-							}	
-						}
-						
-						for(int i = 0; i < result.gradBList.length; i++) {
-							result.gradBList[i] = new double[arg0.gradBList[i].length];
-							for(int j = 0; j < result.gradBList[i].length; j++) {
-								result.gradBList[i][j] = arg0.gradBList[i][j] + arg1.gradBList[i][j];
-							}	
+								
+								result.gradBList[i] = new double[arg0.gradBList[i].length];
+								for(int j = 0; j < result.gradBList[i].length; j++) {
+									result.gradBList[i][j] = arg0.gradBList[i][j] + arg1.gradBList[i][j];
+								}	
+							}
 						}
 							
 						return result;

@@ -6,12 +6,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.acl.deepspark.data.DeltaWeight;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 import org.jblas.DoubleMatrix;
 
 
@@ -56,9 +58,6 @@ public class DistNeuralNetConfiguration {
 			batchWeight[i] = 1.0 / numMinibatch;		
 		JavaRDD<Sample>[] rdd_minibatch = rdd_data.randomSplit(batchWeight);
 		
-		final DoubleMatrix[] delta = new DoubleMatrix[1];
-		final DoubleMatrix[] sample = new DoubleMatrix[1]; 
-				
 		for(int i = 0 ; i < epoch ; i++) {
 			System.out.println(String.format("%d epoch...", i+1));
 			// per epoch
@@ -66,32 +65,60 @@ public class DistNeuralNetConfiguration {
 				if(verbosity)
 					System.out.println(String.format("%d - epoch, %d minibatch",i+1, j / minibatchSize + 1));
 				// per minibatch
-				initGradList();
-				
 				//get output
-				JavaRDD<DoubleMatrix> output = rdd_minibatch[j].map(new Function<Sample, DoubleMatrix>() {
+				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new Function<Sample, DoubleMatrix>() {
 					@Override
 					public DoubleMatrix call(Sample arg0) throws Exception {
-						return getOutput(arg0.data)[0];
+						return getOutput(arg0.data)[0].sub(arg0.label);
 					}
 				});
 				
 				
-						
-				int batchIter = Math.min(data.length, j+ minibatchSize);
-				for(int k = j; k < batchIter; k++) {
-					sample[0] = data[k];
-					delta[0] = getOutput(sample)[0].sub(label[k]);
-					
-					backpropagate(delta);
-				}
+				//backpropagation
+				JavaRDD<DeltaWeight> dWeight = delta.map(new Function<DoubleMatrix, DeltaWeight>() {
+					@Override
+					public DeltaWeight call(DoubleMatrix arg0) throws Exception {
+						DoubleMatrix[] error = new DoubleMatrix[0];
+						error[0] = arg0;
+						return backpropagate(error);
+					}
+				});
 				
-				update();
+				// reduce weight
+				DeltaWeight gradient = dWeight.reduce(new Function2<DeltaWeight, DeltaWeight, DeltaWeight>() {
+					
+					@Override
+					public DeltaWeight call(DeltaWeight arg0, DeltaWeight arg1)	throws Exception {
+						DeltaWeight result = new DeltaWeight(arg0.gradBList.length);
+											
+						for(int i = 0; i < result.gradWList.length; i++) {
+							result.gradWList[i] = new DoubleMatrix[arg0.gradWList[i].length][];
+							for(int j = 0; j < result.gradWList[i].length; j++) {
+								result.gradWList[i][j] = new DoubleMatrix[arg0.gradWList[i][j].length];
+								for(int k = 0; k < result.gradWList[i][j].length;k++) {
+									result.gradWList[i][j][j] = arg0.gradWList[i][j][k].add(arg1.gradWList[i][j][k]);
+								}
+							}	
+						}
+						
+						for(int i = 0; i < result.gradBList.length; i++) {
+							result.gradBList[i] = new double[arg0.gradBList[i].length];
+							for(int j = 0; j < result.gradBList[i].length; j++) {
+								result.gradBList[i][j] = arg0.gradBList[i][j] + arg1.gradBList[i][j];
+							}	
+						}
+							
+						return result;
+					}
+				});
+				
+				//update
+				update(gradient);
 			}
 		}
 	}
 	
-	private void update() {
+	private void update(DeltaWeight gradient) {
 		ListIterator<BaseLayer> it = layerList.listIterator(getNumberOfLayers());
 		int layerIdx = layerList.size();
 		
@@ -99,8 +126,8 @@ public class DistNeuralNetConfiguration {
 			layerIdx--;
 			
 			BaseLayer a = it.previous();
-			DoubleMatrix[][] gradW = gradWList[layerIdx];
-			double[] gradB = gradBList[layerIdx];
+			DoubleMatrix[][] gradW = gradient.gradWList[layerIdx];
+			double[] gradB = gradient.gradBList[layerIdx];
 			
 			if(gradW != null && gradB != null) {
 				for(int i = 0; i < gradW.length ; i++)
@@ -109,18 +136,14 @@ public class DistNeuralNetConfiguration {
 				for(int i = 0; i < gradB.length ; i++)
 					gradB[i] /= minibatchSize;
 				
-				a.update(gradWList[layerIdx], gradBList[layerIdx]);
+				a.update(gradient.gradWList[layerIdx], gradient.gradBList[layerIdx]);
 			}
 		}
 	}
 	
-	private void initGradList() {
-		gradWList = new DoubleMatrix[layerList.size()][][];
-		gradBList = new double[layerList.size()][];
-	}
 	
-	
-	public void backpropagate(DoubleMatrix[] delta) {
+	public DeltaWeight backpropagate(DoubleMatrix[] delta) {
+		DeltaWeight deltas = new DeltaWeight(layerList.size());
 		ListIterator<BaseLayer> it = layerList.listIterator(getNumberOfLayers());
 		int layerIdx = layerList.size();
 		// Back-propagation
@@ -130,31 +153,15 @@ public class DistNeuralNetConfiguration {
 			BaseLayer a = it.previous();
 			a.setDelta(delta);
 			
-			if(gradWList[layerIdx] == null)
-				gradWList[layerIdx] = a.deriveGradientW();
-			else {
-				DoubleMatrix[][] deltaW = a.deriveGradientW();
-				for(int i = 0; i < gradWList[layerIdx].length; i++)
-					for(int j = 0; j < gradWList[layerIdx][i].length ; j++)
-						gradWList[layerIdx][i][j].addi(deltaW[i][j]);
-			}
-			
-			
-			
-			if(gradBList[layerIdx] == null) {
-				if(a.getDelta() != null) {			
-					double[] b = new double[a.getDelta().length];
-					for(int i = 0; i < a.getDelta().length; i++)
-						b[i] = a.getDelta()[i].sum();
-					gradBList[layerIdx] = b;
-				}
-			}
-			else
-				for(int i = 0; i < a.getDelta().length; i++)
-					gradBList[layerIdx][i] += a.getDelta()[i].sum();
+			deltas.gradWList[layerIdx] = a.deriveGradientW();
+			double[] b = new double[a.getDelta().length];
+			for(int i = 0; i < a.getDelta().length; i++)
+				b[i] = a.getDelta()[i].sum();
+			deltas.gradBList[layerIdx] = b;
 			
 			delta = a.deriveDelta();
 		}
+		return deltas;
 	}
 	
 	public DoubleMatrix[] getOutput(DoubleMatrix[] data) {
@@ -168,27 +175,5 @@ public class DistNeuralNetConfiguration {
 			output = l.getOutput();
 		}
 		return output;
-	}
-	
-	public static class Builder {
-		private double learningRate;	
-		private int epoch;
-		private double momentum;
-		
-		public void learningRate(double learningRates) {
-			this.learningRate = learningRates;
-		}
-		
-		public void epoch(int epoch) {
-			this.epoch = epoch;
-		}
-		
-		public void momentum(double momentum) {
-			this.momentum = momentum;
-		}
-		
-		public void addLayer(BaseLayer l) {
-			
-		}
 	}
 }

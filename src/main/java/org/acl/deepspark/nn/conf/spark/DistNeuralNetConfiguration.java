@@ -160,10 +160,13 @@ public class DistNeuralNetConfiguration implements Serializable {
 			a.setDelta(delta);
 			
 			deltas.gradWList[layerIdx] = a.deriveGradientW();
-			double[] b = new double[a.getDelta().length];
-			for(int i = 0; i < a.getDelta().length; i++)
-				b[i] = a.getDelta()[i].sum();
-			deltas.gradBList[layerIdx] = b;
+			
+			if(a.getDelta() != null) {	
+				double[] b = new double[a.getDelta().length];
+				for(int i = 0; i < a.getDelta().length; i++)
+					b[i] = a.getDelta()[i].sum();
+				deltas.gradBList[layerIdx] = b;
+			}			
 			
 			delta = a.deriveDelta();
 		}

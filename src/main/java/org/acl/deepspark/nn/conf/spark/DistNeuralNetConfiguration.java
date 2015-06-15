@@ -102,7 +102,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 							for(int j = 0; j < result.gradWList[i].length; j++) {
 								result.gradWList[i][j] = new DoubleMatrix[arg0.gradWList[i][j].length];
 								for(int k = 0; k < result.gradWList[i][j].length;k++) {
-									result.gradWList[i][j][j] = arg0.gradWList[i][j][k].add(arg1.gradWList[i][j][k]);
+									result.gradWList[i][j][k] = arg0.gradWList[i][j][k].add(arg1.gradWList[i][j][k]);
 								}
 							}	
 						}

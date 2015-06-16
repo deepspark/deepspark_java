@@ -104,7 +104,7 @@ public class NeuralNetConfiguration implements Serializable {
 				for(int i = 0; i < gradB.length ; i++)
 					gradB[i] /= minibatchSize;
 				
-				a.update(gradWList[layerIdx], gradBList[layerIdx]);
+				a.update(gradW, gradB);
 			}
 		}
 	}

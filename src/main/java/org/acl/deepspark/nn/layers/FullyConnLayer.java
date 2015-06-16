@@ -17,7 +17,7 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 	private DoubleMatrix prevDeltaW;
 	private double prevDeltaBias;
 	private double bias = 0.01;
-	private double decayLambda = 1e-5;
+	private double decayLambda = 0.00001;
 
 	public FullyConnLayer(int nOut) {
 		this.dimOut = nOut;
@@ -102,9 +102,12 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public void initWeights() {
-		W = WeightUtil.randInitWeights(dimOut, dimIn);
-		prevDeltaW = DoubleMatrix.zeros(dimOut, dimIn);
-		prevDeltaBias = 0;
+		if(W == null) {
+			W = WeightUtil.randInitWeights(dimOut, dimIn);
+			bias = 0.01;
+			prevDeltaW = DoubleMatrix.zeros(dimOut, dimIn);
+			prevDeltaBias = 0;
+		}
 	}
 
 	@Override

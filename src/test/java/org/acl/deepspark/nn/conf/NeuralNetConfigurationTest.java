@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
+import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.layers.FullyConnLayer;
 import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
@@ -18,36 +19,30 @@ public class NeuralNetConfigurationTest {
 	
 	public static void main(String[] args) {
 		System.out.println("Data Loading...");
-		MnistLoader loader = new MnistLoader();
-		loader.load("C:/Users/Hanjoo Kim/Downloads/mnist_train.txt",true);
-		DoubleMatrix[] train_data = loader.getData();
-		DoubleMatrix[] train_label = loader.getLabel();
 		
-		loader.load("C:/Users/Hanjoo Kim/Downloads/mnist_test.txt",true);
-		DoubleMatrix[] test_data = loader.getData();
-		DoubleMatrix[] test_label = loader.getLabel();
+		Sample[] train_data = MnistLoader.loadIntoSamples("C:/Users/Hanjoo Kim/Downloads/mnist_train.txt",true);
+		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Hanjoo Kim/Downloads/mnist_test.txt",true);
 		
 		System.out.println("Shuffling...");
 		Collections.shuffle(Arrays.asList(train_data));
 		Collections.shuffle(Arrays.asList(test_data));
 		
 		// configure network
-		NeuralNetConfiguration net = new NeuralNetConfiguration(0.1, 3, 1000,true);
-		net.addLayer(new ConvolutionLayer(9, 9, 20)); // conv with 20 filters (9x9)
+		NeuralNetConfiguration net = new NeuralNetConfiguration(0.1, 10, 100,true);
+		net.addLayer(new ConvolutionLayer(3, 3, 2)); // conv with 20 filters (9x9)
 		net.addLayer(new PoolingLayer(2)); // max pool
 		net.addLayer(new FullyConnLayer(200)); // hidden
 		net.addLayer(new FullyConnLayer(10)); // output
 		
+		net.prepareForTraining(0);
 		System.out.println("Start Learning...");
 		Date startTime = new Date();
-		net.training(train_data, train_label);
-		DoubleMatrix[] matrix = new DoubleMatrix[1];
+		net.training(train_data);
 		
 		System.out.println(String.format("Testing... with %d samples...", nTest));
 		int count = 0;
 		for(int j = 0 ; j < nTest; j++) {
-			matrix[0] = test_data[j];
-			if(test_label[j].argmax() == net.getOutput(matrix)[0].argmax())
+			if(test_data[j].label.argmax() == net.getOutput(test_data[j].data)[0].argmax())
 				count++;
 		}
 		

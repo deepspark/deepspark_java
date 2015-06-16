@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.jblas.DoubleMatrix;
 
@@ -26,6 +27,7 @@ public class NeuralNetConfiguration implements Serializable {
 	
 	//running options	
 	private boolean verbosity = true; 
+	private boolean finalize = false;
 	
 	public NeuralNetConfiguration(double learningRate, int epoch, int minibatchSize) {
 		layerList = new ArrayList<BaseLayer>();
@@ -39,21 +41,19 @@ public class NeuralNetConfiguration implements Serializable {
 	}
 
 	public void addLayer(BaseLayer l) {
-		layerList.add(l);
+		if(!finalize)
+			layerList.add(l);
 	}
 	
 	public int getNumberOfLayers() {
 		return layerList.size();
 	}
 	
-	public void training(DoubleMatrix[] data, DoubleMatrix[] label) {
-		if (data.length != label.length) {
-			System.err.println("Mismatch of the number of data and labels");
+	public void training(Sample[] data) {
+		if(!finalize)
 			return;
-		}
 		
 		final DoubleMatrix[] delta = new DoubleMatrix[1];
-		final DoubleMatrix[] sample = new DoubleMatrix[1]; 
 				
 		for(int i = 0 ; i < epoch ; i++) {
 			System.out.println(String.format("%d epoch...", i+1));
@@ -66,15 +66,17 @@ public class NeuralNetConfiguration implements Serializable {
 
 				int batchIter = Math.min(data.length, j+ minibatchSize);
 				for(int k = j; k < batchIter; k++) {
-					sample[0] = data[k];
-					delta[0] = getOutput(sample)[0].sub(label[k]);
-					
+					delta[0] = getOutput(data[k].data)[0].sub(data[k].label);
 					backpropagate(delta);
 				}
 				
 				update();
 			}
 		}
+	}
+	
+	public void prepareForTraining(int dimInput) {
+		finalize = true;
 	}
 	
 	private void update() {
@@ -154,27 +156,5 @@ public class NeuralNetConfiguration implements Serializable {
 			output = l.getOutput();
 		}
 		return output;
-	}
-	
-	public static class Builder {
-		private double learningRate;	
-		private int epoch;
-		private double momentum;
-		
-		public void learningRate(double learningRates) {
-			this.learningRate = learningRates;
-		}
-		
-		public void epoch(int epoch) {
-			this.epoch = epoch;
-		}
-		
-		public void momentum(double momentum) {
-			this.momentum = momentum;
-		}
-		
-		public void addLayer(BaseLayer l) {
-			
-		}
 	}
 }

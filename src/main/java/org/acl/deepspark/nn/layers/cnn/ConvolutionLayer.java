@@ -22,7 +22,7 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 	private double[] prevDeltaBias;
 		
 	// weight decay
-	private double decayLambda = 1e-5;
+	private double decayLambda = 0.00001;
 	
 	private int[] stride = {1, 1};
 	private int zeroPadding = 0;

@@ -13,25 +13,24 @@ public class PoolingLayerTest {
 		DoubleMatrix inputMat2 = new DoubleMatrix(input2);
 		DoubleMatrix[] inputMatrices = {inputMat, inputMat2};
 		
-		// pooling layer constructor
-		PoolingLayer poolingLayer = new PoolingLayer(inputMatrices, 2);
-		PoolingLayer poolingLayer2 = new PoolingLayer(inputMatrices, 3);
+		System.out.println("inputMat");
+		System.out.println(inputMat.toString());
+		System.out.println("inputMat2");
+		System.out.println(inputMat2.toString());
 		
-		// pooling a single image
-		System.out.println(poolingLayer.pooling(inputMat).toString());
-		System.out.println(poolingLayer.pooling(inputMat2).toString());
-		System.out.println();
-		
-		System.out.println(poolingLayer2.pooling(inputMat).toString());
-		System.out.println(poolingLayer2.pooling(inputMat2).toString());
-		System.out.println();
+		PoolingLayer poolingLayer = new PoolingLayer(2);
+		PoolingLayer poolingLayer2 = new PoolingLayer(3);
+		poolingLayer.setInput(inputMatrices);
+		poolingLayer2.setInput(inputMatrices);
 		
 		// overall pooling check
 		DoubleMatrix[] result = poolingLayer.pooling();
 		DoubleMatrix[] result2 = poolingLayer2.pooling();
 		
+		System.out.println("inputMat pooling");
 		for(DoubleMatrix matrix : result)
 			System.out.println(matrix.toString());
+		System.out.println("inputMat2 pooling");
 		for(DoubleMatrix matrix : result2)
 			System.out.println(matrix.toString());
 		

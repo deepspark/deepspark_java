@@ -28,13 +28,18 @@ public class NeuralNetConfigurationTest {
 		Collections.shuffle(Arrays.asList(test_data));
 		
 		// configure network
-		NeuralNetConfiguration net = new NeuralNetConfiguration(0.1, 10, 100,true);
+		NeuralNetConfiguration net = new NeuralNetConfiguration(0.1, 2, 1,true);
 		net.addLayer(new ConvolutionLayer(3, 3, 2)); // conv with 20 filters (9x9)
 		net.addLayer(new PoolingLayer(2)); // max pool
 		net.addLayer(new FullyConnLayer(200)); // hidden
 		net.addLayer(new FullyConnLayer(10)); // output
 		
-		net.prepareForTraining(0);
+		int[] dim = new int[3];
+		dim[0] = train_data[0].data[0].getRows();
+		dim[1] = train_data[0].data[0].getColumns();
+		dim[2] = train_data[0].data.length;
+		
+		net.prepareForTraining(dim);
 		System.out.println("Start Learning...");
 		Date startTime = new Date();
 		net.training(train_data);

@@ -186,4 +186,21 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public int[] initWeights(int[] dim) {
+		int[] outDim = new int[3];
+		
+		this.dimRows = dim[0];
+		this.dimCols = dim[1];
+		this.numChannels = dim[2];
+		this.dimIn = dimRows * dimCols * numChannels;
+		initWeights();
+		
+		outDim[0] = dim[0] - filterRows +1; //output row dimension
+		outDim[1] = dim[1] - filterCols +1; //output col dimension
+		outDim[2] = numFilters; //output channel dimension
+		
+		return outDim;
+	}
 }

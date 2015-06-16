@@ -75,8 +75,15 @@ public class NeuralNetConfiguration implements Serializable {
 		}
 	}
 	
-	public void prepareForTraining(int dimInput) {
+	public void prepareForTraining(int[] dimIn) {
 		finalize = true;
+		Iterator<BaseLayer> itLayer = layerList.iterator();
+		
+		// Feed-forward
+		while (itLayer.hasNext()) {
+			BaseLayer l = itLayer.next();
+			dimIn = l.initWeights(dimIn);
+		}
 	}
 	
 	private void update() {

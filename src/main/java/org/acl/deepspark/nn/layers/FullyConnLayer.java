@@ -121,4 +121,18 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 		grad[0][0] = delta[0].mmul(WeightUtil.flat2Vec(input).transpose());
 		return grad;
 	}
+
+	@Override
+	public int[] initWeights(int[] dim) {
+		int[] outDim = new int[1];
+		int inDim = 1;
+		for(int i = 0; i < dim.length; i++) {
+			inDim *= dim[i];
+		}
+		dimIn = inDim;
+		outDim[0] = dimOut;
+		
+		initWeights();
+		return outDim;
+	}
 }

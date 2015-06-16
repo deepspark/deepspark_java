@@ -145,6 +145,21 @@ public class PoolingLayer extends BaseLayer  implements Serializable {
 		}
 	}
 
+	public int[] initWeights(int[] dim) {
+		int[] outDim = new int[3];
+		
+		this.dimRows = dim[0];
+		this.dimCols = dim[1];
+		this.numChannels = dim[2];
+		initWeights();
+		
+		outDim[0] = outputRows;
+		outDim[1] = outputCols;
+		outDim[2] = numChannels;
+			
+		return outDim;
+	}
+	
 	@Override
 	public void applyDropOut() {
 		// TODO Auto-generated method stub

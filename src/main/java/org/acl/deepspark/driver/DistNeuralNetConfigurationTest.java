@@ -36,8 +36,10 @@ public class DistNeuralNetConfigurationTest implements Serializable {
 		System.out.println(String.format("%d samples loaded...", train_samples.length));
 		
 		// configure network
-		DistNeuralNetConfiguration net = new DistNeuralNetConfiguration(0.1, 3, minibatch, sc, true);
-		net.addLayer(new ConvolutionLayer(9, 9, 20)); // conv with 20 filters (9x9)
+		DistNeuralNetConfiguration net = new DistNeuralNetConfiguration(0.1, 10, minibatch, sc, true);
+		net.addLayer(new ConvolutionLayer(5, 5, 10)); // conv with 20 filters (5x5)
+		net.addLayer(new PoolingLayer(2)); // max pool
+		net.addLayer(new ConvolutionLayer(5, 5, 20)); // conv with 20 filters (5x5)
 		net.addLayer(new PoolingLayer(2)); // max pool
 		net.addLayer(new FullyConnLayer(200)); // hidden
 		net.addLayer(new FullyConnLayer(10)); // output

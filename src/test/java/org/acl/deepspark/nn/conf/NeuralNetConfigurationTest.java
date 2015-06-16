@@ -28,8 +28,10 @@ public class NeuralNetConfigurationTest {
 		Collections.shuffle(Arrays.asList(test_data));
 		
 		// configure network
-		NeuralNetConfiguration net = new NeuralNetConfiguration(0.1, 2, 10,true);
-		net.addLayer(new ConvolutionLayer(3, 3, 2)); // conv with 20 filters (9x9)
+		NeuralNetConfiguration net = new NeuralNetConfiguration(0.1, 2, 1,true);
+		net.addLayer(new ConvolutionLayer(5, 5, 10)); // conv with 20 filters (9x9)
+		net.addLayer(new PoolingLayer(2)); // max pool
+		net.addLayer(new ConvolutionLayer(5, 5, 20)); // conv with 20 filters (9x9)
 		net.addLayer(new PoolingLayer(2)); // max pool
 		net.addLayer(new FullyConnLayer(200)); // hidden
 		net.addLayer(new FullyConnLayer(10)); // output

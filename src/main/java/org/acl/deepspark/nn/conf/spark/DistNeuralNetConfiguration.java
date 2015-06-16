@@ -61,7 +61,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 			return;
 		
 		List<Sample> data_list = Arrays.asList(data);
-		JavaRDD<Sample> rdd_data = sc.parallelize(data_list);
+		JavaRDD<Sample> rdd_data = sc.parallelize(data_list).cache();
 		int numMinibatch = (int) Math.ceil((double) data.length / minibatchSize); 
 		double[] batchWeight = new double[numMinibatch];
 		for(int i = 0; i < numMinibatch; i++)
@@ -73,7 +73,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 			// per epoch
 			for(int j = 0; j < rdd_minibatch.length; j++) {
 				if(verbosity)
-					System.out.println(String.format("%d - epoch, %d minibatch",i+1, j / minibatchSize + 1));
+					System.out.println(String.format("%d - epoch, %d minibatch",i+1, j + 1));
 				// per minibatch
 				//get output
 				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new OutputFunction(this));

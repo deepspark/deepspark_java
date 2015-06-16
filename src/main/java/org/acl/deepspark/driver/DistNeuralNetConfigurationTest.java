@@ -42,6 +42,13 @@ public class DistNeuralNetConfigurationTest implements Serializable {
 		net.addLayer(new FullyConnLayer(200)); // hidden
 		net.addLayer(new FullyConnLayer(10)); // output
 		
+		int[] dim = new int[3];
+		dim[0] = train_samples[0].data[0].getRows();
+		dim[1] = train_samples[0].data[0].getColumns();
+		dim[2] = train_samples[0].data.length;
+		
+		net.prepareForTraining(dim);
+		
 		System.out.println("Start Learning...");
 		Date startTime = new Date();
 		net.training(train_samples);

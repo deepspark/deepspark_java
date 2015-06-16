@@ -32,7 +32,9 @@ public class DistNeuralNetConfiguration implements Serializable {
 	
 	//running options	
 	private boolean verbosity = true;
-	private transient JavaSparkContext sc = null; 
+	private transient JavaSparkContext sc = null;
+
+	private boolean finalize = false; 
 	
 	public DistNeuralNetConfiguration(double learningRate, int epoch, int minibatchSize, JavaSparkContext sc) {
 		layerList = new ArrayList<BaseLayer>();
@@ -55,6 +57,9 @@ public class DistNeuralNetConfiguration implements Serializable {
 	}
 	
 	public void training(Sample[] data) {
+		if(!finalize )
+			return;
+		
 		List<Sample> data_list = Arrays.asList(data);
 		JavaRDD<Sample> rdd_data = sc.parallelize(data_list);
 		int numMinibatch = (int) Math.ceil((double) data.length / minibatchSize); 
@@ -121,6 +126,17 @@ public class DistNeuralNetConfiguration implements Serializable {
 				//update
 				update(gradient);
 			}
+		}
+	}
+	
+	public void prepareForTraining(int[] dimIn) {
+		finalize = true;
+		Iterator<BaseLayer> itLayer = layerList.iterator();
+		
+		// Feed-forward
+		while (itLayer.hasNext()) {
+			BaseLayer l = itLayer.next();
+			dimIn = l.initWeights(dimIn);
 		}
 	}
 	

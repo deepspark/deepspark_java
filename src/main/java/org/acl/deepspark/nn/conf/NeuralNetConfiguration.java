@@ -59,9 +59,10 @@ public class NeuralNetConfiguration implements Serializable {
 			System.out.println(String.format("%d epoch...", i+1));
 			// per epoch
 			for(int j = 0; j < data.length; j += minibatchSize) {
-				if(verbosity)
-					System.out.println(String.format("%d - epoch, %d minibatch",i+1, j / minibatchSize + 1));
 				// per minibatch
+				if(verbosity) {
+					System.out.println(String.format("%d - epoch, %d minibatch",i+1, j / minibatchSize + 1));
+				}
 				initGradList();
 
 				int batchIter = Math.min(data.length, j+ minibatchSize);
@@ -69,7 +70,6 @@ public class NeuralNetConfiguration implements Serializable {
 					delta[0] = getOutput(data[k].data)[0].sub(data[k].label);
 					backpropagate(delta);
 				}
-				
 				update();
 			}
 		}

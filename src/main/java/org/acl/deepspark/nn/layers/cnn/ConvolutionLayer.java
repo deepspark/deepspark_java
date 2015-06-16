@@ -110,8 +110,9 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 		DoubleMatrix[] data = new DoubleMatrix[numFilters];
 		// TODO: check dims(image) > dims(filter)
 		for(int i = 0; i < numFilters; i++) {
+			data[i] = DoubleMatrix.zeros(getOutputRows(), getOutputCols());
 			for(int j = 0; j < numChannels; j++) {
-				data[i] = MathUtils.convolution(input[j], W[i][j], MathUtils.VALID_CONV);
+				data[i].addi(MathUtils.convolution(input[j], W[i][j], MathUtils.VALID_CONV));
 			}
 			data[i].addi(bias[i]);
 		}
@@ -128,7 +129,7 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 	public void setDelta(DoubleMatrix[] propDelta) {
 		delta = propDelta;
 		for(int i = 0 ; i < delta.length; i++)
-			delta[i].mul(output[i].mul(output[i].mul(-1.0).add(1.0)));
+			delta[i].muli(output[i].mul(output[i].mul(-1.0).add(1.0)));
 	}
 	
 	// TODO:
@@ -139,13 +140,10 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 		// update Weights
 		for (int i = 0; i < numFilters; i++)
 			for (int j = 0; j < numChannels; j++)
-				gradient[i][j] = MathUtils.convolution(input[j], getDelta()[i], MathUtils.VALID_CONV);
-		
+				gradient[i][j] = MathUtils.convolution(input[j], getDelta()[i], MathUtils.VALID_CONV);		
 		return gradient;
 	}
-	
-	
-	
+
 	@Override
 	public void update(DoubleMatrix[][] gradW, double[] gradB) {
 		for (int i = 0; i < numFilters; i++) {
@@ -172,7 +170,7 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 		
 		// TODO: check dims(image) > dims(filter)
 		for (int j = 0; j < numChannels; j++) {
-			propDelta[j] = new DoubleMatrix(dimRows, dimCols);
+			propDelta[j] = DoubleMatrix.zeros(dimRows, dimCols);
 			for (int i = 0; i < numFilters; i++) {
 				filter = new DoubleMatrix(W[i][j].toArray2());
 				

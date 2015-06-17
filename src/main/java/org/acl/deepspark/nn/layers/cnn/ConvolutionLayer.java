@@ -18,8 +18,8 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 	
 	// momentum 
 	private double momentumFactor = 0.0;
-	private DoubleMatrix[][] prevDeltaW;
-	private double[] prevDeltaBias;
+	private transient DoubleMatrix[][] prevDeltaW;
+	private transient double[] prevDeltaBias;
 		
 	// weight decay
 	private double decayLambda = 0.00001;

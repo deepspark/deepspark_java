@@ -72,15 +72,31 @@ public class Activator implements Serializable {
 	}
 	
 	public static double relu(double x) {
-		return x;
+		return Math.max(0, x);
 	}
 	
 	public static DoubleMatrix relu(DoubleMatrix matrix) {
+		if(matrix != null) {
+			int rows = matrix.rows;
+			int cols = matrix.columns;
+			double activation;
+			
+			for(int m = 0; m < rows; m++) {
+				for(int n = 0; n < cols; n++) {
+					activation = relu(matrix.get(m,n));
+					matrix.put(m, n, activation);
+				}
+			}
+		}
 		return matrix;
 	}
 	
 	
 	public static DoubleMatrix[] relu(DoubleMatrix[] matrices) {
+		int size = matrices.length;
+		for(int i = 0; i < size; i++) {
+			matrices[i] = relu(matrices[i]);
+		}
 		return matrices;
 	}
 	

@@ -43,15 +43,31 @@ public class Activator implements Serializable {
 	}
 	
 	public static double tanh(double x) {
-		return x;
+		return Math.tanh(x);
 	}
 	
 	public static DoubleMatrix tanh(DoubleMatrix matrix) {
+		if(matrix != null) {
+			int rows = matrix.rows;
+			int cols = matrix.columns;
+			double activation;
+			
+			for(int m = 0; m < rows; m++) {
+				for(int n = 0; n < cols; n++) {
+					activation = tanh(matrix.get(m,n));
+					matrix.put(m, n, activation);
+				}
+			}
+		}
 		return matrix;
 	}
 	
 	
 	public static DoubleMatrix[] tanh(DoubleMatrix[] matrices) {
+		int size = matrices.length;
+		for(int i = 0; i < size; i++) {
+			matrices[i] = tanh(matrices[i]);
+		}
 		return matrices;
 	}
 	

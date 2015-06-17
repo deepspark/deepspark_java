@@ -127,7 +127,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 				
 				accW = sc.accumulator(getEmptyDeltaWeight(), new DeltaAccumulator());
 				// reduce weight
-				 dWeight.foreachAsync(new VoidFunction<DeltaWeight>() {
+				 dWeight.foreach(new VoidFunction<DeltaWeight>() {
 					
 					@Override
 					public void call(DeltaWeight arg0) throws Exception {

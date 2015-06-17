@@ -35,6 +35,12 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 		this.numFilters = numFilters;
 	}
 	
+	public ConvolutionLayer(int filterRows, int filterCols, int numFilters, double momentum, double decayLambda) {
+		this(filterRows, filterCols, numFilters);
+		this.momentumFactor = momentum;
+		this.decayLambda = decayLambda;
+	}
+	
 	public ConvolutionLayer(DoubleMatrix input, int filterRows, int filterCols, int numFilters) {
 		super(input);
 		this.filterRows = filterRows;
@@ -202,5 +208,11 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 		outDim[2] = numFilters; //output channel dimension
 		
 		return outDim;
+	}
+
+	@Override
+	public int[] getWeightInfo() {
+		int[] info = {numFilters, numChannels, filterRows, filterCols};
+		return null;
 	}
 }

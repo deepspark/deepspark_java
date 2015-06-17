@@ -172,5 +172,10 @@ public class PoolingLayer extends BaseLayer  implements Serializable {
 		return null;
 	}
 
+	@Override
+	public int[] getWeightInfo() {
+		return null;
+	}
+
 	
 }

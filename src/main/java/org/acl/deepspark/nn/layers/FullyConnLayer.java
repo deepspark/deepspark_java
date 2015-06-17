@@ -23,6 +23,12 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 		this.dimOut = nOut;
 	}
 	
+	public FullyConnLayer(int nOut,double momentum, double decayLambda) {
+		this.dimOut = nOut;
+		this.momentumFactor = momentum;
+		this.decayLambda = decayLambda;
+	}
+	
 	public FullyConnLayer(DoubleMatrix input, int nOut) {
 		super(input, nOut);
 		initWeights();
@@ -134,5 +140,11 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 		
 		initWeights();
 		return outDim;
+	}
+
+	@Override
+	public int[] getWeightInfo() {
+		int[] info = {1, 1, dimOut, dimIn};
+		return info;
 	}
 }

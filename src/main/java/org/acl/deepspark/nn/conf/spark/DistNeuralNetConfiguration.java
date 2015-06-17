@@ -7,13 +7,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.acl.deepspark.data.DeltaAccumulator;
 import org.acl.deepspark.data.DeltaWeight;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.layers.BaseLayer;
+import org.apache.spark.Accumulator;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.api.java.function.VoidFunction;
 import org.jblas.DoubleMatrix;
 
 
@@ -27,14 +30,46 @@ public class DistNeuralNetConfiguration implements Serializable {
 	private int epoch;
 	private double momentum;
 	private int minibatchSize;
-	
+		
 	private List<BaseLayer> layerList;
 	
 	//running options	
 	private boolean verbosity = true;
+	
+	//spark
 	private transient JavaSparkContext sc = null;
-
+	private Accumulator<DeltaWeight> accW = null;
 	private boolean finalize = false; 
+	
+	public DeltaWeight getEmptyDeltaWeight() {
+		if(!finalize)
+			return null;
+		
+		DeltaWeight d = new DeltaWeight(layerList.size());
+		Iterator<BaseLayer> itLayer = layerList.iterator();
+		int count = 0;
+		while (itLayer.hasNext()) {
+			BaseLayer l = itLayer.next();
+			int[] info = l.getWeightInfo();
+			if(info == null) {
+				d.gradWList[count] = null;
+				d.gradBList[count] = null;
+			} else {
+				d.gradWList[count] = new DoubleMatrix[info[0]][info[1]];
+				d.gradBList[count] = new double[info[0]];
+				
+				for(int i = 0; i < info[0]; i++) {
+					for(int j = 0; j < info[j]; j++) {
+						d.gradWList[count][i][j] = DoubleMatrix.zeros(info[2],info[3]);
+					}
+					d.gradBList[count][i] = 0;
+				}
+			}
+			count++;
+		}
+		
+		return d;
+	}
 	
 	public DistNeuralNetConfiguration(double learningRate, int epoch, int minibatchSize, JavaSparkContext sc) {
 		layerList = new ArrayList<BaseLayer>();
@@ -74,6 +109,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 			for(int j = 0; j < rdd_minibatch.length; j++) {
 				if(verbosity)
 					System.out.println(String.format("%d - epoch, %d minibatch",i+1, j + 1));
+								
 				// per minibatch
 				//get output
 				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new OutputFunction(this));
@@ -89,40 +125,17 @@ public class DistNeuralNetConfiguration implements Serializable {
 					}
 				});
 				
-				
+				accW = sc.accumulator(getEmptyDeltaWeight(), new DeltaAccumulator());
 				// reduce weight
-				DeltaWeight gradient = dWeight.reduce(new Function2<DeltaWeight, DeltaWeight, DeltaWeight>() {
+				 dWeight.foreachAsync(new VoidFunction<DeltaWeight>() {
 					
-					/**
-					 * 
-					 */
-					private static final long serialVersionUID = 8486768340399892033L;
-
 					@Override
-					public DeltaWeight call(DeltaWeight arg0, DeltaWeight arg1)	throws Exception {
-						DeltaWeight result = new DeltaWeight(arg0.gradBList.length);
-											
-						for(int i = 0; i < result.gradWList.length; i++) {
-							if(arg0.gradWList[i] != null && arg1.gradWList[i] != null) {
-								result.gradWList[i] = new DoubleMatrix[arg0.gradWList[i].length][];
-								for(int j = 0; j < result.gradWList[i].length; j++) {
-									result.gradWList[i][j] = new DoubleMatrix[arg0.gradWList[i][j].length];
-									for(int k = 0; k < result.gradWList[i][j].length;k++) {
-										result.gradWList[i][j][k] = arg0.gradWList[i][j][k].add(arg1.gradWList[i][j][k]);
-									}
-								}
-								
-								result.gradBList[i] = new double[arg0.gradBList[i].length];
-								for(int j = 0; j < result.gradBList[i].length; j++) {
-									result.gradBList[i][j] = arg0.gradBList[i][j] + arg1.gradBList[i][j];
-								}	
-							}
-						}
-							
-						return result;
+					public void call(DeltaWeight arg0) throws Exception {
+						accW.add(arg0);
 					}
 				});
-				
+				 
+				 DeltaWeight gradient = accW.value();
 				//update
 				update(gradient);
 			}

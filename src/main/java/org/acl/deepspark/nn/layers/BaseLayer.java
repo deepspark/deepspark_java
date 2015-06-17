@@ -109,7 +109,7 @@ public abstract class BaseLayer implements Serializable {
 	public abstract void initWeights(); 
 	public abstract int[] initWeights(int[] dim);
 	public abstract void applyDropOut();
-	
+	public abstract int[] getWeightInfo();
 	public abstract DoubleMatrix[][] deriveGradientW();
 	public abstract DoubleMatrix[] getOutput();
 	public abstract DoubleMatrix[] deriveDelta();

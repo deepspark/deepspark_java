@@ -12,10 +12,10 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 	 */
 	private static final long serialVersionUID = -7250079452692054259L;
 	private DoubleMatrix W;
-	private transient DoubleMatrix output;
+	private DoubleMatrix output;
 	private double momentumFactor = 0.0;
-	private transient DoubleMatrix prevDeltaW;
-	private transient double prevDeltaBias;
+	private DoubleMatrix prevDeltaW;
+	private double prevDeltaBias;
 	private double bias = 0.01;
 	private double decayLambda = 0.00001;
 

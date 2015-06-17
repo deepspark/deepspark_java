@@ -22,7 +22,7 @@ public class DistNeuralNetConfigurationTest implements Serializable {
 	private static final long serialVersionUID = 8811812248690041287L;
 	
 	public static final int nTest = 10000;
-	public static final int minibatch = 100;
+	public static final int minibatch = 1;
 	
 	public static void main(String[] args) {
 		SparkConf conf = new SparkConf().setAppName("DeepSpark CNN Test Driver");
@@ -36,7 +36,7 @@ public class DistNeuralNetConfigurationTest implements Serializable {
 		System.out.println(String.format("%d samples loaded...", train_samples.length));
 		
 		// configure network
-		DistNeuralNetConfiguration net = new DistNeuralNetConfiguration(0.1, 2, minibatch, sc, true);
+		DistNeuralNetConfiguration net = new DistNeuralNetConfiguration(0.1, 1, minibatch, sc, true);
 		net.addLayer(new ConvolutionLayer(9, 9, 20,0.5, 1e-5)); // conv with 20 filters (9x9)
 		net.addLayer(new PoolingLayer(2)); // max pool
 		net.addLayer(new FullyConnLayer(500,0.5, 1e-5)); // hidden

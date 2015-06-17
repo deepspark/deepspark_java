@@ -102,6 +102,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 		for(int i = 0; i < numMinibatch; i++)
 			batchWeight[i] = 1.0 / numMinibatch;		
 		JavaRDD<Sample>[] rdd_minibatch = rdd_data.randomSplit(batchWeight);
+		accW = sc.accumulator(getEmptyDeltaWeight(), new DeltaAccumulator());
 		
 		for(int i = 0 ; i < epoch ; i++) {
 			System.out.println(String.format("%d epoch...", i+1));
@@ -112,7 +113,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 								
 				// per minibatch
 				//get output
-				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new OutputFunction(this));
+				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new OutputFunction(this)).cache();
 				
 				//backpropagation
 				JavaRDD<DeltaWeight> dWeight = delta.map(new Function<DoubleMatrix, DeltaWeight>() {
@@ -123,11 +124,12 @@ public class DistNeuralNetConfiguration implements Serializable {
 						error[0] = arg0;
 						return backpropagate(error);
 					}
-				});
+				}).cache();
 				
-				accW = sc.accumulator(getEmptyDeltaWeight(), new DeltaAccumulator());
+				accW.setValue(getEmptyDeltaWeight());
+				
 				// reduce weight
-				 dWeight.foreach(new VoidFunction<DeltaWeight>() {
+				dWeight.foreach(new VoidFunction<DeltaWeight>() {
 					
 					@Override
 					public void call(DeltaWeight arg0) throws Exception {

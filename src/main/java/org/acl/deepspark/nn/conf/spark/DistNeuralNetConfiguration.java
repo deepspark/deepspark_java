@@ -1,22 +1,15 @@
 package org.acl.deepspark.nn.conf.spark;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
-import org.acl.deepspark.data.DeltaAccumulator;
 import org.acl.deepspark.data.DeltaWeight;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.layers.BaseLayer;
-import org.apache.spark.Accumulator;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.VoidFunction;
 import org.jblas.DoubleMatrix;
 
 
@@ -47,13 +40,12 @@ public class DistNeuralNetConfiguration implements Serializable {
 				d.gradBList[count] = new double[info[0]];
 				
 				for(int i = 0; i < info[0]; i++) {
-					for(int j = 0; j < info[j]; j++) {
+					for(int j = 0; j < info[1]; j++) {
 						d.gradWList[count][i][j] = DoubleMatrix.zeros(info[2],info[3]);
 					}
 					d.gradBList[count][i] = 0;
 				}
 			}
-			count++;
 		}
 		
 		return d;
@@ -63,10 +55,13 @@ public class DistNeuralNetConfiguration implements Serializable {
 		return layerList.length;
 	}
 	
-	public void training(JavaRDD<Sample> data) {
+	public void training(JavaRDD<Sample> data,JavaSparkContext sc) {
 		if(!finalize )
 			return;
 		
+		//sc.broadcast(layerList);
+		
+		// getting output;
 		JavaRDD<DoubleMatrix> delta = data.map(new Function<Sample, DoubleMatrix>() {
 			@Override
 			public DoubleMatrix call(Sample v1) throws Exception {
@@ -74,7 +69,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 				System.out.println(error.sum() / error.length);
 				return error;
 			}
-		}).cache();
+		});
 		
 		//backpropagation
 		JavaRDD<DeltaWeight> dWeight = delta.map(new Function<DoubleMatrix, DeltaWeight>() {
@@ -85,8 +80,9 @@ public class DistNeuralNetConfiguration implements Serializable {
 				error[0] = arg0;
 				return backpropagate(error);
 			}
-		}).cache();
-		long minibatchSize = dWeight.count();
+		});
+		
+		
 		
 		DeltaWeight gradient = dWeight.fold(getEmptyDeltaWeight(), new Function2<DeltaWeight, DeltaWeight, DeltaWeight>() {
 			@Override
@@ -109,6 +105,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 		});				
 		
 		//update
+		long minibatchSize = dWeight.count();
 		update(gradient, (int) minibatchSize);
 	}
 	

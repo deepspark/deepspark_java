@@ -74,7 +74,7 @@ public class DistNeuralNetConfigurationTest implements Serializable {
 			System.out.println(String.format("%d epoch...", i+1));
 			for(int j = 0; j < rddMinibatch.length; j++) {
 				System.out.println(String.format("%d - epoch, %d minibatch",i+1, j + 1));
-				net.training(rddMinibatch[j]);
+				net.training(rddMinibatch[j],sc);
 			}
 		}
 		sc.close();

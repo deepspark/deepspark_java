@@ -131,26 +131,26 @@ public class DistNeuralNetConfiguration implements Serializable {
 					}
 				}).cache();
 				
-				List<DeltaWeight> dW = dWeight.collect();
-				ListIterator<DeltaWeight> iter = dW.listIterator();
-				DeltaWeight gradient = getEmptyDeltaWeight();
-				
-				while(iter.hasNext()) {
-					DeltaWeight arg1 = iter.next();
-					for(int i1 = 0; i1 < gradient.gradWList.length; i1++) {
-						if(gradient.gradWList[i1] != null && arg1.gradWList[i1] != null) {
-							for(int j1 = 0; j1 < gradient.gradWList[i1].length; j1++) {
-								for(int k = 0; k < gradient.gradWList[i1][j1].length;k++) {
-									gradient.gradWList[i1][j1][k].addi(arg1.gradWList[i1][j1][k]);
+				DeltaWeight gradient = dWeight.fold(getEmptyDeltaWeight(), new Function2<DeltaWeight, DeltaWeight, DeltaWeight>() {
+					
+					@Override
+					public DeltaWeight call(DeltaWeight v1, DeltaWeight v2) throws Exception {
+						for(int i1 = 0; i1 < v1.gradWList.length; i1++) {
+							if(v1.gradWList[i1] != null && v2.gradWList[i1] != null) {
+								for(int j1 = 0; j1 < v1.gradWList[i1].length; j1++) {
+									for(int k = 0; k < v1.gradWList[i1][j1].length;k++) {
+										v1.gradWList[i1][j1][k].addi(v2.gradWList[i1][j1][k]);
+									}
 								}
+								
+								for(int j1 = 0; j1 < v1.gradBList[i1].length; j1++) {
+									v1.gradBList[i1][j1] += v2.gradBList[i1][j1];
+								}	
 							}
-							
-							for(int j1 = 0; j1 < gradient.gradBList[i1].length; j1++) {
-								gradient.gradBList[i1][j1] += arg1.gradBList[i1][j1];
-							}	
 						}
-					}					
-				}
+						return v1;
+					}
+				});				
 				
 				//update
 				update(gradient);

@@ -25,6 +25,10 @@ public abstract class BaseLayer implements Serializable {
 	public double dropOutRate;
 	private int activationMethod = Activator.SIGMOID;
 	
+	public BaseLayer(int activator) {
+		this.activationMethod = activator;
+	}
+	
 	public BaseLayer() { }
 	
 	public BaseLayer(DoubleMatrix input) {
@@ -85,12 +89,15 @@ public abstract class BaseLayer implements Serializable {
 		switch(activationMethod) {
 		case Activator.SIGMOID:
 			activated = Activator.sigmoid(matrix);
-			
+			break;
 		case Activator.TANH:
 			activated = Activator.tanh(matrix);
-			
+			break;
 		case Activator.RELU:
 			activated = Activator.relu(matrix);
+			break;
+		case Activator.SOFTMAX:
+			activated = Activator.softmax(matrix);
 		}
 		return activated;
 	}

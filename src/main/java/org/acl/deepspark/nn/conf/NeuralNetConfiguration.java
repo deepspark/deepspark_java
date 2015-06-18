@@ -69,7 +69,7 @@ public class NeuralNetConfiguration implements Serializable {
 				double meanError= 0;
 				for(int k = j; k < batchIter; k++) {
 					delta[0] = getOutput(data[k].data)[0].sub(data[k].label);
-					meanError += delta[0].sum() / delta[0].length;
+					meanError += delta[0].mul(delta[0]).sum() / delta[0].length;
 					backpropagate(delta);
 				}
 				meanError /= minibatchSize;

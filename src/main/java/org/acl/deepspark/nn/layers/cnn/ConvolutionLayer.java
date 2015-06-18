@@ -86,10 +86,10 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 			
 			for(int i = 0; i < numFilters; i++) {
 				for(int j = 0; j < numChannels; j++) {
-					W[i][j] = WeightUtil.randInitWeights(filterRows, filterCols);
+					W[i][j] = WeightUtil.randInitWeights(filterRows, filterCols, dimIn);
 					prevDeltaW[i][j] = DoubleMatrix.zeros(filterRows, filterCols);
 				}
-				bias[i] = 0.01;
+				bias[i] = 0.0;
 				prevDeltaBias[i] = 0;
 			}
 		}
@@ -158,8 +158,8 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 				prevDeltaW[i][j].addi(W[i][j].mul(learningRate * decayLambda));
 				prevDeltaW[i][j].addi(gradW[i][j].muli(learningRate));
 				
-				prevDeltaBias[i] *= momentumFactor;
-				prevDeltaBias[i] += (gradB[i]  + bias[i] * decayLambda)* learningRate;
+				//prevDeltaBias[i] *= momentumFactor;
+				prevDeltaBias[i] = (gradB[i]  + bias[i] * decayLambda)* learningRate;
 				W[i][j].subi(prevDeltaW[i][j]);
 				bias[i] -= prevDeltaBias[i];
 			}
@@ -213,6 +213,6 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 	@Override
 	public int[] getWeightInfo() {
 		int[] info = {numFilters, numChannels, filterRows, filterCols};
-		return null;
+		return info;
 	}
 }

@@ -3,6 +3,8 @@ package org.acl.deepspark.nn.functions;
 import java.io.Serializable;
 
 import org.jblas.DoubleMatrix;
+import org.jblas.MatrixFunctions;
+import org.jblas.SimpleBlas;
 
 public class Activator implements Serializable {
 	/**
@@ -12,6 +14,7 @@ public class Activator implements Serializable {
 	public static final int SIGMOID = 0;
 	public static final int TANH = 1;
 	public static final int RELU = 2;
+	public static final int SOFTMAX =3;
 	
 	public static double sigmoid(double x) {
 		double temp = Math.exp(-x);
@@ -99,7 +102,16 @@ public class Activator implements Serializable {
 		}
 		return matrices;
 	}
-	
-	
-	
+
+	public static DoubleMatrix softmax(DoubleMatrix matrix) {
+		if(matrix != null) {
+			double max = matrix.max();
+			
+			matrix.subi(max);
+			MatrixFunctions.expi(matrix);
+			double sum = matrix.sum();
+			matrix.divi(sum);
+		}
+		return matrix;
+	}
 }

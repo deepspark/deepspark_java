@@ -14,7 +14,11 @@ public class WeightUtil implements Serializable {
 	private static final long serialVersionUID = -1196601489934475280L;
 
 	public static DoubleMatrix randInitWeights(int dimRow, int dimCol) {
-		return DoubleMatrix.randn(dimRow, dimCol).divi(10);
+		return randInitWeights(dimRow, dimCol, 2);
+	}
+	
+	public static DoubleMatrix randInitWeights(int dimRow, int dimCol, int numInput) {
+		return DoubleMatrix.randn(dimRow, dimCol).muli(Math.sqrt(2/numInput));
 	}
 	
 	public static DoubleMatrix accum(DoubleMatrix[] matrices) {

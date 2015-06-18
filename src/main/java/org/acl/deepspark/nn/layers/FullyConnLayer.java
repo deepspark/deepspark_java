@@ -2,6 +2,7 @@ package org.acl.deepspark.nn.layers;
 
 import java.io.Serializable;
 
+import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.weights.WeightUtil;
 import org.jblas.DoubleMatrix;
 
@@ -24,6 +25,14 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 	}
 	
 	public FullyConnLayer(int nOut,double momentum, double decayLambda) {
+		super(Activator.SOFTMAX);
+		this.dimOut = nOut;
+		this.momentumFactor = momentum;
+		this.decayLambda = decayLambda;
+	}
+	
+	public FullyConnLayer(int nOut,double momentum, double decayLambda, int activator) {
+		super(activator);
 		this.dimOut = nOut;
 		this.momentumFactor = momentum;
 		this.decayLambda = decayLambda;
@@ -86,18 +95,16 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 	@Override
 	public void setDelta(DoubleMatrix[] delta) {
 		this.delta = delta;
-		
-		delta[0].muli(output.mul(output.mul(-1.0).add(1.0)));
 	}
 	
 	@Override
 	public void update(DoubleMatrix[][] gradW, double[] gradB) {
 		prevDeltaW.muli(momentumFactor);
-		prevDeltaW.addi(W.mul(learningRate * decayLambda ));
+		prevDeltaW.addi(W.mul(learningRate * 2* decayLambda ));
 		prevDeltaW.addi(gradW[0][0].muli(learningRate));
 		
-		prevDeltaBias *= momentumFactor;
-		prevDeltaBias += bias * decayLambda * learningRate;
+		//prevDeltaBias *= momentumFactor;
+		prevDeltaBias = bias * decayLambda * learningRate;
 		prevDeltaBias += gradB[0] * learningRate;
 		 
 		// weight update
@@ -109,7 +116,7 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 	@Override
 	public void initWeights() {
 		if(W == null) {
-			W = WeightUtil.randInitWeights(dimOut, dimIn);
+			W = WeightUtil.randInitWeights(dimOut, dimIn, dimIn);
 			bias = 0.01;
 			prevDeltaW = DoubleMatrix.zeros(dimOut, dimIn);
 			prevDeltaBias = 0;

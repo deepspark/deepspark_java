@@ -10,6 +10,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.broadcast.Broadcast;
 import org.jblas.DoubleMatrix;
 
 
@@ -59,26 +60,53 @@ public class DistNeuralNetConfiguration implements Serializable {
 		if(!finalize )
 			return;
 		
-		//sc.broadcast(layerList);
+		final Broadcast<BaseLayer[]> layers = sc.broadcast(layerList);
 		
 		// getting output;
 		JavaRDD<DoubleMatrix> delta = data.map(new Function<Sample, DoubleMatrix>() {
 			@Override
 			public DoubleMatrix call(Sample v1) throws Exception {
-				DoubleMatrix error = getOutput(v1.data)[0].sub(v1.label);
+				DoubleMatrix[] output = v1.data;
+				for(int l = 0; l < layers.value().length; l++) {
+					BaseLayer a = layers.value()[l];
+					a.setInput(output);
+					output = a.getOutput();
+				}
+				DoubleMatrix error = output[0].sub(v1.label);
 				System.out.println(error.sum() / error.length);
+				
 				return error;
 			}
 		});
 		
 		//backpropagation
 		JavaRDD<DeltaWeight> dWeight = delta.map(new Function<DoubleMatrix, DeltaWeight>() {
-
 			@Override
 			public DeltaWeight call(DoubleMatrix arg0) throws Exception {
+				BaseLayer[] layerList = layers.value();
 				DoubleMatrix[] error = new DoubleMatrix[1];
 				error[0] = arg0;
-				return backpropagate(error);
+				
+				DeltaWeight deltas = new DeltaWeight(layerList.length);
+				
+				// Back-propagation
+				for(int l = layerList.length - 1; l >=0 ; l--) {
+					BaseLayer a =layerList[l];
+					a.setDelta(error);
+					
+					deltas.gradWList[l] = a.deriveGradientW();
+					
+					if(a.getDelta() != null) {	
+						double[] b = new double[a.getDelta().length];
+						for(int i = 0; i < a.getDelta().length; i++)
+							b[i] = a.getDelta()[i].sum();
+						deltas.gradBList[l] = b;
+					}			
+					
+					error = a.deriveDelta();
+				}
+				
+				return deltas;
 			}
 		});
 		
@@ -100,6 +128,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 						}	
 					}
 				}
+				
 				return v1;
 			}
 		});				
@@ -138,32 +167,8 @@ public class DistNeuralNetConfiguration implements Serializable {
 	}
 	
 	
-	public DeltaWeight backpropagate(DoubleMatrix[] delta) {
-		DeltaWeight deltas = new DeltaWeight(layerList.length);
-		
-		// Back-propagation
-		for(int l = layerList.length - 1; l >=0 ; l--) {
-			BaseLayer a =layerList[l];
-			a.setDelta(delta);
-			
-			deltas.gradWList[l] = a.deriveGradientW();
-			
-			if(a.getDelta() != null) {	
-				double[] b = new double[a.getDelta().length];
-				for(int i = 0; i < a.getDelta().length; i++)
-					b[i] = a.getDelta()[i].sum();
-				deltas.gradBList[l] = b;
-			}			
-			
-			delta = a.deriveDelta();
-		}
-		
-		return deltas;
-	}
-	
 	public DoubleMatrix[] getOutput(DoubleMatrix[] data) {
 		DoubleMatrix[] output = data;
-		// Feed-forward
 		for(int l = 0; l < layerList.length; l++) {
 			BaseLayer a = layerList[l];
 			a.setInput(output);

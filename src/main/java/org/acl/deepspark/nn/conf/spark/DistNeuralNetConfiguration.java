@@ -145,7 +145,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 		layerList = new BaseLayer[l.size()];
 		layerList = l.toArray(layerList);
 		
-		for(int i = 0; i < 0; i++) {
+		for(int i = 0; i < layerList.length; i++) {
 			dimIn = layerList[i].initWeights(dimIn);
 		}
 	}

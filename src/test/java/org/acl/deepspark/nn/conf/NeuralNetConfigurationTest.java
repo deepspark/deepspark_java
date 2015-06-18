@@ -15,7 +15,7 @@ import org.jblas.DoubleMatrix;
 public class NeuralNetConfigurationTest {
 	
 	public static final int nTest = 10000;
-	public static final int minibatch = 1;
+	public static final int minibatch = 100;
 	
 	public static void main(String[] args) {
 		System.out.println("Data Loading...");
@@ -28,11 +28,11 @@ public class NeuralNetConfigurationTest {
 		Collections.shuffle(Arrays.asList(test_data));
 		
 		// configure network
-		NeuralNetConfiguration net = new NeuralNetConfiguration(0.1, 1, minibatch,true);
-		net.addLayer(new ConvolutionLayer(9, 9, 20,0.5, 1e-5)); // conv with 20 filters (9x9)
+		NeuralNetConfiguration net = new NeuralNetConfiguration(0.1, 3, minibatch,true);
+		net.addLayer(new ConvolutionLayer(9, 9, 20,0.2, 1e-5)); // conv with 20 filters (9x9)
 		net.addLayer(new PoolingLayer(2)); // max pool
-		net.addLayer(new FullyConnLayer(500,0.5, 1e-5)); // hidden
-		net.addLayer(new FullyConnLayer(10,0.5, 1e-5)); // output
+		net.addLayer(new FullyConnLayer(500,0.2, 1e-5)); // hidden
+		net.addLayer(new FullyConnLayer(10,0.2, 1e-5)); // output
 		
 		int[] dim = new int[3];
 		dim[0] = train_data[0].data[0].getRows();

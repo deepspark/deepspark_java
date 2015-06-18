@@ -38,7 +38,6 @@ public class DistNeuralNetConfiguration implements Serializable {
 	
 	//spark
 	private transient JavaSparkContext sc = null;
-	private Accumulator<DeltaWeight> accW = null;
 	private boolean finalize = false; 
 	
 	public DeltaWeight getEmptyDeltaWeight() {
@@ -102,7 +101,6 @@ public class DistNeuralNetConfiguration implements Serializable {
 		for(int i = 0; i < numMinibatch; i++)
 			batchWeight[i] = 1.0 / numMinibatch;		
 		JavaRDD<Sample>[] rdd_minibatch = rdd_data.randomSplit(batchWeight);
-		accW = sc.accumulator(getEmptyDeltaWeight(), new DeltaAccumulator());
 		
 		for(int i = 0 ; i < epoch ; i++) {
 			System.out.println(String.format("%d epoch...", i+1));
@@ -113,7 +111,14 @@ public class DistNeuralNetConfiguration implements Serializable {
 								
 				// per minibatch
 				//get output
-				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new OutputFunction(this)).cache();
+				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new Function<Sample, DoubleMatrix>() {
+					@Override
+					public DoubleMatrix call(Sample v1) throws Exception {
+						DoubleMatrix error = getOutput(v1.data)[0].sub(v1.label);
+						System.out.println(error.sum() / error.length);
+						return error;
+					}
+				}).cache();
 				
 				//backpropagation
 				JavaRDD<DeltaWeight> dWeight = delta.map(new Function<DoubleMatrix, DeltaWeight>() {
@@ -126,18 +131,27 @@ public class DistNeuralNetConfiguration implements Serializable {
 					}
 				}).cache();
 				
-				accW.setValue(getEmptyDeltaWeight());
+				List<DeltaWeight> dW = dWeight.collect();
+				ListIterator<DeltaWeight> iter = dW.listIterator();
+				DeltaWeight gradient = getEmptyDeltaWeight();
 				
-				// reduce weight
-				dWeight.foreach(new VoidFunction<DeltaWeight>() {
-					
-					@Override
-					public void call(DeltaWeight arg0) throws Exception {
-						accW.add(arg0);
-					}
-				});
-				 
-				 DeltaWeight gradient = accW.value();
+				while(iter.hasNext()) {
+					DeltaWeight arg1 = iter.next();
+					for(int i1 = 0; i1 < gradient.gradWList.length; i1++) {
+						if(gradient.gradWList[i1] != null && arg1.gradWList[i1] != null) {
+							for(int j1 = 0; j1 < gradient.gradWList[i1].length; j1++) {
+								for(int k = 0; k < gradient.gradWList[i1][j1].length;k++) {
+									gradient.gradWList[i1][j1][k].addi(arg1.gradWList[i1][j1][k]);
+								}
+							}
+							
+							for(int j1 = 0; j1 < gradient.gradBList[i1].length; j1++) {
+								gradient.gradBList[i1][j1] += arg1.gradBList[i1][j1];
+							}	
+						}
+					}					
+				}
+				
 				//update
 				update(gradient);
 			}

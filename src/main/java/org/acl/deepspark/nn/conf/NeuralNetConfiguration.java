@@ -66,10 +66,14 @@ public class NeuralNetConfiguration implements Serializable {
 				initGradList();
 
 				int batchIter = Math.min(data.length, j+ minibatchSize);
+				double meanError= 0;
 				for(int k = j; k < batchIter; k++) {
 					delta[0] = getOutput(data[k].data)[0].sub(data[k].label);
+					meanError += delta[0].sum() / delta[0].length;
 					backpropagate(delta);
 				}
+				meanError /= minibatchSize;
+				System.out.println(meanError);
 				update();
 			}
 		}

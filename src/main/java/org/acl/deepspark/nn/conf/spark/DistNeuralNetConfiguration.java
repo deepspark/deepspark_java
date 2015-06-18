@@ -26,29 +26,18 @@ public class DistNeuralNetConfiguration implements Serializable {
 	 */
 	private static final long serialVersionUID = -6624391825370570205L;
 	
-	private double learningRate;	
-	private int epoch;
-	private double momentum;
-	private int minibatchSize;
-		
-	private List<BaseLayer> layerList;
-	
-	//running options	
-	private boolean verbosity = true;
+	private BaseLayer[] layerList;
 	
 	//spark
-	private transient JavaSparkContext sc = null;
 	private boolean finalize = false; 
 	
 	public DeltaWeight getEmptyDeltaWeight() {
 		if(!finalize)
 			return null;
 		
-		DeltaWeight d = new DeltaWeight(layerList.size());
-		Iterator<BaseLayer> itLayer = layerList.iterator();
-		int count = 0;
-		while (itLayer.hasNext()) {
-			BaseLayer l = itLayer.next();
+		DeltaWeight d = new DeltaWeight(layerList.length);
+		for(int count =0; count < layerList.length; count++) {
+			BaseLayer l = layerList[count];
 			int[] info = l.getWeightInfo();
 			if(info == null) {
 				d.gradWList[count] = null;
@@ -70,122 +59,81 @@ public class DistNeuralNetConfiguration implements Serializable {
 		return d;
 	}
 	
-	public DistNeuralNetConfiguration(double learningRate, int epoch, int minibatchSize, JavaSparkContext sc) {
-		layerList = new ArrayList<BaseLayer>();
-		this.epoch = epoch;
-		this.minibatchSize = minibatchSize;
-		this.sc = sc;
-	}
-	
-	public DistNeuralNetConfiguration(double d, int i, int j, JavaSparkContext sc, boolean b) {
-		this(d,i,j,sc);
-		verbosity =b;
-	}
-
-	public void addLayer(BaseLayer l) {
-		layerList.add(l);
-	}
-	
 	public int getNumberOfLayers() {
-		return layerList.size();
+		return layerList.length;
 	}
 	
-	public void training(Sample[] data) {
+	public void training(JavaRDD<Sample> data) {
 		if(!finalize )
 			return;
 		
-		List<Sample> data_list = Arrays.asList(data);
-		JavaRDD<Sample> rdd_data = sc.parallelize(data_list).cache();
-		int numMinibatch = (int) Math.ceil((double) data.length / minibatchSize); 
-		double[] batchWeight = new double[numMinibatch];
-		for(int i = 0; i < numMinibatch; i++)
-			batchWeight[i] = 1.0 / numMinibatch;		
-		JavaRDD<Sample>[] rdd_minibatch = rdd_data.randomSplit(batchWeight);
+		JavaRDD<DoubleMatrix> delta = data.map(new Function<Sample, DoubleMatrix>() {
+			@Override
+			public DoubleMatrix call(Sample v1) throws Exception {
+				DoubleMatrix error = getOutput(v1.data)[0].sub(v1.label);
+				System.out.println(error.sum() / error.length);
+				return error;
+			}
+		}).cache();
 		
-		for(int i = 0 ; i < epoch ; i++) {
-			System.out.println(String.format("%d epoch...", i+1));
-			// per epoch
-			for(int j = 0; j < rdd_minibatch.length; j++) {
-				if(verbosity)
-					System.out.println(String.format("%d - epoch, %d minibatch",i+1, j + 1));
-								
-				// per minibatch
-				//get output
-				JavaRDD<DoubleMatrix> delta = rdd_minibatch[j].map(new Function<Sample, DoubleMatrix>() {
-					@Override
-					public DoubleMatrix call(Sample v1) throws Exception {
-						DoubleMatrix error = getOutput(v1.data)[0].sub(v1.label);
-						System.out.println(error.sum() / error.length);
-						return error;
-					}
-				}).cache();
-				
-				//backpropagation
-				JavaRDD<DeltaWeight> dWeight = delta.map(new Function<DoubleMatrix, DeltaWeight>() {
+		//backpropagation
+		JavaRDD<DeltaWeight> dWeight = delta.map(new Function<DoubleMatrix, DeltaWeight>() {
 
-					@Override
-					public DeltaWeight call(DoubleMatrix arg0) throws Exception {
-						DoubleMatrix[] error = new DoubleMatrix[1];
-						error[0] = arg0;
-						return backpropagate(error);
-					}
-				}).cache();
-				
-				DeltaWeight gradient = dWeight.fold(getEmptyDeltaWeight(), new Function2<DeltaWeight, DeltaWeight, DeltaWeight>() {
-					
-					@Override
-					public DeltaWeight call(DeltaWeight v1, DeltaWeight v2) throws Exception {
-						for(int i1 = 0; i1 < v1.gradWList.length; i1++) {
-							if(v1.gradWList[i1] != null && v2.gradWList[i1] != null) {
-								for(int j1 = 0; j1 < v1.gradWList[i1].length; j1++) {
-									for(int k = 0; k < v1.gradWList[i1][j1].length;k++) {
-										v1.gradWList[i1][j1][k].addi(v2.gradWList[i1][j1][k]);
-									}
-								}
-								
-								for(int j1 = 0; j1 < v1.gradBList[i1].length; j1++) {
-									v1.gradBList[i1][j1] += v2.gradBList[i1][j1];
-								}	
+			@Override
+			public DeltaWeight call(DoubleMatrix arg0) throws Exception {
+				DoubleMatrix[] error = new DoubleMatrix[1];
+				error[0] = arg0;
+				return backpropagate(error);
+			}
+		}).cache();
+		long minibatchSize = dWeight.count();
+		
+		DeltaWeight gradient = dWeight.fold(getEmptyDeltaWeight(), new Function2<DeltaWeight, DeltaWeight, DeltaWeight>() {
+			@Override
+			public DeltaWeight call(DeltaWeight v1, DeltaWeight v2) throws Exception {
+				for(int i1 = 0; i1 < v1.gradWList.length; i1++) {
+					if(v1.gradWList[i1] != null && v2.gradWList[i1] != null) {
+						for(int j1 = 0; j1 < v1.gradWList[i1].length; j1++) {
+							for(int k = 0; k < v1.gradWList[i1][j1].length;k++) {
+								v1.gradWList[i1][j1][k].addi(v2.gradWList[i1][j1][k]);
 							}
 						}
-						return v1;
+						
+						for(int j1 = 0; j1 < v1.gradBList[i1].length; j1++) {
+							v1.gradBList[i1][j1] += v2.gradBList[i1][j1];
+						}	
 					}
-				});				
-				
-				//update
-				update(gradient);
+				}
+				return v1;
 			}
-		}
+		});				
+		
+		//update
+		update(gradient, (int) minibatchSize);
 	}
 	
-	public void prepareForTraining(int[] dimIn) {
+	public void prepareForTraining(List<BaseLayer> l, int[] dimIn) {
 		finalize = true;
-		Iterator<BaseLayer> itLayer = layerList.iterator();
+		layerList = new BaseLayer[l.size()];
+		layerList = l.toArray(layerList);
 		
-		// Feed-forward
-		while (itLayer.hasNext()) {
-			BaseLayer l = itLayer.next();
-			dimIn = l.initWeights(dimIn);
+		for(int i = 0; i < 0; i++) {
+			dimIn = layerList[i].initWeights(dimIn);
 		}
 	}
 	
-	private void update(DeltaWeight gradient) {
-		ListIterator<BaseLayer> it = layerList.listIterator(getNumberOfLayers());
-		int layerIdx = layerList.size();
-		
-		while(it.hasPrevious()) {
-			layerIdx--;
-			
-			BaseLayer a = it.previous();
-			DoubleMatrix[][] gradW = gradient.gradWList[layerIdx];
-			double[] gradB = gradient.gradBList[layerIdx];
+	private void update(DeltaWeight gradient,int minibatchSize) {
+		for(int i = layerList.length - 1; i >=0 ; i--) {
+			BaseLayer a = layerList[i];
+			DoubleMatrix[][] gradW = gradient.gradWList[i];
+			double[] gradB = gradient.gradBList[i];
 			
 			if(gradW != null && gradB != null) {
-				for(int i = 0; i < gradW.length ; i++)
-					for(int j = 0; j < gradW[i].length ; j++)
-						gradW[i][j].divi(minibatchSize);
-				for(int i = 0; i < gradB.length ; i++)
-					gradB[i] /= minibatchSize;
+				for(int i1 = 0; i1 < gradW.length ; i1++)
+					for(int j = 0; j < gradW[i1].length ; j++)
+						gradW[i1][j].divi(minibatchSize);
+				for(int i1 = 0; i1 < gradB.length ; i1++)
+					gradB[i1] /= minibatchSize;
 				
 				a.update(gradW, gradB);
 			}
@@ -194,39 +142,35 @@ public class DistNeuralNetConfiguration implements Serializable {
 	
 	
 	public DeltaWeight backpropagate(DoubleMatrix[] delta) {
-		DeltaWeight deltas = new DeltaWeight(layerList.size());
-		ListIterator<BaseLayer> it = layerList.listIterator(getNumberOfLayers());
-		int layerIdx = layerList.size();
+		DeltaWeight deltas = new DeltaWeight(layerList.length);
+		
 		// Back-propagation
-		while(it.hasPrevious()) {
-			layerIdx--;
-			
-			BaseLayer a = it.previous();
+		for(int l = layerList.length - 1; l >=0 ; l--) {
+			BaseLayer a =layerList[l];
 			a.setDelta(delta);
 			
-			deltas.gradWList[layerIdx] = a.deriveGradientW();
+			deltas.gradWList[l] = a.deriveGradientW();
 			
 			if(a.getDelta() != null) {	
 				double[] b = new double[a.getDelta().length];
 				for(int i = 0; i < a.getDelta().length; i++)
 					b[i] = a.getDelta()[i].sum();
-				deltas.gradBList[layerIdx] = b;
+				deltas.gradBList[l] = b;
 			}			
 			
 			delta = a.deriveDelta();
 		}
+		
 		return deltas;
 	}
 	
 	public DoubleMatrix[] getOutput(DoubleMatrix[] data) {
-		Iterator<BaseLayer> itLayer = layerList.iterator();
 		DoubleMatrix[] output = data;
-		
 		// Feed-forward
-		while (itLayer.hasNext()) {
-			BaseLayer l = itLayer.next();
-			l.setInput(output);
-			output = l.getOutput();
+		for(int l = 0; l < layerList.length; l++) {
+			BaseLayer a = layerList[l];
+			a.setInput(output);
+			output = a.getOutput();
 		}
 		return output;
 	}

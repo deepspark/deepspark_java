@@ -34,9 +34,11 @@ public class DistNeuralNetConfiguration implements Serializable {
 			BaseLayer l = layerList[count];
 			int[] info = l.getWeightInfo();
 			if(info == null) {
+				System.out.println(String.format("%d th - layer (empty weight)", l));
 				d.gradWList[count] = null;
 				d.gradBList[count] = null;
 			} else {
+				System.out.println(String.format("%d th - layer (%d channel, %d filter %d x %d weight matrix)", l, info[0], info[1], info[2], info[3]));
 				d.gradWList[count] = new DoubleMatrix[info[0]][info[1]];
 				d.gradBList[count] = new double[info[0]];
 				

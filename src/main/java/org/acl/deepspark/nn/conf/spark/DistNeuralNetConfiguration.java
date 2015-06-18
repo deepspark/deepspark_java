@@ -11,6 +11,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.broadcast.Broadcast;
+import org.deeplearning4j.spark.canova.RDDMiniBatches.MiniBatchFunction;
 import org.jblas.DoubleMatrix;
 
 
@@ -34,14 +35,11 @@ public class DistNeuralNetConfiguration implements Serializable {
 			BaseLayer l = layerList[count];
 			int[] info = l.getWeightInfo();
 			if(info == null) {
-				System.out.println(String.format("%d th - layer (empty weight)", count));
 				d.gradWList[count] = null;
 				d.gradBList[count] = null;
 			} else {
-				System.out.println(String.format("%d th - layer (%d channel, %d filter %d x %d weight matrix)", count, info[0], info[1], info[2], info[3]));
 				d.gradWList[count] = new DoubleMatrix[info[0]][info[1]];
 				d.gradBList[count] = new double[info[0]];
-				
 				for(int i = 0; i < info[0]; i++) {
 					for(int j = 0; j < info[1]; j++) {
 						d.gradWList[count][i][j] = DoubleMatrix.zeros(info[2],info[3]);
@@ -58,7 +56,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 		return layerList.length;
 	}
 	
-	public void training(JavaRDD<Sample> data,JavaSparkContext sc) {
+	public void training(JavaRDD<Sample> data, int minibatchSize, JavaSparkContext sc) {
 		if(!finalize )
 			return;
 		
@@ -68,9 +66,10 @@ public class DistNeuralNetConfiguration implements Serializable {
 		JavaRDD<DoubleMatrix> delta = data.map(new Function<Sample, DoubleMatrix>() {
 			@Override
 			public DoubleMatrix call(Sample v1) throws Exception {
+				BaseLayer[] layerList = layers.value();
 				DoubleMatrix[] output = v1.data;
-				for(int l = 0; l < layers.value().length; l++) {
-					BaseLayer a = layers.value()[l];
+				for(int l = 0; l < layerList.length; l++) {
+					BaseLayer a = layerList[l];
 					a.setInput(output);
 					output = a.getOutput();
 				}
@@ -112,8 +111,6 @@ public class DistNeuralNetConfiguration implements Serializable {
 			}
 		});
 		
-		
-		
 		DeltaWeight gradient = dWeight.fold(getEmptyDeltaWeight(), new Function2<DeltaWeight, DeltaWeight, DeltaWeight>() {
 			@Override
 			public DeltaWeight call(DeltaWeight v1, DeltaWeight v2) throws Exception {
@@ -136,8 +133,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 		});				
 		
 		//update
-		long minibatchSize = dWeight.count();
-		update(gradient, (int) minibatchSize);
+		update(gradient, minibatchSize);
 	}
 	
 	public void prepareForTraining(List<BaseLayer> l, int[] dimIn) {

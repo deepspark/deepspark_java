@@ -1,12 +1,14 @@
 package org.acl.deepspark.driver;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.acl.deepspark.data.DeltaWeight;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.conf.spark.DistNeuralNetConfiguration;
 import org.acl.deepspark.nn.layers.BaseLayer;
@@ -34,7 +36,10 @@ public class DistNeuralNetConfigurationTest implements Serializable {
 	public static final int epoch = 3;
 	
 	public static void main(String[] args) {
-		SparkConf conf = new SparkConf().setAppName("DeepSpark CNN Test Driver");
+		SparkConf conf = new SparkConf().setAppName("DeepSpark CNN Test Driver").set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		Class[] reg_classes = {BaseLayer.class, ConvolutionLayer.class, PoolingLayer.class,
+				FullyConnLayer.class, DeltaWeight.class, Sample.class};
+		conf.registerKryoClasses(reg_classes);
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		
 		System.out.println("Data Loading...");
@@ -58,7 +63,7 @@ public class DistNeuralNetConfigurationTest implements Serializable {
 		dim[0] = train_samples[0].data[0].getRows();
 		dim[1] = train_samples[0].data[0].getColumns();
 		dim[2] = train_samples[0].data.length;
-		net.prepareForTraining(layerList,dim);
+		net.prepareForTraining(layerList, dim);
 		
 		// prepare RDD
 		
@@ -74,7 +79,7 @@ public class DistNeuralNetConfigurationTest implements Serializable {
 			System.out.println(String.format("%d epoch...", i+1));
 			for(int j = 0; j < rddMinibatch.length; j++) {
 				System.out.println(String.format("%d - epoch, %d minibatch",i+1, j + 1));
-				net.training(rddMinibatch[j],sc);
+				net.training(rddMinibatch[j],minibatch, sc);
 			}
 		}
 		sc.close();

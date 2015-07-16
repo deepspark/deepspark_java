@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.driver.NeuralNet;
+import org.acl.deepspark.nn.driver.NeuralNetRunner;
 import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.layers.FullyConnLayer;
 import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
@@ -49,13 +50,15 @@ public class NeuralNetConfigurationTest {
 											.setDecayLambda(0.0001)
 											.setMomentum(0.9)
 											.setDropOutRate(0.0)
+											.setInputDim(new int[]{28, 28, 1})
+											.setOutputDim(new int[]{10})
 											.addLayer(layer1)
 											.addLayer(layer2)
 											.addLayer(layer3)
 											.addLayer(layer4)
 											.build();
 
-		NeuralNetDriver driver = new NeuralNetDriver(net);
+		NeuralNetRunner driver = new NeuralNetRunner(net);
 		driver.train(train_data);
 		driver.predict(test_data);
 

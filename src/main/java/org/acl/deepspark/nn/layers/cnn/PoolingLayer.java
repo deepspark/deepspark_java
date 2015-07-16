@@ -2,7 +2,7 @@ package org.acl.deepspark.nn.layers.cnn;
 
 import java.io.Serializable;
 
-import org.acl.deepspark.data.Weight;
+import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.jblas.DoubleMatrix;
 import org.jblas.ranges.RangeUtils;
@@ -186,7 +186,12 @@ public class PoolingLayer extends BaseLayer  implements Serializable {
 
 
 	@Override
-	public INDArray generateOutput(Weight w, INDArray input) {
+	public INDArray createWeight(LayerConf conf, int[] input) {
+		return null;
+	}
+
+	@Override
+	public INDArray generateOutput(INDArray w, INDArray input) {
 		return null;
 	}
 
@@ -196,7 +201,7 @@ public class PoolingLayer extends BaseLayer  implements Serializable {
 	}
 
 	@Override
-	public Weight gradient(INDArray error) {
+	public INDArray gradient(INDArray error) {
 		return null;
 	}
 }

@@ -2,28 +2,21 @@ package org.acl.deepspark.nn.driver;
 
 import org.acl.deepspark.data.DeltaWeight;
 import org.acl.deepspark.data.Sample;
-import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
-import org.acl.deepspark.nn.functions.Activator;
-import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.layers.FullyConnLayer;
 import org.acl.deepspark.nn.layers.Layer;
 import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
-import org.jblas.DoubleMatrix;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
 
 /**
  * Created by Jaehong on 2015-07-16.
  */
 public class NeuralNet {
+
 
     private ArrayList<Layer> layers;
     private INDArray[] weights;
@@ -40,35 +33,39 @@ public class NeuralNet {
         decayLambda = conf.getParams().get("decayLambda");
         momentum = conf.getParams().get("momentum");
         dropOutRate = conf.getParams().get("dropOutRate");
-        buildLayer(conf);
+        initNetwork(conf);
     }
 
-    private void buildLayer(final NeuralNetConf conf) {
-        layers = new ArrayList<>();
+    public void initNetwork(final NeuralNetConf conf) {
         ArrayList<LayerConf> arr = conf.getLayerList();
+        int[] dimIn = conf.getDimIn();
 
-        int type;
+        layers = new ArrayList<>();
+        weights = new INDArray[arr.size()];
+
+        buildNetwork(arr, dimIn);
+    }
+
+    private void buildNetwork(ArrayList<LayerConf> arr, int[] dimIn) {
         for (int i = 0 ; i< arr.size(); i++) {
-            type = arr.get(i).getType();
-            switch (type) {
+            LayerConf layerConf = arr.get(i);
+            int activator = layerConf.getActivator();
+            Layer layer = null;
+
+            switch (layerConf.getType()) {
                 case LayerConf.CONVOLUTION:
-                    layers.add(new ConvolutionLayer());
+                    layer = new ConvolutionLayer(activator);
                     break;
-
                 case LayerConf.POOLING:
-                    layers.add(new PoolingLayer());
+                    layer = new PoolingLayer(activator);
                     break;
-
                 case LayerConf.FULLYCONN:
-                    layers.add(new FullyConnLayer());
+                    layer = new FullyConnLayer(activator);
                     break;
             }
+            layers.add(layer);
+            weights[i] = layer.createWeight(layerConf, dimIn);
         }
-        createWeight(arr);
-    }
-
-    private void createWeight(final ArrayList<LayerConf> arr) {
-        
     }
 
 

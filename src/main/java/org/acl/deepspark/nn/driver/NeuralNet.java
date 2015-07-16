@@ -63,8 +63,10 @@ public class NeuralNet {
                     layer = new FullyConnLayer(activator);
                     break;
             }
-            layers.add(layer);
-            weights[i] = layer.createWeight(layerConf, dimIn);
+            if (layer != null) {
+                layers.add(layer);
+                weights[i] = layer.createWeight(layerConf, dimIn);
+            }
         }
     }
 

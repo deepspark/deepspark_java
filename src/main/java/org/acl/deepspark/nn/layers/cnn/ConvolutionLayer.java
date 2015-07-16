@@ -2,10 +2,12 @@ package org.acl.deepspark.nn.layers.cnn;
 
 import java.io.Serializable;
 
+import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.weights.WeightUtil;
 import org.acl.deepspark.utils.MathUtils;
 import org.jblas.DoubleMatrix;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 public class ConvolutionLayer extends BaseLayer  implements Serializable{
 	/**
@@ -27,6 +29,10 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 	private int[] stride = {1, 1};
 	private int zeroPadding = 0;
 	private boolean useZeroPadding = true;
+
+	public ConvolutionLayer() {
+
+	}
 
 	public ConvolutionLayer(int filterRows, int filterCols, int numFilters) {
 		super();
@@ -214,5 +220,21 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable{
 	public int[] getWeightInfo() {
 		int[] info = {numFilters, numChannels, filterRows, filterCols};
 		return info;
+	}
+
+
+	@Override
+	public INDArray generateOutput(Weight w, INDArray input) {
+		return null;
+	}
+
+	@Override
+	public INDArray deriveDelta(INDArray error) {
+		return null;
+	}
+
+	@Override
+	public Weight gradient(INDArray error) {
+		return null;
 	}
 }

@@ -5,11 +5,12 @@ import java.util.Collections;
 import java.util.Date;
 
 import org.acl.deepspark.data.Sample;
+import org.acl.deepspark.nn.driver.NeuralNet;
+import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.layers.FullyConnLayer;
 import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
 import org.acl.deepspark.utils.MnistLoader;
-import org.jblas.DoubleMatrix;
 
 
 public class NeuralNetConfigurationTest {
@@ -27,9 +28,44 @@ public class NeuralNetConfigurationTest {
 		System.out.println("Shuffling...");
 		Collections.shuffle(Arrays.asList(train_data));
 		Collections.shuffle(Arrays.asList(test_data));
-		
+
+
+		LayerConf layer1 = new LayerConf(LayerConf.CONVOLUTION);
+		layer1.setFilterSize(new int[]{3, 3});
+		layer1.setNumFilters(10);
+		layer1.setActivator(Activator.SIGMOID);
+
+		LayerConf layer2 = new LayerConf(LayerConf.POOLING);
+		layer2.setPoolingSize(2);
+		layer2.setActivator(Activator.SIGMOID);
+
+		LayerConf layer3 = new LayerConf(LayerConf.FULLYCONN);
+		layer3.setOutputUnit(120);
+
+		LayerConf layer4 = new LayerConf(LayerConf.FULLYCONN);
+		layer3.setOutputUnit(10);
+
+		NeuralNet net = new NeuralNetConf().setLearningRate(0.1)
+											.setDecayLambda(0.0001)
+											.setMomentum(0.9)
+											.setDropOutRate(0.0)
+											.addLayer(layer1)
+											.addLayer(layer2)
+											.addLayer(layer3)
+											.addLayer(layer4)
+											.build();
+
+		NeuralNetDriver driver = new NeuralNetDriver(net);
+		driver.train(train_data);
+		driver.predict(test_data);
+
+
+
+
+
+
 		// configure network
-		NeuralNetConfiguration net = new NeuralNetConfiguration(0.1, 1, minibatch,true);
+		NeuralNetConf net = new NeuralNetConf(0.1, 1, minibatch,true);
 		net.addLayer(new ConvolutionLayer(9, 9, 20,momentum, 1e-5)); // conv with 20 filters (9x9)
 		net.addLayer(new PoolingLayer(2)); // max pool
 		net.addLayer(new FullyConnLayer(10,momentum, 1e-5)); // output

@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.acl.deepspark.nn.functions.Activator;
 import org.jblas.DoubleMatrix;
 
-public abstract class BaseLayer implements Serializable {
+public abstract class BaseLayer implements Serializable, Layer {
 	/**
 	 * 
 	 */

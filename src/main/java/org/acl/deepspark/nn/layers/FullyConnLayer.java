@@ -2,9 +2,11 @@ package org.acl.deepspark.nn.layers;
 
 import java.io.Serializable;
 
+import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.weights.WeightUtil;
 import org.jblas.DoubleMatrix;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 // Fully Connected HiddenLayer
 public class FullyConnLayer extends BaseLayer implements Serializable {
@@ -19,6 +21,10 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 	private double prevDeltaBias;
 	private double bias = 0.01;
 	private double decayLambda = 0.00001;
+
+	public FullyConnLayer() {
+
+	}
 
 	public FullyConnLayer(int nOut) {
 		this.dimOut = nOut;
@@ -153,5 +159,20 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 	public int[] getWeightInfo() {
 		int[] info = {1, 1, dimOut, dimIn};
 		return info;
+	}
+
+	@Override
+	public INDArray generateOutput(Weight w, INDArray input) {
+		return null;
+	}
+
+	@Override
+	public INDArray deriveDelta(INDArray error) {
+		return null;
+	}
+
+	@Override
+	public Weight gradient(INDArray error) {
+		return null;
 	}
 }

@@ -233,17 +233,17 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable {
 	}
 
 	@Override
-	public INDArray generateOutput(INDArray w, INDArray input) {
+	public INDArray generateOutput(INDArray weight, INDArray input) {
 		return null;
 	}
 
 	@Override
-	public INDArray deriveDelta(INDArray error) {
+	public INDArray deriveDelta(INDArray weight, INDArray error) {
 		return null;
 	}
 
 	@Override
-	public INDArray gradient(INDArray error) {
+	public INDArray gradient(INDArray input, INDArray error) {
 		return null;
 	}
 

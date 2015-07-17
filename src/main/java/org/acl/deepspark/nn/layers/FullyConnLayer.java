@@ -2,7 +2,7 @@ package org.acl.deepspark.nn.layers;
 
 import java.io.Serializable;
 
-import org.acl.deepspark.data.Weight;
+import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.weights.WeightUtil;
 import org.jblas.DoubleMatrix;
@@ -162,17 +162,22 @@ public class FullyConnLayer extends BaseLayer implements Serializable {
 	}
 
 	@Override
-	public INDArray generateOutput(Weight w, INDArray input) {
+	public INDArray createWeight(LayerConf conf, int[] input) {
 		return null;
 	}
 
 	@Override
-	public INDArray deriveDelta(INDArray error) {
+	public INDArray generateOutput(INDArray weight, INDArray input) {
 		return null;
 	}
 
 	@Override
-	public Weight gradient(INDArray error) {
+	public INDArray deriveDelta(INDArray weight, INDArray error) {
+		return null;
+	}
+
+	@Override
+	public INDArray gradient(INDArray input, INDArray error) {
 		return null;
 	}
 }

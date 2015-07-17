@@ -42,6 +42,7 @@ public class NeuralNetConfigurationTest {
 
 		LayerConf layer3 = new LayerConf(LayerConf.FULLYCONN);
 		layer3.setOutputUnit(120);
+		layer2.setActivator(Activator.SIGMOID);
 
 		LayerConf layer4 = new LayerConf(LayerConf.FULLYCONN);
 		layer3.setOutputUnit(10);
@@ -58,14 +59,11 @@ public class NeuralNetConfigurationTest {
 											.addLayer(layer4)
 											.build();
 
-		NeuralNetRunner driver = new NeuralNetRunner(net);
+		NeuralNetRunner driver = new NeuralNetRunner(net).setIterations(10000)
+														 .setMiniBatchSize(10)
+														 ;
 		driver.train(train_data);
 		driver.predict(test_data);
-
-
-
-
-
 
 		// configure network
 		NeuralNetConf net = new NeuralNetConf(0.1, 1, minibatch,true);

@@ -11,16 +11,15 @@ import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by Jaehong on 2015-07-16.
  */
 public class NeuralNet {
-
-
-    private ArrayList<Layer> layers;
+    private Layer[] layers;
     private INDArray[] weights;
-    private INDArray activationOut;
+    private INDArray[] activationOut;
     private DeltaWeight deltaWeights;
 
     double learningRate;
@@ -37,13 +36,11 @@ public class NeuralNet {
     }
 
     public void initNetwork(final NeuralNetConf conf) {
-        ArrayList<LayerConf> arr = conf.getLayerList();
-        int[] dimIn = conf.getDimIn();
-
-        layers = new ArrayList<>();
-        weights = new INDArray[arr.size()];
-
-        buildNetwork(arr, dimIn);
+        int size = conf.getLayerList().size();
+        layers = new Layer[size];
+        weights = new INDArray[size];
+        activationOut = new INDArray[size+1];
+        buildNetwork(conf.getLayerList(), conf.getDimIn());
     }
 
     private void buildNetwork(ArrayList<LayerConf> arr, int[] dimIn) {
@@ -64,19 +61,31 @@ public class NeuralNet {
                     break;
             }
             if (layer != null) {
-                layers.add(layer);
-                weights[i] = layer.createWeight(layerConf, dimIn);
+                layers[i] = layer;
+                weights[i] = layers[i].createWeight(layerConf, dimIn);
             }
         }
     }
 
+    public void setWeights(INDArray[] weights) {
+        this.weights = weights;
+    }
+
 
     public INDArray feedForward(Sample in) {
-        return null;
+        activationOut[0] = in.getFeature();
+        for (int i = 0; i < layers.length; i++) {
+            activationOut[i+1] = layers[i].generateOutput(weights[i], activationOut[i]);
+        }
+        return activationOut[layers.length];
     }
 
 
     public void backPropagate(INDArray error) {
+        for (int i = layers.length-1; i >= 0; i--) {
+            error = layers[i].deriveDelta(weights[i], error);
+            layers[i].gradient()
+        }
 
     }
 

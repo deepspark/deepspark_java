@@ -19,8 +19,8 @@ import java.util.Iterator;
 public class NeuralNet {
     private Layer[] layers;
     private INDArray[] weights;
+    private INDArray[] deltaWeights;
     private INDArray[] activationOut;
-    private DeltaWeight deltaWeights;
 
     double learningRate;
     double decayLambda;
@@ -39,7 +39,9 @@ public class NeuralNet {
         int size = conf.getLayerList().size();
         layers = new Layer[size];
         weights = new INDArray[size];
+        deltaWeights = new INDArray[size];
         activationOut = new INDArray[size+1];
+
         buildNetwork(conf.getLayerList(), conf.getDimIn());
     }
 
@@ -83,10 +85,9 @@ public class NeuralNet {
 
     public void backPropagate(INDArray error) {
         for (int i = layers.length-1; i >= 0; i--) {
+            deltaWeights[i] = layers[i].gradient(activationOut[i], error);
             error = layers[i].deriveDelta(weights[i], error);
-            layers[i].gradient()
         }
-
     }
 
 

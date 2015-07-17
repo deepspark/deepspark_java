@@ -11,5 +11,14 @@ public class Weight implements Serializable {
 	private static final long serialVersionUID = -2016361466768395491L;
 	
 	public INDArray w;
-	public INDArray b;	
+	public INDArray b;
+
+	public Weight() {
+
+	}
+
+	public void addi(Weight weight) {
+
+	}
+
 }

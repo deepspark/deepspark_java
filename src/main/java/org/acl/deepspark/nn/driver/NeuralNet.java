@@ -1,7 +1,8 @@
 package org.acl.deepspark.nn.driver;
 
-import org.acl.deepspark.data.DeltaWeight;
+import org.acl.deepspark.data.Accumulator;
 import org.acl.deepspark.data.Sample;
+import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
 import org.acl.deepspark.nn.layers.FullyConnLayer;
@@ -11,16 +12,13 @@ import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * Created by Jaehong on 2015-07-16.
  */
 public class NeuralNet {
-    private Layer[] layers;
-    private INDArray[] weights;
-    private INDArray[] deltaWeights;
-    private INDArray[] activationOut;
+    private Layer[]     layers;
+    private Weight[]  weights;
 
     double learningRate;
     double decayLambda;
@@ -38,10 +36,7 @@ public class NeuralNet {
     public void initNetwork(final NeuralNetConf conf) {
         int size = conf.getLayerList().size();
         layers = new Layer[size];
-        weights = new INDArray[size];
-        deltaWeights = new INDArray[size];
-        activationOut = new INDArray[size+1];
-
+        weights = new Weight[size];
         buildNetwork(conf.getLayerList(), conf.getDimIn());
     }
 
@@ -69,41 +64,59 @@ public class NeuralNet {
         }
     }
 
-    public void setWeights(INDArray[] weights) {
+    public void setWeights(Weight[] weights) {
         this.weights = weights;
     }
 
-    public INDArray[] getWeights() {
+    public Weight[] getWeights() {
         return weights;
     }
 
-    public void setDeltaWeights(INDArray[] deltaWeights) {
-        this.deltaWeights = deltaWeights;
-    }
-
-    public INDArray[] getDeltaWeights() {
-        return deltaWeights;
-    }
-
     public INDArray feedForward(Sample in) {
-        activationOut[0] = in.getFeature();
+        INDArray activationOut = in.getFeature();
         for (int i = 0; i < layers.length; i++) {
-            activationOut[i+1] = layers[i].generateOutput(weights[i], activationOut[i]);
+//            preActivation[i + 1] = layers[i].generateOutput(weights[i], activationOut);
+//            activationOut = layers[i].activate(preActivation[i + 1]);
+            activationOut = layers[i].generateOutput(weights[i], activationOut);
         }
-        return activationOut[layers.length];
+        return activationOut;
     }
 
-    public void backPropagate(INDArray error) {
+    public Weight[] train(Sample in, INDArray label) {
+        Weight[] gradient = new Weight[layers.length];
+        INDArray[] preActivation = new INDArray[layers.length];
+        INDArray[] postActivation = new INDArray[layers.length + 1];
+        postActivation[0] = in.getFeature();
+
+        for (int i = 0; i < layers.length; i++) {
+            preActivation[i] = layers[i].generateOutput(weights[i], postActivation[i]);
+            postActivation[i+1] = layers[i].activate(preActivation[i]);
+        }
+
+        INDArray error = postActivation[layers.length].sub(label);
         for (int i = layers.length-1; i >= 0; i--) {
-            deltaWeights[i] = layers[i].gradient(activationOut[i], error);
-            error = layers[i].deriveDelta(weights[i], error);
+            gradient[i] = layers[i].gradient(preActivation[i], postActivation[i], error);
+            error = layers[i].deriveDelta(weights[i], preActivation[i], error);
         }
+        return gradient;
     }
+    /** move to NeuralNetRunner **/
+//
+//    public void calcDeltaWeight() {
+//        INDArray[] arr = gradients.getAverage();
+//        for (int i = 0 ; i < layers.length; i++) {
+//            if (deltaWeights[i] == null)
+//                deltaWeights[i] = weights[i].mul(decayLambda).add(arr[i]).mul(-1 * learningRate);
+//            else {
+//                INDArray delta = weights[i].mul(decayLambda).add(arr[i]).mul(-1 * learningRate);
+//                deltaWeights[i].addi(deltaWeights[i].mul(momentum).add(delta));
+//            }
+//        }
+//    }
 
-
-    public void updateWeight() {
+    public void updateWeight(Weight deltaWeight) {
         for (int i = 0 ; i < weights.length; i++) {
-            // TODO update weight w/ lr and acummulated deltaWeights
+
         }
     }
 }

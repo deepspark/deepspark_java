@@ -2,6 +2,7 @@ package org.acl.deepspark.nn.layers.cnn;
 
 import java.io.Serializable;
 
+import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.layers.Layer;
@@ -10,7 +11,7 @@ import org.acl.deepspark.utils.MathUtils;
 import org.jblas.DoubleMatrix;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
-public class ConvolutionLayer extends BaseLayer  implements Serializable {
+public class ConvolutionLayer implements Serializable, Layer {
 	/**
 	 * 
 	 */
@@ -228,17 +229,17 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable {
 	}
 
 	@Override
-	public INDArray createWeight(LayerConf conf, int[] input) {
+	public Weight createWeight(LayerConf conf, int[] input) {
 		return null;
 	}
 
 	@Override
-	public INDArray generateOutput(INDArray weight, INDArray input) {
+	public INDArray generateOutput(Weight weight, INDArray input) {
 		return null;
 	}
 
 	@Override
-	public INDArray deriveDelta(INDArray weight, INDArray error) {
+	public INDArray deriveDelta(Weight weight, INDArray error, INDArray output) {
 		return null;
 	}
 
@@ -246,6 +247,4 @@ public class ConvolutionLayer extends BaseLayer  implements Serializable {
 	public INDArray gradient(INDArray input, INDArray error) {
 		return null;
 	}
-
-
 }

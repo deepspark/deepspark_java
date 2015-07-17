@@ -17,7 +17,7 @@ public class NeuralNetConf implements Serializable {
 	private int[] dimIn;
 	private int[] dimOut;
 	private ArrayList<LayerConf> layers;
-	private HashMap<String, Object> params;
+	private HashMap<String, Double> params;
 
 	public NeuralNetConf() {
 		layers = new ArrayList<>();
@@ -28,7 +28,6 @@ public class NeuralNetConf implements Serializable {
 		params.put("decayLambda", 0.0001);
 		params.put("momentum", 0.9);
 		params.put("dropOutRate", 0.0);
-		params.put("activator", ActivatorType.SIGMOID);
 	}
 
 	public NeuralNetConf setLearningRate(double learningRate) {
@@ -68,7 +67,7 @@ public class NeuralNetConf implements Serializable {
 		return layers;
 	}
 
-	public HashMap<String, Object> getParams() {
+	public HashMap<String, Double> getParams() {
 		return params;
 	}
 

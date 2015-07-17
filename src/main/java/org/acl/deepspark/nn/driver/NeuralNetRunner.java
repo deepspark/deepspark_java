@@ -1,5 +1,6 @@
 package org.acl.deepspark.nn.driver;
 
+import org.acl.deepspark.data.Accumulator;
 import org.acl.deepspark.data.Sample;
 import org.jblas.util.Random;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -9,6 +10,8 @@ import org.nd4j.linalg.api.ndarray.INDArray;
  */
 public class NeuralNetRunner {
     private NeuralNet net;
+    private INDArray[] deltaWeights;
+    private Accumulator weightAccum;
     private int iteration;
     private int batchSize;
 
@@ -37,7 +40,7 @@ public class NeuralNetRunner {
             for (int j = 0; j < batchSize; j++) {
                 int index = Random.nextInt(dataSize);
                 error = data[index].label.sub(net.feedForward(data[index]));
-                net.backPropagate(error);
+                weightAccum.accumulate();
             }
             net.updateWeight();
         }
@@ -46,9 +49,8 @@ public class NeuralNetRunner {
     public INDArray[] predict(Sample[] data) {
         if (data != null) {
             INDArray[] output = new INDArray[data.length];
-            for (int i = 0 ; i < data.length ; i++) {
+            for (int i = 0 ; i < data.length ; i++)
                 output[i] = predict(data[i]);
-            }
             return output;
         }
         return null;

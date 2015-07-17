@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.apache.spark.AccumulatorParam;
 import org.jblas.DoubleMatrix;
 
-public class DeltaAccumulator implements Serializable, AccumulatorParam<DeltaWeight> {
+public class DeltaAccumulator implements Serializable, AccumulatorParam<Accumulator> {
 
 	/**
 	 * 
@@ -13,7 +13,7 @@ public class DeltaAccumulator implements Serializable, AccumulatorParam<DeltaWei
 	private static final long serialVersionUID = -5883736230420541223L;
 
 	@Override
-	public DeltaWeight addInPlace(DeltaWeight arg0, DeltaWeight arg1) {
+	public Accumulator addInPlace(Accumulator arg0, Accumulator arg1) {
 		for(int i = 0; i < arg0.gradWList.length; i++) {
 			if(arg0.gradWList[i] != null && arg1.gradWList[i] != null) {
 				for(int j = 0; j < arg0.gradWList[i].length; j++) {
@@ -31,8 +31,8 @@ public class DeltaAccumulator implements Serializable, AccumulatorParam<DeltaWei
 	}
 
 	@Override
-	public DeltaWeight zero(DeltaWeight arg0) {
-		DeltaWeight d = new DeltaWeight(arg0.gradWList.length);
+	public Accumulator zero(Accumulator arg0) {
+		Accumulator d = new Accumulator(arg0.gradWList.length);
 		for(int i = 0; i < arg0.gradWList.length; i++) {
 			d.gradWList[i] = null;
 			d.gradBList[i] = null;
@@ -56,7 +56,7 @@ public class DeltaAccumulator implements Serializable, AccumulatorParam<DeltaWei
 	}
 
 	@Override
-	public DeltaWeight addAccumulator(DeltaWeight arg0, DeltaWeight arg1) {
+	public Accumulator addAccumulator(Accumulator arg0, Accumulator arg1) {
 		return addInPlace(arg0, arg1);
 	}
 }

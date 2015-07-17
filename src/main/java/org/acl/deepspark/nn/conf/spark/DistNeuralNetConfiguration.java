@@ -3,7 +3,7 @@ package org.acl.deepspark.nn.conf.spark;
 import java.io.Serializable;
 import java.util.List;
 
-import org.acl.deepspark.data.DeltaWeight;
+import org.acl.deepspark.data.Accumulator;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.apache.spark.api.java.JavaRDD;
@@ -11,7 +11,6 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.broadcast.Broadcast;
-import org.deeplearning4j.spark.canova.RDDMiniBatches.MiniBatchFunction;
 import org.jblas.DoubleMatrix;
 
 
@@ -26,11 +25,11 @@ public class DistNeuralNetConfiguration implements Serializable {
 	//spark
 	private boolean finalize = false; 
 	
-	public DeltaWeight getEmptyDeltaWeight() {
+	public Accumulator getEmptyDeltaWeight() {
 		if(!finalize)
 			return null;
 		
-		DeltaWeight d = new DeltaWeight(layerList.length);
+		Accumulator d = new Accumulator(layerList.length);
 		for(int count =0; count < layerList.length; count++) {
 			BaseLayer l = layerList[count];
 			int[] info = l.getWeightInfo();
@@ -81,14 +80,14 @@ public class DistNeuralNetConfiguration implements Serializable {
 		});
 		
 		//backpropagation
-		JavaRDD<DeltaWeight> dWeight = delta.map(new Function<DoubleMatrix, DeltaWeight>() {
+		JavaRDD<Accumulator> dWeight = delta.map(new Function<DoubleMatrix, Accumulator>() {
 			@Override
-			public DeltaWeight call(DoubleMatrix arg0) throws Exception {
+			public Accumulator call(DoubleMatrix arg0) throws Exception {
 				BaseLayer[] layerList = layers.value();
 				DoubleMatrix[] error = new DoubleMatrix[1];
 				error[0] = arg0;
 				
-				DeltaWeight deltas = new DeltaWeight(layerList.length);
+				Accumulator deltas = new Accumulator(layerList.length);
 				
 				// Back-propagation
 				for(int l = layerList.length - 1; l >=0 ; l--) {
@@ -111,9 +110,9 @@ public class DistNeuralNetConfiguration implements Serializable {
 			}
 		});
 		
-		DeltaWeight gradient = dWeight.fold(getEmptyDeltaWeight(), new Function2<DeltaWeight, DeltaWeight, DeltaWeight>() {
+		Accumulator gradient = dWeight.fold(getEmptyDeltaWeight(), new Function2<Accumulator, Accumulator, Accumulator>() {
 			@Override
-			public DeltaWeight call(DeltaWeight v1, DeltaWeight v2) throws Exception {
+			public Accumulator call(Accumulator v1, Accumulator v2) throws Exception {
 				for(int i1 = 0; i1 < v1.gradWList.length; i1++) {
 					if(v1.gradWList[i1] != null && v2.gradWList[i1] != null) {
 						for(int j1 = 0; j1 < v1.gradWList[i1].length; j1++) {
@@ -146,7 +145,7 @@ public class DistNeuralNetConfiguration implements Serializable {
 		}
 	}
 	
-	private void update(DeltaWeight gradient,int minibatchSize) {
+	private void update(Accumulator gradient,int minibatchSize) {
 		for(int i = layerList.length - 1; i >=0 ; i--) {
 			BaseLayer a = layerList[i];
 			DoubleMatrix[][] gradW = gradient.gradWList[i];

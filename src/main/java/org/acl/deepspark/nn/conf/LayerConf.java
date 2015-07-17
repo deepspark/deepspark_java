@@ -12,7 +12,6 @@ public class LayerConf {
 
     private HashMap<String, Object> layerParams;
     private int type;
-
     public static final int CONVOLUTION = 0;
     public static final int POOLING = 1;
     public static final int FULLYCONN = 2;

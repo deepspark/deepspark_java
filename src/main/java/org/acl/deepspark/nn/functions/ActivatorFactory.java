@@ -2,6 +2,8 @@ package org.acl.deepspark.nn.functions;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.SigmoidDerivative;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.factory.Nd4jBackend;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.NDArrayUtil;
 
@@ -18,8 +20,9 @@ public class ActivatorFactory {
 				
 				@Override
 				public INDArray derivative(INDArray input) {
-					
-					return null;
+					INDArray ret = Nd4j.onesLike(input);
+					INDArray f = output(input);
+					return ret.subi(f).muli(f);
 				}
 			};
 			

@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.acl.deepspark.nn.driver.NeuralNet;
 import org.acl.deepspark.nn.functions.Activator;
+import org.acl.deepspark.nn.functions.ActivatorType;
 
 
 public class NeuralNetConf implements Serializable {
@@ -16,7 +17,7 @@ public class NeuralNetConf implements Serializable {
 	private int[] dimIn;
 	private int[] dimOut;
 	private ArrayList<LayerConf> layers;
-	private HashMap<String, Double> params;
+	private HashMap<String, Object> params;
 
 	public NeuralNetConf() {
 		layers = new ArrayList<>();
@@ -27,7 +28,7 @@ public class NeuralNetConf implements Serializable {
 		params.put("decayLambda", 0.0001);
 		params.put("momentum", 0.9);
 		params.put("dropOutRate", 0.0);
-		params.put("activator", (double) Activator.SIGMOID);
+		params.put("activator", ActivatorType.SIGMOID);
 	}
 
 	public NeuralNetConf setLearningRate(double learningRate) {
@@ -67,7 +68,7 @@ public class NeuralNetConf implements Serializable {
 		return layers;
 	}
 
-	public HashMap<String, Double> getParams() {
+	public HashMap<String, Object> getParams() {
 		return params;
 	}
 

@@ -1,6 +1,7 @@
 package org.acl.deepspark.nn.conf;
 
 import org.acl.deepspark.nn.functions.Activator;
+import org.acl.deepspark.nn.functions.ActivatorType;
 
 import java.util.HashMap;
 
@@ -19,7 +20,7 @@ public class LayerConf {
     public LayerConf(int type) {
         this.type = type;
         layerParams = new HashMap<>();
-        layerParams.put("activator", Activator.SIGMOID);
+        layerParams.put("activator", ActivatorType.SIGMOID);
     }
 
     public void setOutputUnit(int dimOut) {

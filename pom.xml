@@ -10,8 +10,7 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<dl4j.version>0.0.3.3.2.alpha1</dl4j.version>
-		<nd4j.version>0.0.3.5.5.3-SNAPSHOT</nd4j.version>
+		<nd4j.version>0.0.3.5.5.3</nd4j.version>
 		<canova.version>0.0.0.2-SNAPSHOT</canova.version>
 		<scala.binary.version>2.10</scala.binary.version>
 		<spark.version>1.2.1</spark.version>
@@ -94,25 +93,6 @@
     
 	<dependencyManagement>
 		<dependencies>
-		
-			<dependency>
-				<groupId>org.deeplearning4j</groupId>
-				<artifactId>deeplearning4j-core</artifactId>
-				<version>${dl4j.version}</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>org.deeplearning4j</groupId>
-				<artifactId>deeplearning4j-scaleout-api</artifactId>
-				<version>${dl4j.version}</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>org.deeplearning4j</groupId>
-				<artifactId>dl4j-spark</artifactId>
-				<version>${dl4j.version}</version>
-			</dependency>
-
 			<dependency>
 				<groupId>org.apache.spark</groupId>
 				<artifactId>spark-mllib_${scala.binary.version}</artifactId>
@@ -149,22 +129,16 @@
 	
 	<dependencies>
 		<dependency>
-		      <groupId>org.deeplearning4j</groupId>
-		      <artifactId>deeplearning4j-core</artifactId>
-		</dependency>
-			
-		<dependency>
-		      <groupId>org.deeplearning4j</groupId>
-		      <artifactId>dl4j-spark</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-mllib_${scala.binary.version}</artifactId>
 			<version>${spark.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+		<dependency>
+		   <groupId>org.nd4j</groupId>
+		   <artifactId>nd4j-jblas</artifactId>
+		   <version>${nd4j.version}</version>
+	    </dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-core_${scala.binary.version}</artifactId>

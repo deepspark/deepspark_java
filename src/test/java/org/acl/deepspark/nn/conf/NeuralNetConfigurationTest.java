@@ -60,8 +60,7 @@ public class NeuralNetConfigurationTest {
 											.build();
 
 		NeuralNetRunner driver = new NeuralNetRunner(net).setIterations(10000)
-														 .setMiniBatchSize(10)
-														 ;
+														 .setMiniBatchSize(10);
 		driver.train(train_data);
 		driver.predict(test_data);
 

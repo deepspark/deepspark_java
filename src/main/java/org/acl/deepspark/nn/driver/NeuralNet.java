@@ -73,6 +73,17 @@ public class NeuralNet {
         this.weights = weights;
     }
 
+    public INDArray[] getWeights() {
+        return weights;
+    }
+
+    public void setDeltaWeights(INDArray[] deltaWeights) {
+        this.deltaWeights = deltaWeights;
+    }
+
+    public INDArray[] getDeltaWeights() {
+        return deltaWeights;
+    }
 
     public INDArray feedForward(Sample in) {
         activationOut[0] = in.getFeature();
@@ -82,7 +93,6 @@ public class NeuralNet {
         return activationOut[layers.length];
     }
 
-
     public void backPropagate(INDArray error) {
         for (int i = layers.length-1; i >= 0; i--) {
             deltaWeights[i] = layers[i].gradient(activationOut[i], error);
@@ -91,4 +101,9 @@ public class NeuralNet {
     }
 
 
+    public void updateWeight() {
+        for (int i = 0 ; i < weights.length; i++) {
+            // TODO update weight w/ lr and acummulated deltaWeights
+        }
+    }
 }

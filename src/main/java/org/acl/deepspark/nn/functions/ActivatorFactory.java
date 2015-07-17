@@ -1,6 +1,9 @@
 package org.acl.deepspark.nn.functions;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.transforms.SigmoidDerivative;
+import org.nd4j.linalg.ops.transforms.Transforms;
+import org.nd4j.linalg.util.NDArrayUtil;
 
 public class ActivatorFactory {
 	public static Activator getActivator(ActivatorType t) {
@@ -10,16 +13,16 @@ public class ActivatorFactory {
 				
 				@Override
 				public INDArray output(INDArray input) {
-					
-					return null;
+					return Transforms.sigmoid(input);
 				}
 				
 				@Override
 				public INDArray derivative(INDArray input) {
-					// TODO Auto-generated method stub
+					
 					return null;
 				}
 			};
+			
 		case RECTIFIED_LINEAR:
 			return new Activator() {
 				@Override
@@ -34,6 +37,7 @@ public class ActivatorFactory {
 					return null;
 				}
 			};
+			
 		case SOFTMAX:
 			return new Activator() {
 				@Override

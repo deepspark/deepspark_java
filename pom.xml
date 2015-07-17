@@ -10,7 +10,7 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<nd4j.version>0.0.3.5.5.2</nd4j.version>
+		<nd4j.version>0.0.3.5.5.5</nd4j.version>
 		<canova.version>0.0.0.2-SNAPSHOT</canova.version>
 		<scala.binary.version>2.10</scala.binary.version>
 		<spark.version>1.2.1</spark.version>

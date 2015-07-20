@@ -1,5 +1,5 @@
 package org.acl.deepspark.nn.layers.cnn;
-import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
+import org.acl.deepspark.nn.layers.ConvolutionLayer;
 import org.jblas.DoubleMatrix;
 
 

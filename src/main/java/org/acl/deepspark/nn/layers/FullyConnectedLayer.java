@@ -1,5 +1,7 @@
 package org.acl.deepspark.nn.layers;
 
+import java.io.Serializable;
+
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.Activator;
@@ -11,7 +13,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 
 
 // Fully Connected HiddenLayer
-public class FullyConnectedLayer implements Layer {
+public class FullyConnectedLayer implements Layer, Serializable {
 	private Activator activator;
 	public FullyConnectedLayer(ActivatorType t) {
 		activator = ActivatorFactory.getActivator(t);

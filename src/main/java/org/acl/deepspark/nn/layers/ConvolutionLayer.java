@@ -1,4 +1,4 @@
-package org.acl.deepspark.nn.layers.cnn;
+package org.acl.deepspark.nn.layers;
 
 import java.io.Serializable;
 
@@ -6,7 +6,6 @@ import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.BaseLayer;
-import org.acl.deepspark.nn.layers.Layer;
 import org.acl.deepspark.nn.weights.WeightUtil;
 import org.acl.deepspark.utils.MathUtils;
 import org.jblas.DoubleMatrix;

@@ -9,10 +9,15 @@ import org.acl.deepspark.nn.driver.NeuralNet;
 import org.acl.deepspark.nn.driver.NeuralNetRunner;
 import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.functions.ActivatorType;
+import org.acl.deepspark.nn.layers.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.FullyConnLayer;
+<<<<<<< HEAD
 import org.acl.deepspark.nn.layers.LayerType;
 import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
+=======
+import org.acl.deepspark.nn.layers.PoolingLayer;
+>>>>>>> 617521ee9a9c9d3d69e6328ae1d070fee9588bf0
 import org.acl.deepspark.utils.MnistLoader;
 
 

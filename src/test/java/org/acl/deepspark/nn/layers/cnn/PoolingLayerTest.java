@@ -1,7 +1,7 @@
 package org.acl.deepspark.nn.layers.cnn;
 
 import org.jblas.DoubleMatrix;
-import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
+import org.acl.deepspark.nn.layers.PoolingLayer;
 
 public class PoolingLayerTest {
 	public static void main(String[] args) {

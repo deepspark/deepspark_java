@@ -43,7 +43,7 @@ public class FullyConnectedLayer implements Layer {
 	}
 
 	@Override
-	public INDArray createWeight(LayerConf conf, int[] input) {
+	public Weight createWeight(LayerConf conf, int[] input) {
 		// TODO Auto-generated method stub
 		return null;
 	}

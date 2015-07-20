@@ -19,7 +19,7 @@ public class LayerConf {
     public LayerConf(int type) {
         this.type = type;
         layerParams = new HashMap<>();
-        layerParams.put("activator", ActivatorType.SIGMOID);
+        setActivator(ActivatorType.SIGMOID);
     }
 
     public void setOutputUnit(int dimOut) {
@@ -38,7 +38,7 @@ public class LayerConf {
         layerParams.put("poolingSize", poolingSize);
     }
 
-    public void setActivator(int activator) {
+    public void setActivator(ActivatorType activator) {
         layerParams.put("activator", activator);
     }
 
@@ -58,8 +58,8 @@ public class LayerConf {
         return (int) layerParams.get("numFilters");
     }
 
-    public int getActivator() {
-        return (int) layerParams.get("activator");
+    public ActivatorType getActivator() {
+        return (ActivatorType) layerParams.get("activator");
     }
 
     public int getType() {

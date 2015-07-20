@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
+import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.layers.Layer;
 import org.acl.deepspark.nn.weights.WeightUtil;
@@ -36,7 +37,7 @@ public class ConvolutionLayer implements Serializable, Layer {
 
 	}
 
-	public ConvolutionLayer(int activator) {
+	public ConvolutionLayer(ActivatorType activator) {
 
 	}
 

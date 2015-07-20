@@ -55,6 +55,11 @@ public class NeuralNetConf implements Serializable {
 		return this;
 	}
 
+	public NeuralNetConf setOutputDim(int[] dimOut) {
+		this.dimOut = dimOut;
+		return this;
+	}
+
 	public int[] getDimIn() {
 		return dimIn;
 	}
@@ -67,15 +72,14 @@ public class NeuralNetConf implements Serializable {
 		return layers;
 	}
 
+	public int getNumLayers() {
+		return layers.size();
+	}
+
 	public HashMap<String, Double> getParams() {
 		return params;
 	}
 
-	public NeuralNetConf setOutputDim(int[] dimOut) {
-		this.dimOut = dimOut;
-		return this;
-	}
-	
 	public NeuralNetConf addLayer(LayerConf l) {
 		layers.add(l);
 		return this;

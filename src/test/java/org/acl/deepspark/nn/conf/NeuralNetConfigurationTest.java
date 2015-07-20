@@ -8,6 +8,7 @@ import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.driver.NeuralNet;
 import org.acl.deepspark.nn.driver.NeuralNetRunner;
 import org.acl.deepspark.nn.functions.Activator;
+import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.FullyConnLayer;
 import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
@@ -31,7 +32,7 @@ public class NeuralNetConfigurationTest {
 		Collections.shuffle(Arrays.asList(test_data));
 
 
-		LayerConf layer1 = new LayerConf(LayerConf.CONVOLUTION);
+		LayerConf layer1 = new LayerConf(ActivatorType.SIGMOID);
 		layer1.setFilterSize(new int[]{3, 3});
 		layer1.setNumFilters(10);
 		layer1.setActivator(Activator.SIGMOID);

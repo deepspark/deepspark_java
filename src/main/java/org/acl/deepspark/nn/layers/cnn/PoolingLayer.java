@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
+import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.layers.Layer;
 import org.jblas.DoubleMatrix;
@@ -28,6 +29,9 @@ public class PoolingLayer implements Serializable, Layer {
 
 	}
 
+	public PoolingLayer(ActivatorType activator) {
+
+	}
 
 	public PoolingLayer(int poolSize) {
 		super();

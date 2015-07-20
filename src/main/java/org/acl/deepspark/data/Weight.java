@@ -17,8 +17,31 @@ public class Weight implements Serializable {
 
 	}
 
+	public void add(Weight weight) {
+
+	}
+
 	public void addi(Weight weight) {
 
 	}
 
+	public void sub(Weight weight) {
+
+	}
+
+	public void subi(Weight weight) {
+
+	}
+
+	public Weight mul(double d) {
+		return null;
+	}
+
+	public Weight muli(double d) {
+		return null;
+	}
+
+	public INDArray mmul(INDArray input) {
+		return null;
+	}
 }

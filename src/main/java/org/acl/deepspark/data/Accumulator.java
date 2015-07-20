@@ -28,12 +28,12 @@ public class Accumulator implements Serializable {
 		}
 	}
 
-	public Weight getAverage() {
-		for (INDArray weight : gradWList) {
-			// TODO: check whether divi() performs well
-			weight.divi(num);
-		}
-
+	public Weight[] getAverage() {
+//		for (INDArray weight : gradWList) {
+//			// TODO: check whether divi() performs well
+//			weight.divi(num);
+//		}
+		return null;
 	}
 
 	public void clear() {

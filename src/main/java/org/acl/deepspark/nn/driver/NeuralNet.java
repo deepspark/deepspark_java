@@ -62,8 +62,9 @@ public class NeuralNet {
             }
             if (layer != null) {
                 layers[i] = layer;
+
                 weights[i] = layers[i].createWeight(layerConf, dimIn);
-                weightUpdates[i] = new Weight(weights[i].getShape());
+                weightUpdates[i] = new Weight(weights[i].getShape(), dimIn);
             }
         }
     }
@@ -91,7 +92,7 @@ public class NeuralNet {
         Weight[] gradient = new Weight[layers.length];
         INDArray[] preActivation = new INDArray[layers.length];
         INDArray[] postActivation = new INDArray[layers.length + 1];
-        postActivation[0] = in.getFeature();
+        postActivation[0] = in.data;
 
         for (int i = 0; i < layers.length; i++) {
             preActivation[i] = layers[i].generateOutput(weights[i], postActivation[i]);

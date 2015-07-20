@@ -41,17 +41,17 @@ public class NeuralNetConfigurationTest {
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
 		layer1.setFilterSize(new int[]{3, 3});
 		layer1.setNumFilters(10);
-		layer1.setActivator(Activator.SIGMOID);
+		layer1.setActivator(ActivatorType.SIGMOID);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);
 		layer2.setPoolingSize(2);
-		layer2.setActivator(Activator.SIGMOID);
+		layer2.setActivator(ActivatorType.SIGMOID);
 
 		LayerConf layer3 = new LayerConf(LayerType.FULLYCONN);
 		layer3.setOutputUnit(120);
-		layer2.setActivator(Activator.SIGMOID);
+		layer2.setActivator(ActivatorType.SIGMOID);
 
-		LayerConf layer4 = new LayerConf(LayerConf.FULLYCONN);
+		LayerConf layer4 = new LayerConf(LayerType.FULLYCONN);
 		layer3.setOutputUnit(10);
 
 		NeuralNet net = new NeuralNetConf().setLearningRate(0.1)

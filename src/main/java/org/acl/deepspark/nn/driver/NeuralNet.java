@@ -46,26 +46,22 @@ public class NeuralNet {
     private void buildNetwork(ArrayList<LayerConf> arr, int[] dimIn) {
         for (int i = 0 ; i< arr.size(); i++) {
             LayerConf layerConf = arr.get(i);
-            ActivatorType activator = layerConf.getActivator();
-            Layer layer = null;
+            ActivatorType activator = (ActivatorType) layerConf.get("activator");
 
             switch (layerConf.getType()) {
                 case CONVOLUTION:
-                    layer = new ConvolutionLayer(activator);
+                    layers[i] = new ConvolutionLayer(activator);
                     break;
                 case POOLING:
-                    layer = new PoolingLayer(activator);
+                    layers[i] = new PoolingLayer(activator);
                     break;
                 case FULLYCONN:
-                    layer = new FullyConnectedLayer(activator);
+                    layers[i] = new FullyConnectedLayer(activator);
                     break;
             }
-            if (layer != null) {
-                layers[i] = layer;
-
-                weights[i] = layers[i].createWeight(layerConf, dimIn);
-                weightUpdates[i] = new Weight(weights[i].getShape(), dimIn);
-            }
+            weights[i] = layers[i].createWeight(layerConf, dimIn);
+            dimIn = layers[i].calculateOutputDimension(layerConf, dimIn);
+            weightUpdates[i] = new Weight(weights[i].getShape(), dimIn);
         }
     }
 
@@ -79,13 +75,6 @@ public class NeuralNet {
 
     public int getNumLayers() {
         return layers.length;
-    }
-
-    public INDArray feedForward(Sample in) {
-        INDArray activationOut = in.getFeature();
-        for (int i = 0; i < layers.length; i++)
-            activationOut = layers[i].generateOutput(weights[i], activationOut);
-        return activationOut;
     }
 
     public Weight[] train(Sample in) {
@@ -106,6 +95,13 @@ public class NeuralNet {
                 error = layers[i].deriveDelta(weights[i], preActivation[i-1], error);
         }
         return gradient;
+    }
+
+    public INDArray predict(Sample in) {
+        INDArray activationOut = in.data;
+        for (int i = 0; i < layers.length; i++)
+            activationOut = layers[i].generateOutput(weights[i], activationOut);
+        return activationOut;
     }
 
     public void updateWeight(Weight[] deltaWeight) throws Exception {

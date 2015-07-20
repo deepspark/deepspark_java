@@ -19,7 +19,8 @@ public class Weight implements Serializable {
 	}
 
 	public Weight(int weight[], int bias[]) {
-		w = Nd4j.zeros(weight);
+		// Weight initialization, weight: gaussian, bias: zero
+		w = Nd4j.randn(weight);
 		b = Nd4j.zeros(bias);
 	}
 
@@ -71,6 +72,25 @@ public class Weight implements Serializable {
 		return this;
 	}
 
+	public Weight div(double d) {
+		Weight result = new Weight();
+		result.w = this.w.div(d);
+		result.b = this.b.div(d);
+		return result;
+	}
+
+	public Weight divi(double d) {
+		w.divi(d);
+		b.divi(d);
+		return this;
+	}
+
+	public void clear() {
+		if (w != null && b != null) {
+
+		}
+	}
+
 	// Matrix multiplication for weight x input
 	public static INDArray mmul(Weight weight, INDArray input) {
 		INDArray result = weight.w.mmul(input);
@@ -82,5 +102,6 @@ public class Weight implements Serializable {
 		INDArray result = input.mmul(weight.w);
 		return result.addi(weight.b);
 	}
+
 
 }

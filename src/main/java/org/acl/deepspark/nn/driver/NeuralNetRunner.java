@@ -10,14 +10,10 @@ import org.nd4j.linalg.api.ndarray.INDArray;
  */
 public class NeuralNetRunner {
     private NeuralNet net;
-    private INDArray[] deltaWeights;
     private Accumulator weightAccum;
 
     private int iteration;
     private int batchSize;
-    private double learningRate;
-    private double decayLambda;
-    private double momentum;
 
     public NeuralNetRunner(NeuralNet net) {
         this.net = net;
@@ -26,7 +22,6 @@ public class NeuralNetRunner {
         /* default configuration */
         this.iteration = 10000;
         this.batchSize = 1;
-        this.learningRate = 0.1;
     }
 
     public NeuralNetRunner setIterations(int iteration) {
@@ -45,6 +40,7 @@ public class NeuralNetRunner {
             for (int j = 0; j < batchSize; j++)
                 weightAccum.accumulate(net.train(data[Random.nextInt(dataSize)]));
             net.updateWeight(weightAccum.getAverage());
+            weightAccum.clear();
         }
     }
 
@@ -56,6 +52,6 @@ public class NeuralNetRunner {
     }
 
     public INDArray predict(Sample data) {
-        return net.feedForward(data);
+        return net.predict(data);
     }
 }

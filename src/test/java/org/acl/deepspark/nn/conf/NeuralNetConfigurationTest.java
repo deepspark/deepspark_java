@@ -39,9 +39,9 @@ public class NeuralNetConfigurationTest {
 
 
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
-		layer1.setFilterSize(new int[]{3, 3});
-		layer1.setNumFilters(10);
-		layer1.setActivator(ActivatorType.SIGMOID);
+		layer1.set("inputDim", new int[]{3, 3});
+		layer1.set("numFilters", 10);
+		layer1.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);
 		layer2.setPoolingSize(2);

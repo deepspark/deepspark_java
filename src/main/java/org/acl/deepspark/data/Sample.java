@@ -14,11 +14,4 @@ public class Sample implements Serializable {
 	public INDArray data;
 	public INDArray label;
 
-	public INDArray getFeature() {
-		return data;
-	}
-
-	public INDArray getLabel() {
-		return label;
-	}
 }

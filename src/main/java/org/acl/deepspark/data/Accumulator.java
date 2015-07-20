@@ -26,17 +26,21 @@ public class Accumulator implements Serializable {
 			else
 				gradWList[i].addi(weights[i]);
 		}
+		num++;
 	}
 
 	public Weight[] getAverage() {
-//		for (INDArray weight : gradWList) {
-//			// TODO: check whether divi() performs well
-//			weight.divi(num);
-//		}
-		return null;
+		if (num <= 0) return null;
+
+		Weight[] result = new Weight[gradWList.length];
+		for(int i = 0; i < gradWList.length; i++)
+			result[i] = gradWList[i].div(num);
+		return gradWList;
 	}
 
 	public void clear() {
-
+		for(Weight weight : gradWList)
+			weight = null;
+		num = 0;
 	}
 }

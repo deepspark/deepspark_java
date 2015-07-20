@@ -10,6 +10,9 @@ import org.acl.deepspark.nn.weights.WeightUtil;
 import org.acl.deepspark.utils.MathUtils;
 import org.jblas.DoubleMatrix;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.convolution.Convolution;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.util.NDArrayUtil;
 
 public class ConvolutionLayer implements Serializable, Layer {
 	/**
@@ -235,7 +238,23 @@ public class ConvolutionLayer implements Serializable, Layer {
 
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
-		return null;
+		int[] dim = new int[3];
+		int[] inputDim = input.shape(); // 0: x, 1: y, 2: # of channel;
+		int[] kernelDim = weight.getShape(); // 0: x, 1: y, 2: # of channel, 3: # of filter;
+		dim[0] = inputDim[0] - kernelDim[0] + 1;
+		dim[1] = inputDim[1] - kernelDim[1] + 1;
+		dim[2] = kernelDim[3];
+		
+		INDArray output = Nd4j.zeros(dim);
+		
+		// TODO: check dims(image) > dims(filter)
+		for(int i = 0; i < numFilters; i++) {
+			for(int j = 0; j < numChannels; j++) {
+				output.sl.addi(MathUtils.convolution(input[j], W[i][j], MathUtils.VALID_CONV));
+			}
+			data[i].addi(bias[i]);
+		}
+		return output;
 	}
 
 	@Override
@@ -245,6 +264,12 @@ public class ConvolutionLayer implements Serializable, Layer {
 
 	@Override
 	public INDArray gradient(INDArray input, INDArray error) {
+		return null;
+	}
+
+	@Override
+	public INDArray activate(INDArray output) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

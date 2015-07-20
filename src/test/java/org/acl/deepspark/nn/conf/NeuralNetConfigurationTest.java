@@ -9,9 +9,9 @@ import org.acl.deepspark.nn.driver.NeuralNet;
 import org.acl.deepspark.nn.driver.NeuralNetRunner;
 import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.functions.ActivatorType;
+import org.acl.deepspark.nn.layers.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.FullyConnLayer;
-import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
-import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
+import org.acl.deepspark.nn.layers.PoolingLayer;
 import org.acl.deepspark.utils.MnistLoader;
 
 

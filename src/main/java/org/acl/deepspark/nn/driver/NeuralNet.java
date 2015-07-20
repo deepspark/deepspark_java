@@ -6,10 +6,10 @@ import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
+import org.acl.deepspark.nn.layers.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.FullyConnectedLayer;
 import org.acl.deepspark.nn.layers.Layer;
-import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
-import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
+import org.acl.deepspark.nn.layers.PoolingLayer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 import java.util.ArrayList;

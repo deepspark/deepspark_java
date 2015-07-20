@@ -22,8 +22,8 @@ public class NeuralNetRunner {
     public NeuralNetRunner(NeuralNet net) {
         this.net = net;
         this.weightAccum = new Accumulator(net.getNumLayers());
-        /* default configuration */
 
+        /* default configuration */
         this.iteration = 10000;
         this.batchSize = 1;
         this.learningRate = 0.1;
@@ -39,45 +39,23 @@ public class NeuralNetRunner {
         return this;
     }
 
-    public NeuralNetRunner setLearningRate(double learningRate) {
-        this.learningRate = learningRate;
-        return this;
-    }
-
-    public NeuralNetRunner setDecayLambda(double decayLambda) {
-        this.de
-    }
-
-    learningRate = conf.getParams().get("learningRate");
-    decayLambda = conf.getParams().get("decayLambda");
-    momentum = conf.getParams().get("momentum");
-    dropOutRate = conf.getParams().get("dropOutRate");
-
     public void train(Sample[] data) throws Exception {
         int dataSize = data.length;
-        int index;
         for (int i = 0 ; i < iteration; i++) {
-            for (int j = 0; j < batchSize; j++) {
-                index = Random.nextInt(dataSize);
-                weightAccum.accumulate(net.train(data[index]));
-            }
-            net.updateWeight( weightAccum.getAverage());
+            for (int j = 0; j < batchSize; j++)
+                weightAccum.accumulate(net.train(data[Random.nextInt(dataSize)]));
+            net.updateWeight(weightAccum.getAverage());
         }
     }
 
     public INDArray[] predict(Sample[] data) {
-        if (data != null) {
-            INDArray[] output = new INDArray[data.length];
-            for (int i = 0 ; i < data.length ; i++)
-                output[i] = predict(data[i]);
-            return output;
-        }
-        return null;
+        INDArray[] output = new INDArray[data.length];
+        for (int i = 0 ; i < data.length ; i++)
+            output[i] = predict(data[i]);
+        return output;
     }
 
     public INDArray predict(Sample data) {
-        if (data != null)
-            return net.feedForward(data);
-        return null;
+        return net.feedForward(data);
     }
 }

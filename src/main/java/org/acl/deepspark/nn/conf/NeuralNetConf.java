@@ -76,8 +76,20 @@ public class NeuralNetConf implements Serializable {
 		return layers.size();
 	}
 
-	public HashMap<String, Double> getParams() {
-		return params;
+	public double getLearningRate() {
+		return params.get("learningRate");
+	}
+
+	public double getDecayLambda() {
+		return params.get("decayLambda");
+	}
+
+	public double getMomentum() {
+		return params.get("momentum");
+	}
+
+	public double getDropOutRate() {
+		return params.get("dropOutRate");
 	}
 
 	public NeuralNetConf addLayer(LayerConf l) {

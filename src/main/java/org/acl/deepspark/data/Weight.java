@@ -17,19 +17,27 @@ public class Weight implements Serializable {
 
 	}
 
-	public void add(Weight weight) {
+	public Weight(int shape[]) {
 
 	}
 
-	public void addi(Weight weight) {
+	public int[] getShape() {
+		return w.shape();
+	}
+
+	public Weight add(Weight weight) {
 
 	}
 
-	public void sub(Weight weight) {
+	public Weight addi(Weight weight) {
 
 	}
 
-	public void subi(Weight weight) {
+	public Weight sub(Weight weight) {
+
+	}
+
+	public Weight subi(Weight weight) {
 
 	}
 

@@ -10,6 +10,7 @@ import org.acl.deepspark.nn.driver.NeuralNetRunner;
 import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.FullyConnLayer;
+import org.acl.deepspark.nn.layers.LayerType;
 import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
 import org.acl.deepspark.utils.MnistLoader;
@@ -32,16 +33,16 @@ public class NeuralNetConfigurationTest {
 		Collections.shuffle(Arrays.asList(test_data));
 
 
-		LayerConf layer1 = new LayerConf(ActivatorType.SIGMOID);
+		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
 		layer1.setFilterSize(new int[]{3, 3});
 		layer1.setNumFilters(10);
 		layer1.setActivator(Activator.SIGMOID);
 
-		LayerConf layer2 = new LayerConf(LayerConf.POOLING);
+		LayerConf layer2 = new LayerConf(LayerType.POOLING);
 		layer2.setPoolingSize(2);
 		layer2.setActivator(Activator.SIGMOID);
 
-		LayerConf layer3 = new LayerConf(LayerConf.FULLYCONN);
+		LayerConf layer3 = new LayerConf(LayerType.FULLYCONN);
 		layer3.setOutputUnit(120);
 		layer2.setActivator(Activator.SIGMOID);
 
@@ -61,7 +62,8 @@ public class NeuralNetConfigurationTest {
 											.build();
 
 		NeuralNetRunner driver = new NeuralNetRunner(net).setIterations(10000)
-														 .setMiniBatchSize(10);
+														 .setMiniBatchSize(10)
+														 .;
 		driver.train(train_data);
 		driver.predict(test_data);
 

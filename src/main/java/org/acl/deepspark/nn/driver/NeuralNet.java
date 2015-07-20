@@ -8,6 +8,7 @@ import org.acl.deepspark.nn.conf.NeuralNetConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.FullyConnectedLayer;
 import org.acl.deepspark.nn.layers.Layer;
+import org.acl.deepspark.nn.layers.LayerType;
 import org.acl.deepspark.nn.layers.cnn.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.cnn.PoolingLayer;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -19,17 +20,19 @@ import java.util.ArrayList;
  */
 public class NeuralNet {
     private Layer[]     layers;
-    private Weight[]  weights;
+    private Weight[]    weights;
+    private Weight[]    weightUpdates;
 
+    double learningRate;
     double decayLambda;
     double momentum;
     double dropOutRate;
 
     public NeuralNet(final NeuralNetConf conf) {
-        learningRate = conf.getParams().get("learningRate");
-        decayLambda = conf.getParams().get("decayLambda");
-        momentum = conf.getParams().get("momentum");
-        dropOutRate = conf.getParams().get("dropOutRate");
+        learningRate = conf.getLearningRate();
+        decayLambda = conf.getDecayLambda();
+        momentum = conf.getMomentum();
+        dropOutRate = conf.getDropOutRate();
         initNetwork(conf);
     }
 
@@ -37,6 +40,7 @@ public class NeuralNet {
         int size = conf.getLayerList().size();
         layers = new Layer[size];
         weights = new Weight[size];
+        weightUpdates = new Weight[size];
         buildNetwork(conf.getLayerList(), conf.getDimIn());
     }
 
@@ -47,19 +51,20 @@ public class NeuralNet {
             Layer layer = null;
 
             switch (layerConf.getType()) {
-                case LayerConf.CONVOLUTION:
+                case CONVOLUTION:
                     layer = new ConvolutionLayer(activator);
                     break;
-                case LayerConf.POOLING:
+                case POOLING:
                     layer = new PoolingLayer(activator);
                     break;
-                case LayerConf.FULLYCONN:
+                case FULLYCONN:
                     layer = new FullyConnectedLayer(activator);
                     break;
             }
             if (layer != null) {
                 layers[i] = layer;
                 weights[i] = layers[i].createWeight(layerConf, dimIn);
+                weightUpdates[i] = new Weight(weights[i].getShape());
             }
         }
     }
@@ -102,25 +107,15 @@ public class NeuralNet {
         }
         return gradient;
     }
-    /** move to NeuralNetRunner **/
-//
-//    public void calcDeltaWeight() {
-//        INDArray[] arr = gradients.getAverage();
-//        for (int i = 0 ; i < layers.length; i++) {
-//            if (deltaWeights[i] == null)
-//                deltaWeights[i] = weights[i].mul(decayLambda).add(arr[i]).mul(-1 * learningRate);
-//            else {
-//                INDArray delta = weights[i].mul(decayLambda).add(arr[i]).mul(-1 * learningRate);
-//                deltaWeights[i].addi(deltaWeights[i].mul(momentum).add(delta));
-//            }
-//        }
-//    }
 
     public void updateWeight(Weight[] deltaWeight) throws Exception {
         if (weights.length != deltaWeight.length)
             throw new Exception("weight dimension mismatch");
         for (int i = 0 ; i < weights.length; i++) {
-            weights[i].addi(deltaWeight[i]);
+            weightUpdates[i].muli(momentum)
+                            .subi(weights[i].mul(learningRate*decayLambda))
+                            .subi(deltaWeight[i].mul(learningRate));
+            weights[i].addi(weightUpdates[i]);
         }
     }
 }

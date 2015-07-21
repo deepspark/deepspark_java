@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
+import org.acl.deepspark.nn.functions.Activator;
+import org.acl.deepspark.nn.functions.ActivatorFactory;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.weights.WeightUtil;
@@ -12,6 +14,7 @@ import org.jblas.DoubleMatrix;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.convolution.Convolution;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.NDArrayUtil;
 
 public class ConvolutionLayer implements Serializable, Layer {
@@ -19,76 +22,12 @@ public class ConvolutionLayer implements Serializable, Layer {
 	 * 
 	 */
 	private static final long serialVersionUID = 140807767171115076L;
-	private int filterRows, filterCols, numFilters; // filter spec.
-	private DoubleMatrix[][] W; // filterId, x, y
-	private double[] bias;
-	
-	// momentum 
-	private double momentumFactor = 0.0;
-	private DoubleMatrix[][] prevDeltaW;
-	private double[] prevDeltaBias;
-		
-	// weight decay
-	private double decayLambda = 0.00001;
-	
-	private int[] stride = {1, 1};
-	private int zeroPadding = 0;
-	private boolean useZeroPadding = true;
-
-	public ConvolutionLayer() {
-
-	}
+	private Activator activator;
 
 	public ConvolutionLayer(ActivatorType activator) {
-
+		this.activator = ActivatorFactory.getActivator(activator); 
 	}
 
-	public ConvolutionLayer(int filterRows, int filterCols, int numFilters) {
-		super();
-		this.filterRows = filterRows;
-		this.filterCols = filterCols;
-		this.numFilters = numFilters;
-	}
-	
-	public ConvolutionLayer(int filterRows, int filterCols, int numFilters, double momentum, double decayLambda) {
-		this(filterRows, filterCols, numFilters);
-		this.momentumFactor = momentum;
-		this.decayLambda = decayLambda;
-	}
-	
-	public ConvolutionLayer(DoubleMatrix input, int filterRows, int filterCols, int numFilters) {
-		super(input);
-		this.filterRows = filterRows;
-		this.filterCols = filterCols;
-		this.numFilters = numFilters;
-		initWeights();
-	}
-	
-	public ConvolutionLayer(DoubleMatrix[] input, int filterRows, int filterCols, int numFilters) {
-		super(input);
-		this.filterRows = filterRows;
-		this.filterCols = filterCols;
-		this.numFilters = numFilters;
-		initWeights();
-	}
-	
-	public ConvolutionLayer(DoubleMatrix input, int filterRows, int filterCols, int numFilters, double momentum) {
-		this(input, filterRows, filterCols, numFilters);
-		momentumFactor = momentum;
-	}
-	
-	public ConvolutionLayer(DoubleMatrix[] input, int filterRows, int filterCols, int numFilters,double momentum) {
-		this(input, filterRows, filterCols, numFilters);
-		momentumFactor = momentum;
-	}
-	
-	public void setFilterWeights(DoubleMatrix[][] filters) {
-		W = filters;
-	}
-	
-	public DoubleMatrix[][] getFilterWeights() {
-		return W;
-	}
 	
 	@Override
 	public void initWeights() {
@@ -110,22 +49,6 @@ public class ConvolutionLayer implements Serializable, Layer {
 		}
 	}
 
-	public int getNumOfChannels() {
-		return numChannels;
-	}
-	
-	public int getNumOfFilter() {
-		return numFilters;
-	}
-	
-	private int getOutputRows() {
-		return  dimRows - filterRows + 1;
-	}
-	
-	private int getOutputCols() {
-		return  dimCols - filterCols + 1;
-	}
-	
 	// Convolution of multiple channel input images
 	public DoubleMatrix[] convolution() {
 		DoubleMatrix[] data = new DoubleMatrix[numFilters];
@@ -226,33 +149,43 @@ public class ConvolutionLayer implements Serializable, Layer {
 	}
 
 	@Override
-	public int[] getWeightInfo() {
-		int[] info = {numFilters, numChannels, filterRows, filterCols};
-		return info;
-	}
-
-	@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
-		return null;
+		// weight - 4D ( channel, filter, x, y )
+		// bias - 2D ( channel, filter )
+		Weight w = new Weight();
+		int[] dimW = new int[4];
+		dimW[0] = (Integer) conf.get("numChannel");
+		dimW[1] = (Integer) conf.get("numFilter");
+		dimW[2] = input[0]; // x
+		dimW[3] = input[1]; // y
+		
+		w.w = Nd4j.randn(dimW);
+		w.b = Nd4j.ones(dimW[0],dimW[1]).mul(0.01);
+		
+		return w;
 	}
 
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
 		int[] dim = new int[3];
-		int[] inputDim = input.shape(); // 0: x, 1: y, 2: # of channel;
-		int[] kernelDim = weight.getShape(); // 0: x, 1: y, 2: # of channel, 3: # of filter;
-		dim[0] = inputDim[0] - kernelDim[0] + 1;
-		dim[1] = inputDim[1] - kernelDim[1] + 1;
-		dim[2] = kernelDim[3];
+		int[] inputDim = input.shape(); // 0: # of channel, 1: x, 2: y;
+		int[] kernelDim = weight.getShape(); // 0: # of channel, 1: # of filter, 2: x, 3: y;
+		
+		int numChannels = kernelDim[0];
+		int numFilters = kernelDim[1];
+		
+		dim[0] = numFilters;
+		dim[1] = inputDim[1] - kernelDim[2] + 1;
+		dim[2] = inputDim[2] - kernelDim[3] + 1;
 		
 		INDArray output = Nd4j.zeros(dim);
 		
 		// TODO: check dims(image) > dims(filter)
 		for(int i = 0; i < numFilters; i++) {
 			for(int j = 0; j < numChannels; j++) {
-				output.sl.addi(MathUtils.convolution(input[j], W[i][j], MathUtils.VALID_CONV));
+				output.slice(i).addi(Convolution.conv2d(input.slice(j), weight.w.slice(j).slice(i), Convolution.Type.VALID)); // valid conv
+				output.slice(i).addi(weight.b.getScalar(j, i));
 			}
-			data[i].addi(bias[i]);
 		}
 		return output;
 	}
@@ -263,12 +196,18 @@ public class ConvolutionLayer implements Serializable, Layer {
 	}
 
 	@Override
-	public INDArray gradient(INDArray input, INDArray error) {
+	public Weight gradient(INDArray input, INDArray error) {
 		return null;
 	}
 
 	@Override
 	public INDArray activate(INDArray output) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
 		// TODO Auto-generated method stub
 		return null;
 	}

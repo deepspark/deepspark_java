@@ -9,6 +9,7 @@ import org.acl.deepspark.nn.functions.ActivatorFactory;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.utils.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 
 
@@ -46,13 +47,26 @@ public class FullyConnectedLayer implements Layer, Serializable {
 
 	@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
-		// TODO Auto-generated method stub
-		return null;
+		int dimOut = (Integer) conf.get("numNodes");
+		int dimIn = 1; 
+		for(int i =0; i < input.length; i++)
+			dimIn *= input[i];
+		
+		Weight w= new Weight();
+		w.w = Nd4j.randn(dimOut, dimIn);
+		w.b = Nd4j.ones(dimOut).mul(0.01);
+		return w;
 	}
 
 	@Override
 	public INDArray activate(INDArray output) {
 		return activator.output(output);
 	}
-	
+
+	@Override
+	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
+		int[] ret = new int[1];
+		ret[0] = (Integer) conf.get("numNodes");
+		return ret;
+	}
 }

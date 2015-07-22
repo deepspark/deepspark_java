@@ -20,7 +20,7 @@ public class Weight implements Serializable {
 
 	public Weight(int weight[], int bias[]) {
 		// Weight initialization, weight: gaussian, bias: zero
-		w = Nd4j.randn(weight);
+		w = Nd4j.zeros(weight);
 		b = Nd4j.zeros(bias);
 	}
 

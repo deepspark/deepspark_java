@@ -4,13 +4,14 @@ import java.io.Serializable;
 
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
+import org.acl.deepspark.nn.functions.ActivatorFactory;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.jblas.DoubleMatrix;
 import org.jblas.ranges.RangeUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
-public class PoolingLayer implements Serializable, Layer {
+public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	/**
 	 * 
 	 */
@@ -28,8 +29,9 @@ public class PoolingLayer implements Serializable, Layer {
 
 	}
 
-	public PoolingLayer(ActivatorType activator) {
-
+	public PoolingLayer(int[] inputShape, ActivatorType t) {
+		super(inputShape);
+		activator = ActivatorFactory.getActivator(t);
 	}
 
 	public PoolingLayer(int poolSize) {

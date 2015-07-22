@@ -17,15 +17,16 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.NDArrayUtil;
 
-public class ConvolutionLayer implements Serializable, Layer {
+public class ConvolutionLayer extends BaseLayer implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 140807767171115076L;
 	private Activator activator;
 
-	public ConvolutionLayer(ActivatorType activator) {
-		this.activator = ActivatorFactory.getActivator(activator); 
+	public ConvolutionLayer(int[] inputShape, ActivatorType t) {
+		super(inputShape);
+		activator = ActivatorFactory.getActivator(t);
 	}
 
 	

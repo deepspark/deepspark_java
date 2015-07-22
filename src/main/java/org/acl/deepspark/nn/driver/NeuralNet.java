@@ -1,6 +1,5 @@
 package org.acl.deepspark.nn.driver;
 
-import org.acl.deepspark.data.Accumulator;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
@@ -50,13 +49,13 @@ public class NeuralNet {
 
             switch (layerConf.getType()) {
                 case CONVOLUTION:
-                    layers[i] = new ConvolutionLayer(activator);
+                    layers[i] = new ConvolutionLayer(dimIn, activator);
                     break;
                 case POOLING:
-                    layers[i] = new PoolingLayer(activator);
+                    layers[i] = new PoolingLayer(dimIn, activator);
                     break;
                 case FULLYCONN:
-                    layers[i] = new FullyConnectedLayer(activator);
+                    layers[i] = new FullyConnectedLayer(dimIn, activator);
                     break;
             }
             weights[i] = layers[i].createWeight(layerConf, dimIn);
@@ -79,34 +78,37 @@ public class NeuralNet {
 
     public Weight[] train(Sample in) {
         Weight[] gradient = new Weight[layers.length];
-        INDArray[] preActivation = new INDArray[layers.length];
-        INDArray[] postActivation = new INDArray[layers.length + 1];
-        postActivation[0] = in.data;
+        INDArray[] output = new INDArray[layers.length];
+        INDArray[] input = new INDArray[layers.length + 1];
+        input[0] = in.data;
 
         for (int i = 0; i < layers.length; i++) {
-            preActivation[i] = layers[i].generateOutput(weights[i], postActivation[i]);
-            postActivation[i+1] = layers[i].activate(preActivation[i]);
+            output[i] = layers[i].generateOutput(weights[i], input[i]);
+            input[i+1] = layers[i].activate(output[i]);
         }
 
-        INDArray error = postActivation[layers.length].sub(in.label);
+        INDArray delta = input[layers.length].sub(in.label);
         for (int i = layers.length-1; i >= 0; i--) {
-            gradient[i] = layers[i].gradient(postActivation[i], error);
+            delta = layers[i].deriveDelta(delta, output[i]);
+            gradient[i] = layers[i].gradient(input[i], delta);
             if (i > 0)
-                error = layers[i].deriveDelta(weights[i], preActivation[i-1], error);
+                delta = layers[i].calculateBackprop(weights[i], delta);
         }
         return gradient;
     }
 
     public INDArray predict(Sample in) {
-        INDArray activationOut = in.data;
-        for (int i = 0; i < layers.length; i++)
-            activationOut = layers[i].generateOutput(weights[i], activationOut);
-        return activationOut;
+        INDArray activatedOut = in.data;
+        for (int i = 0; i < layers.length; i++) {
+            INDArray output = layers[i].generateOutput(weights[i], activatedOut);
+            activatedOut = layers[i].activate(output);
+        }
+        return activatedOut;
     }
 
     public void updateWeight(Weight[] deltaWeight) throws Exception {
         if (weights.length != deltaWeight.length)
-            throw new Exception("weight dimension mismatch");
+            throw new Exception("Weight dimension mismatch");
         for (int i = 0 ; i < weights.length; i++) {
             weightUpdates[i].muli(momentum)
                             .subi(weights[i].mul(learningRate*decayLambda))

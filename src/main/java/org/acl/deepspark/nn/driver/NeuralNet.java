@@ -110,6 +110,7 @@ public class NeuralNet {
         if (weights.length != deltaWeight.length)
             throw new Exception("Weight dimension mismatch");
         for (int i = 0 ; i < weights.length; i++) {
+            // TODO: PoolingLayer weight is null
             weightUpdates[i].muli(momentum)
                             .subi(weights[i].mul(learningRate*decayLambda))
                             .subi(deltaWeight[i].mul(learningRate));

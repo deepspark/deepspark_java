@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
+import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.functions.ActivatorFactory;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.BaseLayer;
@@ -22,12 +23,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 
 	public int[][] maxIndices;
 	private int poolSize;
-	
-	
-	/** Modified **/
-	public PoolingLayer() {
-
-	}
+	private Activator activator;
 
 	public PoolingLayer(int[] inputShape, ActivatorType t) {
 		super(inputShape);
@@ -173,27 +169,16 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 			
 		return outDim;
 	}
-	
-	@Override
-	public void applyDropOut() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public DoubleMatrix[][] deriveGradientW() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int[] getWeightInfo() {
-		return null;
-	}
 
 	@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
 		return null;
+	}
+
+	@Override
+	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
+		int pool_row = (int) conf.get("pool_row");
+		int pool_col = (int) conf.get("pool_col");
 	}
 
 	@Override
@@ -202,12 +187,22 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	}
 
 	@Override
-	public INDArray deriveDelta(Weight weight, INDArray error, INDArray output) {
+	public INDArray activate(INDArray output) {
+		return activator.output(output);
+	}
+
+	@Override
+	public INDArray deriveDelta(INDArray error, INDArray output) {
 		return null;
 	}
 
 	@Override
-	public INDArray gradient(INDArray input, INDArray error) {
+	public Weight gradient(INDArray input, INDArray error) {
+		return null;
+	}
+
+	@Override
+	public INDArray calculateBackprop(Weight weight, INDArray error) {
 		return null;
 	}
 }

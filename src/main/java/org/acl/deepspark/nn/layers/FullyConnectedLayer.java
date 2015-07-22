@@ -14,9 +14,10 @@ import org.nd4j.linalg.factory.Nd4j;
 
 
 // Fully Connected HiddenLayer
-public class FullyConnectedLayer implements Layer, Serializable {
+public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	private Activator activator;
-	public FullyConnectedLayer(ActivatorType t) {
+	public FullyConnectedLayer(int[] inputShape, ActivatorType t) {
+		super(inputShape);
 		activator = ActivatorFactory.getActivator(t);
 	}
 
@@ -28,13 +29,13 @@ public class FullyConnectedLayer implements Layer, Serializable {
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
 		INDArray data = ArrayUtils.makeColumnVector(input);
-		INDArray output = weight.w.mul(data).addi(weight.b);
+		INDArray output = weight.w.mmul(data).addi(weight.b);
 		return activator.output(output);
 	}
 
 	@Override
-	public INDArray deriveDelta(Weight w, INDArray error, INDArray output) {
-		return w.w.transpose().mmuli(error).muli(activator.derivative(output));
+	public INDArray deriveDelta(INDArray error, INDArray output) {
+		return error.mul(activator.derivative(output));
 	}
 
 	@Override
@@ -68,5 +69,10 @@ public class FullyConnectedLayer implements Layer, Serializable {
 		int[] ret = new int[1];
 		ret[0] = (Integer) conf.get("numNodes");
 		return ret;
+	}
+
+	@Override
+	public INDArray calculateBackprop(Weight weight, INDArray delta) {
+		return weight.w.transpose().mmul(delta);
 	}
 }

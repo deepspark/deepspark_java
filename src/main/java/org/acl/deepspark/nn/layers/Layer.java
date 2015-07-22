@@ -10,6 +10,9 @@ public interface Layer {
 	public abstract int[] calculateOutputDimension(LayerConf conf, int[] input);
 	public abstract INDArray generateOutput(Weight weight, INDArray input);
 	public abstract INDArray activate(INDArray output);
-	public abstract Weight gradient(INDArray input, INDArray error);
-	public abstract INDArray deriveDelta(Weight weight, INDArray error, INDArray output);
+	
+	public abstract INDArray deriveDelta(INDArray error, INDArray output);		// compute delta = f'(output) * error
+	public abstract Weight gradient(INDArray input, INDArray error); 			// compute dJ/dw = input * delta
+	public abstract INDArray calculateBackprop(Weight weight, INDArray error);  // compute backprop delta = w' * error
+	
 }

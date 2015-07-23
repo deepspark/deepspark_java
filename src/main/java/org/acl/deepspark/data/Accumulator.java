@@ -35,7 +35,7 @@ public class Accumulator implements Serializable {
 		if (num <= 0) return null;
 
 		Weight[] result = new Weight[gradWList.length];
-		for(int i = 0; i < gradWList.length; i++)
+		for (int i = 0; i < gradWList.length; i++)
 			if (gradWList[i] != null)
 				result[i] = gradWList[i].div(num);
 		return gradWList;

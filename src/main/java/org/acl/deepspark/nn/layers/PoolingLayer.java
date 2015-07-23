@@ -8,21 +8,23 @@ import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.functions.ActivatorFactory;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.BaseLayer;
+import org.acl.deepspark.utils.ArrayUtils;
 import org.jblas.DoubleMatrix;
 import org.jblas.ranges.RangeUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.ops.transforms.Transforms;
 
 public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4318643106939173007L;
-	
-	private int outputRows;
-	private int outputCols;
 
-	public int[][] maxIndices;
-	private int poolSize;
+	private int poolRow;
+	private int poolCol;
+	private INDArray maskArray;
+
 	private Activator activator;
 
 	public PoolingLayer(int[] inputShape, ActivatorType t) {
@@ -30,179 +32,90 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		activator = ActivatorFactory.getActivator(t);
 	}
 
-	public PoolingLayer(int poolSize) {
-		super();
-		this.poolSize = poolSize;
-	}
-	
-	public PoolingLayer(DoubleMatrix input, int poolSize) {
-		super(input);
-		this.poolSize = poolSize;
-		this.outputRows = dimRows / poolSize;
-		this.outputCols = dimCols / poolSize;
-		maxIndices = new int [numChannels][outputRows * outputCols];
-	}
-	
-	public PoolingLayer(DoubleMatrix[] input, int poolSize) {
-		super(input);
-		this.poolSize = poolSize;
-		this.outputRows = dimRows / poolSize;
-		this.outputCols = dimCols / poolSize;
-		maxIndices = new int [numChannels][outputRows * outputCols];
-	}
-	
-	// Apply maxPooling on the featureMap
-	// TODO : add min/average pooling
-	public DoubleMatrix pooling(DoubleMatrix image) {
-		if (image.isEmpty())
-			return null;
-
-		DoubleMatrix data = new DoubleMatrix(outputRows, outputCols);
-		
-		for (int m = 0; m < outputRows; m++) {
-			for (int n = 0; n < outputCols; n++) {
-				data.put(m, n, 
-						image.get(RangeUtils.interval(m*poolSize, (m+1)*poolSize), 
-								  RangeUtils.interval(n*poolSize, (n+1)*poolSize)).max());
-			}
-		}
-		return data;
-	}
-	
-	public DoubleMatrix[] pooling(DoubleMatrix[] image) {
-		int size = image.length;
-		DoubleMatrix[] data = new DoubleMatrix[size];
-		for(int i = 0; i < size; i++) {
-			data[i] = pooling(image[i]);
-		}
-		return data;
-	}
-	
-	public DoubleMatrix[] pooling() {
-		DoubleMatrix[] data = new DoubleMatrix[numChannels];
-		double max;
-		int maxIdx = 0;
-		int idx;
-		
-		for (int i = 0 ; i < numChannels; i++) {
-			data[i] = new DoubleMatrix(outputRows, outputCols);
-			idx = 0;
-			for (int m = 0; m < outputRows; m++) {
-				for (int n = 0; n < outputCols; n++) {
-					
-					max = Double.NEGATIVE_INFINITY;
-					for (int r = m*poolSize; r < (m+1)*poolSize; r++) {
-						for (int c = n*poolSize; c < (n+1)*poolSize; c++) {
-							if (!Double.isNaN(input[i].get(r, c)) && input[i].get(r, c) > max) {
-								maxIdx = input[i].index(r, c);
-								max = input[i].get(r, c);
-							}
-						}
-					}
-					data[i].put(m, n, max);
-					maxIndices[i][idx++] = maxIdx;
-				}
-			}
-		}
-		return data;
-	}
-
+	// complete //
 	@Override
-	public DoubleMatrix[] getOutput() {
-		// TODO Auto-generated method stub
-		return pooling();
-	}
-	
-	@Override
-	public DoubleMatrix[] getDelta() {return null;}
-	
-	@Override
-	public void setDelta(DoubleMatrix[] propDelta) {
-		delta = propDelta;
-	}
-	
-	@Override
-	public DoubleMatrix[] deriveDelta() {
-		// TODO Auto-generated method stub
-		DoubleMatrix[] inputDelta = new DoubleMatrix[numChannels];
-
-		for (int i = 0; i < numChannels; i++) {
-			inputDelta[i] = new DoubleMatrix(dimRows, dimCols);
-			int idx = 0;
-			for (int m = 0; m < outputRows; m++) {
-				for (int n = 0; n < outputCols; n++) {
-					inputDelta[i].put(maxIndices[i][idx++],
-							delta[i].get(m, n));
-				}
-			}
-		}
-		return inputDelta;
-	}
-	
-
-	@Override
-	public void update(DoubleMatrix[][] propDelta, double[] gradB) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void initWeights() {
-		if (maxIndices == null) {
-			outputRows = dimRows / poolSize;
-			outputCols = dimCols / poolSize;
-			maxIndices = new int [numChannels][outputRows * outputCols];
-		}
-	}
-
-	public int[] initWeights(int[] dim) {
-		int[] outDim = new int[3];
-		
-		this.dimRows = dim[0];
-		this.dimCols = dim[1];
-		this.numChannels = dim[2];
-		initWeights();
-		
-		outDim[0] = outputRows;
-		outDim[1] = outputCols;
-		outDim[2] = numChannels;
-			
-		return outDim;
-	}
-
-	@Override
-	public Weight createWeight(LayerConf conf, int[] input) {
+	 public Weight createWeight(LayerConf conf, int[] input) {
 		return null;
 	}
 
+	// complete // TODO: dimensionality check
 	@Override
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
-		int pool_row = (int) conf.get("pool_row");
-		int pool_col = (int) conf.get("pool_col");
+		poolRow = (int) conf.get("poolRow");
+		poolCol = (int) conf.get("poolCol");
+		return new int[] {input[0], input[1], poolRow, poolCol};
 	}
 
+	// complete // TODO: Test needed
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
-		return null;
+		int numFilter = input.size(0);
+		int numChannel = input.size(1);
+		int rows = input.size(2);
+		int cols = input.size(3);
+
+		double value;
+		double outValue;
+
+		INDArray output = Nd4j.create(numFilter, numChannel, (rows/poolRow), (cols/poolCol));
+		maskArray = Nd4j.create(output.shape());
+		for (int i = 0 ; i < numFilter; i++) {
+			for (int j = 0; j < numChannel; j++) {
+				for (int r = 0; r < rows; r++) {
+					int or = r / poolRow;
+					for (int c = 0; c < cols; c++) {
+						int oc = c / poolCol;
+						value = input.getDouble(i, j, r, c);
+						outValue = output.getDouble(i, j, or, oc);
+						if (value > outValue) {
+							output.putScalar(new int[]{i, j, or, oc}, value);
+							maskArray.putScalar(new int[]{i, j, or, oc}, input.index(r, c));
+						}
+					}
+				}
+			}
+		}
+		return output;
 	}
 
+	// complete //
 	@Override
 	public INDArray activate(INDArray output) {
 		return activator.output(output);
 	}
 
+	// complete // TODO: dimensionality check
 	@Override
 	public INDArray deriveDelta(INDArray error, INDArray output) {
-		return null;
+		return error.mul(activator.derivative(output));
 	}
 
+	// complete //
 	@Override
 	public Weight gradient(INDArray input, INDArray error) {
 		return null;
 	}
 
+
+	// TODO: Test Needed
 	@Override
 	public INDArray calculateBackprop(Weight weight, INDArray error) {
-		return null;
+		INDArray delta = Nd4j.create(getInputShape());
+		int numFilter = delta.size(0);
+		int numChannel = delta.size(1);
+		int rows = maskArray.size(2);
+		int cols = maskArray.size(3);
+
+		for (int i = 0 ;i < numFilter; i++) {
+			for (int j = 0; j < numChannel; j++) {
+				for (int or = 0; or < rows; or++) {
+					for (int oc = 0; oc < cols; oc++) {
+						INDArray array = delta.slice(i).slice(j);
+						array.putScalar(maskArray.getInt(i, j, or, oc), error.getDouble(i, j, or, oc));
+					}
+				}
+			}
+		}
+		return delta;
 	}
 }

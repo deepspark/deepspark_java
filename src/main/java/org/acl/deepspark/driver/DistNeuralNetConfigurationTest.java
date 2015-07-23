@@ -12,7 +12,6 @@ import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.conf.spark.DistNeuralNetConfiguration;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.layers.ConvolutionLayer;
-import org.acl.deepspark.nn.layers.FullyConnLayer;
 import org.acl.deepspark.nn.layers.PoolingLayer;
 import org.acl.deepspark.utils.MnistLoader;
 import org.apache.spark.SparkConf;

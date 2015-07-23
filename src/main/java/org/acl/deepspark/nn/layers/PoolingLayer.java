@@ -58,7 +58,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		double outValue;
 
 		INDArray output = Nd4j.create(numFilter, numChannel, (rows/poolRow), (cols/poolCol));
-		maskArray = Nd4j.create(output.shape());
+		maskArray = Nd4j.create(numFilter, numChannel, (rows/poolRow), (cols/poolCol));
 		for (int i = 0 ; i < numFilter; i++) {
 			for (int j = 0; j < numChannel; j++) {
 				for (int r = 0; r < rows; r++) {
@@ -69,7 +69,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 						outValue = output.getDouble(i, j, or, oc);
 						if (value > outValue) {
 							output.putScalar(new int[]{i, j, or, oc}, value);
-							maskArray.putScalar(new int[]{i, j, or, oc}, input.index(r, c));
+						//	maskArray.putScalar(new int[]{i, j, or, oc}, input.index(r, c));
 						}
 					}
 				}

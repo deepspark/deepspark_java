@@ -38,7 +38,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		return null;
 	}
 
-	// complete // TODO: dimensionality check
+	// complete //
 	@Override
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
 		poolRow = (int) conf.get("poolRow");
@@ -46,7 +46,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		return new int[] {input[0], input[1], poolRow, poolCol};
 	}
 
-	// complete // TODO: Test needed
+	// complete //
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
 		int numFilter = input.size(0);
@@ -57,8 +57,8 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		double value;
 		double outValue;
 
-		INDArray output = Nd4j.create(numFilter, numChannel, (rows/poolRow), (cols/poolCol));
-		maskArray = Nd4j.create(numFilter, numChannel, (rows/poolRow), (cols/poolCol));
+		INDArray output = Nd4j.create(numFilter, numChannel, (rows / poolRow), (cols / poolCol));
+		maskArray = Nd4j.create(output.shape());
 		for (int i = 0 ; i < numFilter; i++) {
 			for (int j = 0; j < numChannel; j++) {
 				for (int r = 0; r < rows; r++) {
@@ -69,7 +69,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 						outValue = output.getDouble(i, j, or, oc);
 						if (value > outValue) {
 							output.putScalar(new int[]{i, j, or, oc}, value);
-						//	maskArray.putScalar(new int[]{i, j, or, oc}, input.index(r, c));
+							maskArray.putScalar(new int[]{i, j, or, oc}, input.slice(i).slice(j).index(r, c));
 						}
 					}
 				}
@@ -84,7 +84,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		return activator.output(output);
 	}
 
-	// complete // TODO: dimensionality check
+	// complete //
 	@Override
 	public INDArray deriveDelta(INDArray error, INDArray output) {
 		return error.mul(activator.derivative(output));
@@ -97,25 +97,25 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	}
 
 
-	// TODO: Test Needed
+	// complete
 	@Override
 	public INDArray calculateBackprop(Weight weight, INDArray error) {
-		INDArray delta = Nd4j.create(getInputShape());
-		int numFilter = delta.size(0);
-		int numChannel = delta.size(1);
-		int rows = maskArray.size(2);
-		int cols = maskArray.size(3);
+		INDArray propDelta = Nd4j.create(getInputShape());
+		int numFilter = propDelta.size(0);
+		int numChannel = propDelta.size(1);
+		int rows = error.size(2);
+		int cols = error.size(3);
 
 		for (int i = 0 ;i < numFilter; i++) {
 			for (int j = 0; j < numChannel; j++) {
 				for (int or = 0; or < rows; or++) {
 					for (int oc = 0; oc < cols; oc++) {
-						INDArray array = delta.slice(i).slice(j);
-						array.putScalar(maskArray.getInt(i, j, or, oc), error.getDouble(i, j, or, oc));
+						propDelta.putScalar(maskArray.getInt(i, j, or, oc),
+											error.getDouble(i, j, or, oc));
 					}
 				}
 			}
 		}
-		return delta;
+		return propDelta;
 	}
 }

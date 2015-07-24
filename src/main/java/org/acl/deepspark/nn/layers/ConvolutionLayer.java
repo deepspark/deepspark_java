@@ -128,8 +128,8 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		int numChannel = inputDim[0];
 		
 		dim[0] = numChannel;
-		dim[1] = inputDim[1] + dimRow - 1;
-		dim[2] = inputDim[2] + dimCol - 1;
+		dim[1] = inputDim[1];
+		dim[2] = inputDim[2];
 		
 		INDArray output = Nd4j.zeros(dim);
 		

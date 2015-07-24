@@ -13,9 +13,6 @@ import org.nd4j.linalg.convolution.Convolution;
 import org.nd4j.linalg.factory.Nd4j;
 
 public class ConvolutionLayer extends BaseLayer implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 140807767171115076L;
 	private Activator activator;
 	private int numFilter;

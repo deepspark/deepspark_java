@@ -45,17 +45,16 @@ public class NeuralNet {
     private void buildNetwork(ArrayList<LayerConf> arr, int[] dimIn) {
         for (int i = 0 ; i< arr.size(); i++) {
             LayerConf layerConf = arr.get(i);
-            ActivatorType activator = (ActivatorType) layerConf.get("activator");
 
             switch (layerConf.getType()) {
                 case CONVOLUTION:
-                    layers[i] = new ConvolutionLayer(dimIn, activator);
+                    layers[i] = new ConvolutionLayer(dimIn, layerConf);
                     break;
                 case POOLING:
-                    layers[i] = new PoolingLayer(dimIn, activator);
+                    layers[i] = new PoolingLayer(dimIn, layerConf);
                     break;
                 case FULLYCONN:
-                    layers[i] = new FullyConnectedLayer(dimIn, activator);
+                    layers[i] = new FullyConnectedLayer(dimIn, layerConf);
                     break;
             }
             weights[i] = layers[i].createWeight(layerConf, dimIn);
@@ -110,11 +109,12 @@ public class NeuralNet {
         if (weights.length != deltaWeight.length)
             throw new Exception("Weight dimension mismatch");
         for (int i = 0 ; i < weights.length; i++) {
-            // TODO: PoolingLayer weight is null
-            weightUpdates[i].muli(momentum)
-                            .subi(weights[i].mul(learningRate*decayLambda))
-                            .subi(deltaWeight[i].mul(learningRate));
-            weights[i].addi(weightUpdates[i]);
+            if (weights[i] != null) {
+                weightUpdates[i].muli(momentum)
+                        .subi(weights[i].mul(learningRate * decayLambda))
+                        .subi(deltaWeight[i].mul(learningRate));
+                weights[i].addi(weightUpdates[i]);
+            }
         }
     }
 }

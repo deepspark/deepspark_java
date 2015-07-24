@@ -25,11 +25,10 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	private int poolCol;
 	private INDArray maskArray;
 
-	private Activator activator;
-
-	public PoolingLayer(int[] inputShape, ActivatorType t) {
-		super(inputShape);
-		activator = ActivatorFactory.getActivator(t);
+	public PoolingLayer(int[] inputShape, LayerConf conf) {
+		super(inputShape, conf);
+		this.poolRow = (int) conf.get("poolRow");
+		this.poolCol = (int) conf.get("poolCol");
 	}
 
 	// complete //
@@ -41,8 +40,6 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	// complete //
 	@Override
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
-		poolRow = (int) conf.get("poolRow");
-		poolCol = (int) conf.get("poolCol");
 		return new int[] {input[0], input[1], input[2]/poolRow, input[3]/poolCol};
 	}
 
@@ -86,7 +83,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 
 	// complete //
 	@Override
-	public INDArray deriveDelta(INDArray error, INDArray output) {
+	public INDArray deriveDelta(INDArray output, INDArray error) {
 		return error.mul(activator.derivative(output));
 	}
 

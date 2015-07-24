@@ -15,10 +15,9 @@ import org.nd4j.linalg.factory.Nd4j;
 
 // Fully Connected HiddenLayer
 public class FullyConnectedLayer extends BaseLayer implements Serializable {
-	private Activator activator;
-	public FullyConnectedLayer(int[] inputShape, ActivatorType t) {
-		super(inputShape);
-		activator = ActivatorFactory.getActivator(t);
+
+	public FullyConnectedLayer(int[] inputShape, LayerConf conf) {
+		super(inputShape, conf);
 	}
 
 	/**
@@ -34,7 +33,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 
 	// complete
 	@Override
-	public INDArray deriveDelta(INDArray error, INDArray output) {
+	public INDArray deriveDelta(INDArray output, INDArray error) {
 		return error.mul(activator.derivative(output));
 	}
 

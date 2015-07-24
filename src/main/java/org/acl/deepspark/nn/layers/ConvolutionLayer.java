@@ -14,14 +14,11 @@ import org.nd4j.linalg.factory.Nd4j;
 
 public class ConvolutionLayer extends BaseLayer implements Serializable {
 	private static final long serialVersionUID = 140807767171115076L;
-	private Activator activator;
 	private int numFilter;
 	private int dimRow,dimCol;
 
 	public ConvolutionLayer(int[] shape, LayerConf conf) {
-		super(shape);
-		
-		this.activator = ActivatorFactory.getActivator((ActivatorType) conf.get("activator"));
+		super(shape, conf);
 		this.numFilter = (Integer) conf.get("numFilter");
 		this.dimRow = (Integer) conf.get("filterRow");
 		this.dimCol= (Integer) conf.get("filterCol");
@@ -113,7 +110,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 
 	@Override
-	public INDArray deriveDelta(INDArray error, INDArray output) {
+	public INDArray deriveDelta(INDArray output, INDArray error) {
 		return error.mul(activator.derivative(output));
 	}
 

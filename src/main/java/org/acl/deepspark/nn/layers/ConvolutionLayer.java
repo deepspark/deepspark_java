@@ -103,8 +103,8 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
 		int[] dimW = new int[3];
 		dimW[0] = (Integer) conf.get("numFilter");
-		dimW[1] = getInputShape()[1]; // x
-		dimW[2] = getInputShape()[2]; // y
+		dimW[1] = getInputShape()[1] - dimRow + 1; // x
+		dimW[2] = getInputShape()[2] - dimCol + 1; // y
 		return dimW;
 	}
 

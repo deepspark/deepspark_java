@@ -9,10 +9,13 @@ import org.acl.deepspark.nn.functions.ActivatorFactory;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.BaseLayer;
 import org.acl.deepspark.nn.weights.WeightUtil;
+import org.acl.deepspark.utils.ArrayUtils;
 import org.acl.deepspark.utils.MathUtils;
 import org.jblas.DoubleMatrix;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.convolution.Convolution;
+import org.nd4j.linalg.factory.BaseNDArrayFactory;
+import org.nd4j.linalg.factory.NDArrayFactory;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.NDArrayUtil;
@@ -23,10 +26,16 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	 */
 	private static final long serialVersionUID = 140807767171115076L;
 	private Activator activator;
+	private int numFilter;
+	private int dimRow,dimCol;
 
-	public ConvolutionLayer(int[] inputShape, ActivatorType t) {
-		super(inputShape);
-		activator = ActivatorFactory.getActivator(t);
+	public ConvolutionLayer(int[] shape, LayerConf conf) {
+		super(shape);
+		
+		this.activator = ActivatorFactory.getActivator((ActivatorType) conf.get("activator"));
+		this.numFilter = (Integer) conf.get("numFilter");
+		this.dimRow = (Integer) conf.get("filterRow");
+		this.dimCol= (Integer) conf.get("filterCol");
 	}
 
 	
@@ -153,15 +162,16 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	public Weight createWeight(LayerConf conf, int[] input) {
 		// weight - 4D ( channel, filter, x, y )
 		// bias - 2D ( channel, filter )
+		// input - 3D ( channel, x, y)
 		Weight w = new Weight();
 		int[] dimW = new int[4];
 		dimW[0] = (Integer) conf.get("numChannel");
 		dimW[1] = (Integer) conf.get("numFilter");
-		dimW[2] = input[0]; // x
-		dimW[3] = input[1]; // y
+		dimW[2] = (Integer) conf.get("dimFilterX"); // x
+		dimW[3] = (Integer) conf.get("dimFilterY"); // y
 		
 		w.w = Nd4j.randn(dimW);
-		w.b = Nd4j.ones(dimW[0],dimW[1]).mul(0.01);
+		w.b = Nd4j.ones(dimW[0],dimW[1]).muli(0.01);
 		
 		return w;
 	}
@@ -169,7 +179,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
 		int[] dim = new int[3];
-		int[] inputDim = input.shape(); // 0: # of channel, 1: x, 2: y;
+		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
 		int[] kernelDim = weight.getShape(); // 0: # of channel, 1: # of filter, 2: x, 3: y;
 		
 		int numChannels = kernelDim[0];
@@ -192,24 +202,56 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	}
 
 	@Override
-	public INDArray deriveDelta(Weight weight, INDArray error, INDArray output) {
-		return null;
-	}
-
-	@Override
 	public Weight gradient(INDArray input, INDArray error) {
+		int[] dim = new int[3];
+		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
+		int[] kernelDim = weight.getShape(); // 0: # of channel, 1: # of filter, 2: x, 3: y;
 		return null;
 	}
 
 	@Override
 	public INDArray activate(INDArray output) {
-		// TODO Auto-generated method stub
-		return null;
+		return activator.output(output);
 	}
 
 	@Override
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
-		// TODO Auto-generated method stub
-		return null;
+		int[] dimW = new int[3];
+		dimW[0] = (Integer) conf.get("numFilter");
+		dimW[1] = getInputShape()[1]; // x
+		dimW[2] = getInputShape()[2]; // y
+		return dimW;
+	}
+
+
+	@Override
+	public INDArray deriveDelta(INDArray error, INDArray output) {
+		return error.mul(activator.derivative(output));
+	}
+
+
+	@Override
+	public INDArray calculateBackprop(Weight weight, INDArray error) {
+		int[] dim = new int[3];
+		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
+		
+		int numChannel = inputDim[0];
+		
+		dim[0] = numChannel;
+		dim[1] = inputDim[1] + dimRow - 1;
+		dim[2] = inputDim[2] + dimCol - 1;
+		
+		INDArray output = Nd4j.zeros(dim);
+		
+		
+		// TODO: check dims(image) > dims(filter)
+		for(int i = 0; i < numChannel; i++) {
+			for(int j = 0; j < numFilter; j++) {
+				output.slice(i).addi(Convolution.conv2d(error.slice(j), 
+						ArrayUtils.rot90(ArrayUtils.rot90(weight.w.slice(i).slice(j))),		// flip weight
+						Convolution.Type.FULL)); 											// full conv
+			}
+		}
+		return output;
 	}
 }

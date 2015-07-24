@@ -31,13 +31,13 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		// input - 3D ( channel, x, y)
 		Weight w = new Weight();
 		int[] dimW = new int[4];
-		dimW[0] = (Integer) conf.get("numChannel");
+		dimW[0] = input[0];
 		dimW[1] = (Integer) conf.get("numFilter");
 		dimW[2] = (Integer) conf.get("dimFilterX"); // x
 		dimW[3] = (Integer) conf.get("dimFilterY"); // y
 		
 		w.w = Nd4j.randn(dimW);
-		w.b = Nd4j.ones(dimW[0],dimW[1]).muli(0.01);
+		w.b = Nd4j.ones(1,dimW[1]).muli(0.01);
 		
 		return w;
 	}
@@ -61,8 +61,8 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		for(int i = 0; i < numFilters; i++) {
 			for(int j = 0; j < numChannels; j++) {
 				output.slice(i).addi(Convolution.conv2d(input.slice(j), weight.w.slice(j).slice(i), Convolution.Type.VALID)); // valid conv
-				output.slice(i).addi(weight.b.getScalar(j, i));
 			}
+			output.slice(i).addi(weight.b.getScalar(i));
 		}
 		return output;
 	}
@@ -82,12 +82,17 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		
 		Weight w = new Weight();
 		w.w = Nd4j.zeros(dim);
-		w.b = Nd4j.zeros(inputDim[0], numFilter);
+		w.b = Nd4j.zeros(1, numFilter);
 		
+		//bias
+		for(int j = 0; j < numFilter; j++) {
+			w.b.put(j, Nd4j.sum(error.slice(j)));
+		}
+		
+		//weight
 		for(int i = 0; i < inputDim[0]; i++) {
 			for(int j = 0; j < numFilter; j++) {
 				w.w.slice(i).slice(j).addi(Convolution.conv2d(input.slice(i), error.slice(j), Convolution.Type.VALID)); // valid conv
-				w.b.put(i, j, Nd4j.sum(error.slice(j)));
 			}
 		}
 		

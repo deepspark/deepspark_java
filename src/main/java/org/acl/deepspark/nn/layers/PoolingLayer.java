@@ -43,7 +43,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
 		poolRow = (int) conf.get("poolRow");
 		poolCol = (int) conf.get("poolCol");
-		return new int[] {input[0], input[1], poolRow, poolCol};
+		return new int[] {input[0], input[1], input[2]/poolRow, input[3]/poolCol};
 	}
 
 	// complete //

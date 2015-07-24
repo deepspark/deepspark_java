@@ -25,54 +25,61 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 2662945560065918864L;
-
+	// complete// complete
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
 		INDArray data = ArrayUtils.makeColumnVector(input);
-		INDArray output = weight.w.mmul(data).addi(weight.b);
-		return activator.output(output);
+		return weight.w.mmul(data).addi(weight.b);
 	}
 
+	// complete
 	@Override
 	public INDArray deriveDelta(INDArray error, INDArray output) {
 		return error.mul(activator.derivative(output));
 	}
 
+	// complete
 	@Override
 	public Weight gradient(INDArray error, INDArray input) {
+		INDArray data = ArrayUtils.makeColumnVector(input);
 		Weight w = new Weight();
-		w.w = error.mul(input);
+		w.w = error.mmul(data.transpose());
 		w.b = error;
 		return w;
 	}
 
+	// complete
 	@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
 		int dimOut = (Integer) conf.get("numNodes");
-		int dimIn = 1; 
+		int dimIn = 1;
 		for(int i =0; i < input.length; i++)
 			dimIn *= input[i];
-		
+
 		Weight w= new Weight();
 		w.w = Nd4j.randn(dimOut, dimIn);
-		w.b = Nd4j.ones(dimOut).mul(0.01);
+		w.b = Nd4j.ones(dimOut, 1).mul(0.01);
 		return w;
 	}
 
+	// complete
 	@Override
 	public INDArray activate(INDArray output) {
 		return activator.output(output);
 	}
 
+	// complete
 	@Override
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
-		int[] ret = new int[1];
+		int[] ret = new int[2];
 		ret[0] = (Integer) conf.get("numNodes");
+		ret[1] = 1;
 		return ret;
 	}
-
+	// complete
 	@Override
 	public INDArray calculateBackprop(Weight weight, INDArray delta) {
-		return weight.w.transpose().mmul(delta);
+		INDArray data = weight.w.transpose().mmul(delta);
+		return data.reshape(getInputShape());
 	}
 }

@@ -58,9 +58,9 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		
 		// TODO: check dims(image) > dims(filter)
 		for(int i = 0; i < numFilters; i++) {
-		//	for(int j = 0; j < numChannels; j++)
-		//		output.slice(i).addi(Convolution.conv2d(input.slice(j), weight.w.slice(j).slice(i), Convolution.Type.VALID)); // valid conv
-		//	output.slice(i).addi(weight.b.getScalar(i));
+			for(int j = 0; j < numChannels; j++)
+				output.slice(i).addi(Convolution.conv2d(input.slice(j), weight.w.slice(j).slice(i), Convolution.Type.VALID)); // valid conv
+			output.slice(i).addi(weight.b.getScalar(i));
 		}
 		return output;
 	}
@@ -90,7 +90,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		//weight
 		for(int i = 0; i < inputDim[0]; i++) {
 			for(int j = 0; j < numFilter; j++) {
-		//		w.w.slice(i).slice(j).addi(Convolution.conv2d(input.slice(i), error.slice(j), Convolution.Type.VALID)); // valid conv
+				w.w.slice(i).slice(j).addi(Convolution.conv2d(input.slice(i), error.slice(j), Convolution.Type.VALID)); // valid conv
 			}
 		}
 		
@@ -128,9 +128,9 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		// TODO: check dims(image) > dims(filter)
 		for(int i = 0; i < numChannel; i++) {
 			for(int j = 0; j < numFilter; j++) {
-			//	output.slice(i).addi(Convolution.conv2d(error.slice(j),
-			//			ArrayUtils.rot90(ArrayUtils.rot90(weight.w.slice(i).slice(j))),		// flip weight
-			//			Convolution.Type.FULL)); 											// full conv
+				output.slice(i).addi(Convolution.conv2d(error.slice(j),
+						ArrayUtils.rot90(ArrayUtils.rot90(weight.w.slice(i).slice(j))),		// flip weight
+						Convolution.Type.FULL)); 											// full conv
 			}
 		}
 		return output;

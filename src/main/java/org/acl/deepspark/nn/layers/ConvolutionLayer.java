@@ -122,18 +122,11 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public INDArray calculateBackprop(Weight weight, INDArray error) {
-		int[] dim = new int[3];
 		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
-		
 		int numChannel = inputDim[0];
 		
-		dim[0] = numChannel;
-		dim[1] = inputDim[1];
-		dim[2] = inputDim[2];
-		
-		INDArray output = Nd4j.zeros(dim);
-		
-		
+		INDArray output = Nd4j.zeros(inputDim);
+
 		// TODO: check dims(image) > dims(filter)
 		for(int i = 0; i < numChannel; i++) {
 			for(int j = 0; j < numFilter; j++) {

@@ -29,13 +29,13 @@ public class NeuralNetRunnerTest {
 	public static void main(String[] args) {
 
 		System.out.println("Data Loading...");
-		Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_train.txt", true);
-		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);;
+		Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Hanjoo Kim/Downloads/mnist_train.txt", true);
+		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Hanjoo Kim/Downloads/mnist_test.txt", true);;
 
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
 		layer1.set("numFilters", 2);
-		layer1.set("filterRow", 2);
-		layer1.set("filterCol", 2);
+		layer1.set("filterRow", 3);
+		layer1.set("filterCol", 3);
 		layer1.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);

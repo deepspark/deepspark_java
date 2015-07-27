@@ -36,7 +36,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 
 	// complete
 	@Override
-	public Weight gradient(INDArray error, INDArray input) {
+	public Weight gradient(INDArray input,INDArray error) {
 		INDArray data = ArrayUtils.makeColumnVector(input);
 		Weight w = new Weight();
 		w.w = error.mmul(data.transpose());

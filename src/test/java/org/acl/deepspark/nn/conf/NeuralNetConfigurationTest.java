@@ -44,15 +44,17 @@ public class NeuralNetConfigurationTest {
 		layer1.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);
-		layer2.setPoolingSize(2);
-		layer2.setActivator(ActivatorType.SIGMOID);
+		layer2.set("poolRow", 2);
+		layer2.set("poolCol", 2);
+		layer2.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer3 = new LayerConf(LayerType.FULLYCONN);
-		layer3.setOutputUnit(120);
-		layer2.setActivator(ActivatorType.SIGMOID);
+		layer3.set("numNodes", 120);
+		layer2.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer4 = new LayerConf(LayerType.FULLYCONN);
-		layer3.setOutputUnit(10);
+		layer3.set("numNodes", 10);
+		layer2.set("activator", ActivatorType.SIGMOID);
 
 		NeuralNet net = new NeuralNetConf().setLearningRate(0.1)
 											.setDecayLambda(0.0001)
@@ -67,8 +69,7 @@ public class NeuralNetConfigurationTest {
 											.build();
 
 		NeuralNetRunner driver = new NeuralNetRunner(net).setIterations(10000)
-														 .setMiniBatchSize(10)
-														 .;
+														 .setMiniBatchSize(10);
 		driver.train(train_data);
 		driver.predict(test_data);
 

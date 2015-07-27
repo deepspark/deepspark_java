@@ -29,8 +29,12 @@ public class Weight implements Serializable {
 		this.b = b;
 	}
 
-	public int[] getShape() {
+	public int[] getWeightShape() {
 		return w.shape();
+	}
+
+	public int[] getBiasShape() {
+		return b.shape();
 	}
 
 	public Weight add(Weight weight) {

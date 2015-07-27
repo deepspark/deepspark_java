@@ -1,24 +1,6 @@
 package org.acl.deepspark.driver;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import org.acl.deepspark.data.Accumulator;
-import org.acl.deepspark.data.Sample;
-import org.acl.deepspark.nn.conf.spark.DistNeuralNetConfiguration;
-import org.acl.deepspark.nn.layers.BaseLayer;
-import org.acl.deepspark.nn.layers.ConvolutionLayer;
-import org.acl.deepspark.nn.layers.PoolingLayer;
-import org.acl.deepspark.utils.MnistLoader;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.storage.StorageLevel;
-import org.jblas.DoubleMatrix;
 
 
 public class DistNeuralNetConfigurationTest implements Serializable {
@@ -26,7 +8,7 @@ public class DistNeuralNetConfigurationTest implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 8811812248690041287L;
+/*	private static final long serialVersionUID = 8811812248690041287L;
 	
 	public static final int nTest = 10000;
 	public static final int minibatch = 100;
@@ -97,5 +79,6 @@ public class DistNeuralNetConfigurationTest implements Serializable {
 				count++;
 		}
 		System.out.println(String.format("Accuracy: %f %%", (double) count / nTest * 100));
-	} 
+	}
+*/
 }

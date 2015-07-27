@@ -1,24 +1,13 @@
 package org.acl.deepspark.nn.conf.spark;
 
 import java.io.Serializable;
-import java.util.List;
-
-import org.acl.deepspark.data.Accumulator;
-import org.acl.deepspark.data.Sample;
-import org.acl.deepspark.nn.layers.BaseLayer;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.broadcast.Broadcast;
-import org.jblas.DoubleMatrix;
 
 
 public class DistNeuralNetConfiguration implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -6624391825370570205L;
+/*	private static final long serialVersionUID = -6624391825370570205L;
 	
 	private BaseLayer[] layerList;
 	
@@ -173,4 +162,5 @@ public class DistNeuralNetConfiguration implements Serializable {
 		}
 		return output;
 	}
+*/
 }

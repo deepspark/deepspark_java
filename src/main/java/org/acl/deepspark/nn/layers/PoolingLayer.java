@@ -4,16 +4,8 @@ import java.io.Serializable;
 
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
-import org.acl.deepspark.nn.functions.Activator;
-import org.acl.deepspark.nn.functions.ActivatorFactory;
-import org.acl.deepspark.nn.functions.ActivatorType;
-import org.acl.deepspark.nn.layers.BaseLayer;
-import org.acl.deepspark.utils.ArrayUtils;
-import org.jblas.DoubleMatrix;
-import org.jblas.ranges.RangeUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.ops.transforms.Transforms;
 
 public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	/**

@@ -34,7 +34,7 @@ public class NeuralNetRunner {
         return this;
     }
 
-    public void train(Sample[] data) throws Exception {
+    public void train(Sample[] data) {
         int dataSize = data.length;
         for (int i = 0 ; i < iteration; i++) {
             for (int j = 0; j < batchSize; j++)
@@ -49,6 +49,25 @@ public class NeuralNetRunner {
         for (int i = 0 ; i < data.length ; i++)
             output[i] = predict(data[i]);
         return output;
+    }
+
+    public double printAccuracy(Sample[] data) {
+        int count = 0;
+        for (Sample sample : data) {
+            output = net.predict(sample);
+            // TODO: change to argmax();
+            if (sample.label != net.predict(sample))
+                count++;
+        }
+        return (double) count / data.length;
+    }
+
+    public double printAvgCost(Sample[] data) {
+        INDArray ret
+        INDArray ret;
+        for (Sample sample : data) {
+            net.predict(sample).subi(sample.label)
+        }
     }
 
     public INDArray predict(Sample data) {

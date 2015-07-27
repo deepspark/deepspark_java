@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
-import org.acl.deepspark.nn.functions.Activator;
-import org.acl.deepspark.nn.functions.ActivatorFactory;
-import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.utils.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.convolution.Convolution;
@@ -33,11 +30,11 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		int[] dimW = new int[4];
 		dimW[0] = input[0];
 		dimW[1] = (Integer) conf.get("numFilter");
-		dimW[2] = (Integer) conf.get("dimFilterX"); // x
-		dimW[3] = (Integer) conf.get("dimFilterY"); // y
+		dimW[2] = (Integer) conf.get("filterRow"); // x
+		dimW[3] = (Integer) conf.get("filterCol"); // y
 		
 		w.w = Nd4j.randn(dimW);
-		w.b = Nd4j.ones(1,dimW[1]).muli(0.01);
+		w.b = Nd4j.ones(1, dimW[1]).muli(0.01);
 		
 		return w;
 	}
@@ -46,7 +43,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	public INDArray generateOutput(Weight weight, INDArray input) {
 		int[] dim = new int[3];
 		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
-		int[] kernelDim = weight.getShape(); // 0: # of channel, 1: # of filter, 2: x, 3: y;
+		int[] kernelDim = weight.getWeightShape(); // 0: # of channel, 1: # of filter, 2: x, 3: y;
 		
 		int numChannels = kernelDim[0];
 		int numFilters = kernelDim[1];
@@ -59,9 +56,8 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		
 		// TODO: check dims(image) > dims(filter)
 		for(int i = 0; i < numFilters; i++) {
-			for(int j = 0; j < numChannels; j++) {
+			for(int j = 0; j < numChannels; j++)
 				output.slice(i).addi(Convolution.conv2d(input.slice(j), weight.w.slice(j).slice(i), Convolution.Type.VALID)); // valid conv
-			}
 			output.slice(i).addi(weight.b.getScalar(i));
 		}
 		return output;

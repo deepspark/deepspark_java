@@ -4,7 +4,7 @@ import org.jblas.DoubleMatrix;
 
 public class MnistLoaderTest {
 	public static void main(String[] args) {
-		DoubleMatrix[] mnist_train = MnistLoader.loadData("C:\\Users\\Jaehong\\Downloads\\mnist\\mnist_train.txt");
+/*		DoubleMatrix[] mnist_train = MnistLoader.loadData("C:\\Users\\Jaehong\\Downloads\\mnist\\mnist_train.txt");
 		System.out.println(String.valueOf(mnist_train.length));
 
 		DoubleMatrix[] mnist_train_label = MnistLoader.loadLabel("C:\\Users\\Jaehong\\Downloads\\mnist\\mnist_train.txt");

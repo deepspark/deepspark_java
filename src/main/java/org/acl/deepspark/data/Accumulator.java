@@ -19,9 +19,10 @@ public class Accumulator implements Serializable {
 		num = 0;
 	}
 
-	public void accumulate(Weight[] weights) throws Exception {
+	public void accumulate(Weight[] weights) {
 		if (gradWList.length != weights.length)
-			throw new Exception("Weight dimension mismatch");
+			System.out.println("Weight dimension mismatch");
+		//	throw new Exception("Weight dimension mismatch");
 		for (int i = 0 ; i < gradWList.length; i++) {
 			if (gradWList[i] == null)
 				gradWList[i] = weights[i];

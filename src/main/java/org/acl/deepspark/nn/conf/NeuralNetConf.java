@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.acl.deepspark.nn.driver.NeuralNet;
-import org.acl.deepspark.nn.functions.Activator;
-import org.acl.deepspark.nn.functions.ActivatorType;
 
 
 public class NeuralNetConf implements Serializable {

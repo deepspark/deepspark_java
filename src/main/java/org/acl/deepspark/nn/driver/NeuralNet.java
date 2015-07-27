@@ -4,7 +4,6 @@ import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
-import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.FullyConnectedLayer;
 import org.acl.deepspark.nn.layers.Layer;
@@ -45,7 +44,6 @@ public class NeuralNet {
     private void buildNetwork(ArrayList<LayerConf> arr, int[] dimIn) {
         for (int i = 0 ; i< arr.size(); i++) {
             LayerConf layerConf = arr.get(i);
-
             switch (layerConf.getType()) {
                 case CONVOLUTION:
                     layers[i] = new ConvolutionLayer(dimIn, layerConf);
@@ -59,7 +57,7 @@ public class NeuralNet {
             }
             weights[i] = layers[i].createWeight(layerConf, dimIn);
             dimIn = layers[i].calculateOutputDimension(layerConf, dimIn);
-            weightUpdates[i] = new Weight(weights[i].getShape(), dimIn);
+            weightUpdates[i] = new Weight(weights[i].getWeightShape(), weights[i].getBiasShape());
         }
     }
 
@@ -105,9 +103,10 @@ public class NeuralNet {
         return activatedOut;
     }
 
-    public void updateWeight(Weight[] deltaWeight) throws Exception {
+    public void updateWeight(Weight[] deltaWeight) {
         if (weights.length != deltaWeight.length)
-            throw new Exception("Weight dimension mismatch");
+            System.out.println("Weight update dimension mismatch");
+    //        throw new Exception("Weight dimension mismatch");
         for (int i = 0 ; i < weights.length; i++) {
             if (weights[i] != null) {
                 weightUpdates[i].muli(momentum)

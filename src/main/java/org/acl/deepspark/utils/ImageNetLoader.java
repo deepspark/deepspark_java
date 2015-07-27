@@ -15,7 +15,7 @@ import org.jblas.DoubleMatrix;
 public class ImageNetLoader {
 	private static final long serialVersionUID = 4845357475294611873L;
 	
-	private static final int dimRows = 28;
+/*	private static final int dimRows = 28;
 	private static final int dimChannels = 3;
 	private static final int dimLabel = 1000;
 	
@@ -134,4 +134,5 @@ public class ImageNetLoader {
 		
 		return arr;
 	}
+*/
 }

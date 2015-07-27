@@ -12,6 +12,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.jblas.DoubleMatrix;
+import org.nd4j.linalg.api.buffer.DataBuffer;
+import org.nd4j.linalg.factory.Nd4j;
 
 public class MnistLoader implements Serializable {
 	
@@ -110,8 +112,8 @@ public class MnistLoader implements Serializable {
 				if(normalize)
 					sample[0].divi(256);
 				
-				s.data = sample;
-				s.label = sampleLabel;
+				//s.data = sample;
+				//s.label = sampleLabel;
 				
 				samples.add(s);
 			}
@@ -159,9 +161,12 @@ public class MnistLoader implements Serializable {
 				
 				if(normalize)
 					sample[0].divi(256);
+				int[] dimData = {1, dimRows, dimRows};
 				
-				s.data = sample;
-				s.label = sampleLabel;
+				s.data = Nd4j.zeros(dimData);
+				s.data.setData(Nd4j.createBuffer(featureVec));
+				s.label = Nd4j.zeros(dimLabel,1);
+				s.label.setData(Nd4j.createBuffer(labelVec));;
 				
 				samples.add(s);
 			}

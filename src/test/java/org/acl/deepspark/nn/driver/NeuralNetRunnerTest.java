@@ -19,7 +19,7 @@ import java.util.Date;
 public class NeuralNetRunnerTest {
 
 	public static final int minibatch = 1;
-	public static final int numIteration = 120000;
+	public static final int numIteration = 6000;
 
 	public static final double learningRate = 0.1;
 	public static final double decayLambda = 0.0005;

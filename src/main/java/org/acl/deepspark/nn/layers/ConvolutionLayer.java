@@ -16,7 +16,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 	public ConvolutionLayer(int[] shape, LayerConf conf) {
 		super(shape, conf);
-		this.numFilter = (Integer) conf.get("numFilter");
+		this.numFilter = (Integer) conf.get("numFilters");
 		this.dimRow = (Integer) conf.get("filterRow");
 		this.dimCol= (Integer) conf.get("filterCol");
 	}
@@ -29,7 +29,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		Weight w = new Weight();
 		int[] dimW = new int[4];
 		dimW[0] = input[0];
-		dimW[1] = (Integer) conf.get("numFilter");
+		dimW[1] = (Integer) conf.get("numFilters");
 		dimW[2] = (Integer) conf.get("filterRow"); // x
 		dimW[3] = (Integer) conf.get("filterCol"); // y
 		
@@ -103,7 +103,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	@Override
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
 		int[] dimW = new int[3];
-		dimW[0] = (Integer) conf.get("numFilter");
+		dimW[0] = (Integer) conf.get("numFilters");
 		dimW[1] = getInputShape()[1] - dimRow + 1; // x
 		dimW[2] = getInputShape()[2] - dimCol + 1; // y
 		return dimW;

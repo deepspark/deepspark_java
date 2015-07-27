@@ -2,6 +2,7 @@ package org.acl.deepspark.nn.driver;
 
 import org.acl.deepspark.data.Accumulator;
 import org.acl.deepspark.data.Sample;
+import org.acl.deepspark.utils.ArrayUtils;
 import org.jblas.util.Random;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
@@ -51,26 +52,25 @@ public class NeuralNetRunner {
         return output;
     }
 
+    public INDArray predict(Sample data) {
+        return net.predict(data);
+    }
+
     public double printAccuracy(Sample[] data) {
         int count = 0;
         for (Sample sample : data) {
-            output = net.predict(sample);
-            // TODO: change to argmax();
-            if (sample.label != net.predict(sample))
+            INDArray output = net.predict(sample);
+            if (ArrayUtils.argmax(sample.label) != ArrayUtils.argmax(output))
                 count++;
         }
         return (double) count / data.length;
     }
 
-    public double printAvgCost(Sample[] data) {
-        INDArray ret
-        INDArray ret;
-        for (Sample sample : data) {
-            net.predict(sample).subi(sample.label)
-        }
-    }
-
-    public INDArray predict(Sample data) {
-        return net.predict(data);
-    }
+//    public double printAvgCost(Sample[] data) {
+//        INDArray ret
+//        INDArray ret;
+//        for (Sample sample : data) {
+//            net.predict(sample).subi(sample.label)
+//        }
+//    }
 }

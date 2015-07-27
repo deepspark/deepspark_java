@@ -182,7 +182,8 @@ public class MnistLoader implements Serializable {
 		
 		Sample[] arr = new Sample[samples.size()];
 		arr = samples.toArray(arr);
-		
+
+		System.out.println(String.format("Loaded %d samples from %s", samples.size(), path));
 		return arr;
 	}
 	

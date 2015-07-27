@@ -57,7 +57,8 @@ public class NeuralNet {
             }
             weights[i] = layers[i].createWeight(layerConf, dimIn);
             dimIn = layers[i].calculateOutputDimension(layerConf, dimIn);
-            weightUpdates[i] = new Weight(weights[i].getWeightShape(), weights[i].getBiasShape());
+            if (weights[i] != null)
+                weightUpdates[i] = new Weight(weights[i].getWeightShape(), weights[i].getBiasShape());
         }
     }
 

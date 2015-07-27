@@ -33,8 +33,9 @@ public class NeuralNetRunnerTest {
 		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);;
 
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
-		layer1.set("inputDim", new int[]{3, 3});
 		layer1.set("numFilters", 2);
+		layer1.set("filterRow", 2);
+		layer1.set("filterCol", 2);
 		layer1.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);
@@ -44,11 +45,11 @@ public class NeuralNetRunnerTest {
 
 		LayerConf layer3 = new LayerConf(LayerType.FULLYCONN);
 		layer3.set("numNodes", 120);
-		layer2.set("activator", ActivatorType.SIGMOID);
+		layer3.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer4 = new LayerConf(LayerType.FULLYCONN);
-		layer3.set("numNodes", 10);
-		layer2.set("activator", ActivatorType.SIGMOID);
+		layer4.set("numNodes", 10);
+		layer4.set("activator", ActivatorType.SIGMOID);
 
 		NeuralNet net = new NeuralNetConf()
 							.setLearningRate(learningRate)
@@ -71,19 +72,7 @@ public class NeuralNetRunnerTest {
 		driver.train(training_data);
 		Date endTime = new Date();
 
-		INDArray[] predict = driver.predict(test_data);
-
-
-		System.out.println(String.format("Testing... with %d samples...", nTest));
-		int nTest = predict.length;
-		int count = 0;
-		for(int i = 0 ; i < nTest; i++) {
-			if (predict[i] test_data[i].label)
-			//if(test_data[j].label.argmax() == net.getOutput(test_data[j].data)[0].argmax())
-				count++;
-		}
-
-		System.out.println(String.format("Accuracy: %f %%", (double) count / nTest * 100));
+		System.out.println(String.format("Accuracy: %f %%", driver.printAccuracy(test_data)));
 
 		long time = endTime.getTime() - startTime.getTime();
 		System.out.println(String.format("Training time: %f secs", (double) time / 1000));

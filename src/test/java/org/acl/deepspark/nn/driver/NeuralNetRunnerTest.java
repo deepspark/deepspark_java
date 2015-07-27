@@ -17,8 +17,7 @@ import java.util.Date;
 
 
 public class NeuralNetRunnerTest {
-	
-	public static final int nTest = 10000;
+
 	public static final int minibatch = 1;
 	public static final int numIteration = 120000;
 
@@ -29,8 +28,8 @@ public class NeuralNetRunnerTest {
 	public static void main(String[] args) {
 
 		System.out.println("Data Loading...");
-		Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Hanjoo Kim/Downloads/mnist_train.txt", true);
-		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Hanjoo Kim/Downloads/mnist_test.txt", true);;
+		Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_train.txt", true);
+		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);;
 
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
 		layer1.set("numFilters", 2);

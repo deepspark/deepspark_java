@@ -11,6 +11,7 @@ import org.acl.deepspark.nn.layers.PoolingLayer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Jaehong on 2015-07-16.
@@ -81,16 +82,22 @@ public class NeuralNet {
         input[0] = in.data;
 
         for (int i = 0; i < layers.length; i++) {
+            Date start = new Date();
             output[i] = layers[i].generateOutput(weights[i], input[i]);
             input[i+1] = layers[i].activate(output[i]);
+            Date end = new Date();
+            System.out.println("layer" + String.valueOf(i) + " feedforward:" + String.valueOf(end.getTime() - start.getTime()));
         }
 
         INDArray delta = input[layers.length].sub(in.label);
         for (int i = layers.length-1; i >= 0; i--) {
+            Date start = new Date();
             delta = layers[i].deriveDelta(delta, output[i]);
             gradient[i] = layers[i].gradient(input[i], delta);
             if (i > 0)
                 delta = layers[i].calculateBackprop(weights[i], delta);
+            Date end = new Date();
+            System.out.println("layer" + String.valueOf(i) + " backprop:" + String.valueOf(end.getTime() - start.getTime()));
         }
         return gradient;
     }

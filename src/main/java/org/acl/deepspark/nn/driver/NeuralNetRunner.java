@@ -38,10 +38,14 @@ public class NeuralNetRunner {
     public void train(Sample[] data) {
         int dataSize = data.length;
         for (int i = 0 ; i < iteration; i++) {
-            for (int j = 0; j < batchSize; j++)
+        //    System.out.println(i);
+
+            for (int j = 0; j < batchSize; j++) {
                 weightAccum.accumulate(net.train(data[Random.nextInt(dataSize)]));
+            }
             net.updateWeight(weightAccum.getAverage());
             weightAccum.clear();
+            //System.out.println(printAccuracy(data));
         }
     }
 
@@ -58,7 +62,9 @@ public class NeuralNetRunner {
 
     public double printAccuracy(Sample[] data) {
         int count = 0;
+        int nn = 0;
         for (Sample sample : data) {
+
             INDArray output = net.predict(sample);
             if (ArrayUtils.argmax(sample.label) != ArrayUtils.argmax(output))
                 count++;

@@ -30,4 +30,18 @@ public class ArrayUtils {
 
         return ret.reshape(reverse.shape());
     }
+    
+    public static int argmax(INDArray arr) {
+    	double[] data = arr.data().asDouble();
+    	double maxVal = Double.NEGATIVE_INFINITY;
+    	int maxIdx = -1;
+    	
+    	for(int i = 0; i < data.length; i++) {
+    		if(data[i] > maxVal) {
+    			maxVal = data[i];
+    			maxIdx = i;
+    		}
+    	}
+    	return maxIdx;
+    }
 }

@@ -43,7 +43,7 @@ public class NeuralNetRunnerTest {
 		layer2.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer3 = new LayerConf(LayerType.FULLYCONN);
-		layer3.set("numNodes", 2000);
+		layer3.set("numNodes", 120);
 		layer3.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer4 = new LayerConf(LayerType.FULLYCONN);

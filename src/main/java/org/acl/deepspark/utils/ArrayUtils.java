@@ -58,8 +58,8 @@ public class ArrayUtils {
 		int nCols, nRows;
 		switch(option) {
 		case FULL_CONV:
-			nRows = data.rows() + filter.rows() - 1;
-			nCols = data.columns() + filter.columns() - 1;
+			nRows = data.rows() + filter.rows() -1;
+			nCols = data.columns() + filter.columns() -1;
 			input = Nd4j.zeros(nRows+ filter.rows() -1, nCols + filter.columns() - 1);
 			input.put(new NDArrayIndex[] {NDArrayIndex.interval(filter.rows() - 1, filter.rows() + data.rows() - 1), 
 					NDArrayIndex.interval(filter.columns() - 1, filter.columns() + data.columns() - 1)},
@@ -73,21 +73,20 @@ public class ArrayUtils {
 					NDArrayIndex.interval(filter.columns() / 2, filter.columns() /2  + data.columns())},
 					data);
 			break;
-		case VALID_CONV:
-			nRows = data.rows() - filter.rows() + 1;
-			nCols = data.columns() - filter.columns() + 1;
-			input = data;
-			break;
-		default:
-			return null;
+			case VALID_CONV:
+				nRows = data.rows() - filter.rows() + 1;
+				nCols = data.columns() - filter.columns() + 1;
+				input = data;
+				break;
+			default:
+				return null;
 		}
-		
+
 		result = Nd4j.zeros(nRows, nCols);
 		for(int r = 0; r < nRows ; r++) {
 			for(int c = 0 ; c < nCols ; c++) {
 				INDArray d = input.get(NDArrayIndex.interval(r, r + filter.rows()),
 						NDArrayIndex.interval(c, c + filter.columns()));
-				
 				result.put(r,c, Nd4j.sum(d.mul(filter)));
 			}
 		}

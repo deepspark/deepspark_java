@@ -64,12 +64,11 @@ public class NeuralNetRunner {
         int count = 0;
         int nn = 0;
         for (Sample sample : data) {
-
             INDArray output = net.predict(sample);
             if (ArrayUtils.argmax(sample.label) != ArrayUtils.argmax(output))
                 count++;
         }
-        return (double) count / data.length;
+        return (double) count / data.length * 100;
     }
 
 //    public double printAvgCost(Sample[] data) {

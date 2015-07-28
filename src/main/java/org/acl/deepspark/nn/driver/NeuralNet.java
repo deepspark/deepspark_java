@@ -89,7 +89,6 @@ public class NeuralNet {
         }
 
         INDArray delta = input[layers.length].sub(in.label);
-        System.out.println("Initial delta:" + delta.toString());
         for (int i = layers.length-1; i >= 0; i--) {
             Date start = new Date();
             delta = layers[i].deriveDelta(output[i], delta);
@@ -119,8 +118,6 @@ public class NeuralNet {
                 weightUpdates[i].muli(momentum)
                         .subi(weights[i].mul(learningRate * decayLambda))
                         .subi(deltaWeight[i].mul(learningRate));
-
-                System.out.println("weight update:" + weightUpdates[i].toString());
                 weights[i].addi(weightUpdates[i]);
             }
         }

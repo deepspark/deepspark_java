@@ -19,7 +19,7 @@ import java.util.Date;
 public class NeuralNetRunnerTest {
 
 	public static final int minibatch = 1;
-	public static final int numIteration = 600;
+	public static final int numIteration = 60000;
 
 	public static final double learningRate = 0.1;
 	public static final double decayLambda = 0.0005;
@@ -32,9 +32,9 @@ public class NeuralNetRunnerTest {
 		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);;
 
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
-		layer1.set("numFilters", 2);
-		layer1.set("filterRow", 3);
-		layer1.set("filterCol", 3);
+		layer1.set("numFilters", 20);
+		layer1.set("filterRow", 9);
+		layer1.set("filterCol", 9);
 		layer1.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);

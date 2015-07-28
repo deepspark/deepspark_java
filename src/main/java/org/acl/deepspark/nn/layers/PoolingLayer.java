@@ -67,21 +67,18 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	// complete //
 	@Override
 	public INDArray activate(INDArray output) {
-		System.out.println("pooling out: " + output.toString());
 		return output;
 	}
 
 	// complete //
 	@Override
 	public INDArray deriveDelta(INDArray output, INDArray error) {
-		System.out.println("pooling derivative: " + error.toString());
 		return error;
 	}
 
 	// complete //
 	@Override
 	public Weight gradient(INDArray input, INDArray error) {
-		System.out.println("pooling gradient: null");
 		return null;
 	}
 
@@ -102,7 +99,6 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 				}
 			}
 		}
-		System.out.println("pooling backprop:" + propDelta);
 		return propDelta;
 	}
 }

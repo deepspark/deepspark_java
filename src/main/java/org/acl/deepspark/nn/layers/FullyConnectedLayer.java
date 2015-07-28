@@ -31,7 +31,6 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	// complete
 	@Override
 	public INDArray deriveDelta(INDArray output, INDArray error) {
-		System.out.println("fullyconnected derivative: " + error.mul(activator.derivative(output)));
 		return error.mul(activator.derivative(output));
 	}
 
@@ -42,7 +41,6 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 		Weight w = new Weight();
 		w.w = error.mmul(data.transpose());
 		w.b = error;
-		System.out.println("fullyconnected gradient: " + w.toString());
 		return w;
 	}
 
@@ -63,7 +61,6 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	// complete
 	@Override
 	public INDArray activate(INDArray output) {
-		System.out.println("fullyconnected out: " + activator.output(output).toString());
 		return activator.output(output);
 	}
 
@@ -78,9 +75,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	// complete
 	@Override
 	public INDArray calculateBackprop(Weight weight, INDArray delta) {
-		System.out.println("fullyconnected delta:" + delta.toString());
 		INDArray data = weight.w.transpose().mmul(delta);
-		System.out.println("fullyconnected backprop:" + data.reshape(getInputShape()).toString());
 		return data.reshape(getInputShape());
 	}
 }

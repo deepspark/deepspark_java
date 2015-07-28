@@ -40,18 +40,19 @@ public class ActivatorFactory {
 				}
 			};
 			
-		case SOFTMAX:
+		case SOFTMAX: // only for output
 			return new Activator() {
 				@Override
 				public INDArray output(INDArray input) {
-					// TODO Auto-generated method stub
-					return null;
+					// exp(theta_j^T X) / sum(exp(theta_j^T X))
+					INDArray output = NDArrayUtil.exp(input);  
+					output.divi(Nd4j.sum(output));
+					return output;
 				}
 				
 				@Override
 				public INDArray derivative(INDArray input) {
-					// TODO Auto-generated method stub
-					return null;
+					return Nd4j.ones(input.shape());
 				}
 			};
 		case NONE:

@@ -78,8 +78,8 @@ public class Weight implements Serializable {
 
 	public Weight div(double d) {
 		Weight result = new Weight();
-		result.w = this.w.div(d);
-		result.b = this.b.div(d);
+		result.w = w.div(d);
+		result.b = b.div(d);
 		return result;
 	}
 

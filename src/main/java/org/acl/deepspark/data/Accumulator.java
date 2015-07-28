@@ -39,7 +39,7 @@ public class Accumulator implements Serializable {
 		for (int i = 0; i < gradWList.length; i++)
 			if (gradWList[i] != null)
 				result[i] = gradWList[i].div(num);
-		return gradWList;
+		return result;
 	}
 
 	public void clear() {

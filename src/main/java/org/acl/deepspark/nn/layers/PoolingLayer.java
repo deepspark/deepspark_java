@@ -25,7 +25,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 
 	// complete //
 	@Override
-	 public Weight createWeight(LayerConf conf, int[] input) {
+	public Weight createWeight(LayerConf conf, int[] input) {
 		return null;
 	}
 

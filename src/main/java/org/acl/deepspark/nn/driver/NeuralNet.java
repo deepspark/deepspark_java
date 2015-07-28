@@ -85,8 +85,8 @@ public class NeuralNet {
             Date start = new Date();
             output[i] = layers[i].generateOutput(weights[i], input[i]);
             input[i+1] = layers[i].activate(output[i]);
+            System.out.println(input[i+1].toString());
             Date end = new Date();
-            //System.out.println("layer" + String.valueOf(i) + " feedforward:" + String.valueOf(end.getTime() - start.getTime()));
         }
 
         INDArray delta = input[layers.length].sub(in.label);
@@ -97,7 +97,6 @@ public class NeuralNet {
             if (i > 0)
                 delta = layers[i].calculateBackprop(weights[i], delta);
             Date end = new Date();
-            //System.out.println("layer" + String.valueOf(i) + " backprop:" + String.valueOf(end.getTime() - start.getTime()));
         }
         return gradient;
     }

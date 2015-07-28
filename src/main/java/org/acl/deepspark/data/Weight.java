@@ -107,5 +107,8 @@ public class Weight implements Serializable {
 		return result.addi(weight.b);
 	}
 
+	public String toString() {
+		return String.format("weight: %s, bias: %s", w.toString(), b.toString());
+	}
 
 }

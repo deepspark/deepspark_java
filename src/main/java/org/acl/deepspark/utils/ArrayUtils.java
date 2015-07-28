@@ -51,9 +51,10 @@ public class ArrayUtils {
     	return maxIdx;
     }
     
-    public static INDArray convolution(INDArray data, INDArray filter, int option) {
+    public static INDArray convolution(INDArray data, INDArray filter_org, int option) {
 		INDArray result;
 		INDArray input;
+		INDArray filter = rot90(rot90(filter_org));
 		int nCols, nRows;
 		switch(option) {
 		case FULL_CONV:

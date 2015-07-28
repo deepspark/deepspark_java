@@ -36,8 +36,7 @@ public class ActivatorFactory {
 				
 				@Override
 				public INDArray derivative(INDArray input) {
-					INDArray idx = input.gt(0);
-					return Nd4j.ones(input.shape()).mul(idx);
+					return input.gt(0);
 				}
 			};
 			

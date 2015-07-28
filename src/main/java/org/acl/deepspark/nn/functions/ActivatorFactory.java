@@ -1,9 +1,7 @@
 package org.acl.deepspark.nn.functions;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.transforms.SigmoidDerivative;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.factory.Nd4jBackend;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.NDArrayUtil;
 
@@ -45,7 +43,7 @@ public class ActivatorFactory {
 				@Override
 				public INDArray output(INDArray input) {
 					// exp(theta_j^T X) / sum(exp(theta_j^T X))
-					INDArray output = NDArrayUtil.exp(input);  
+					INDArray output = Transforms.exp(input,true);  
 					output.divi(Nd4j.sum(output));
 					return output;
 				}

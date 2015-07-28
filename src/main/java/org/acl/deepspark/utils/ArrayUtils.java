@@ -57,14 +57,16 @@ public class ArrayUtils {
 		INDArray filter = rot90(rot90(filter_org));
 		int nCols, nRows;
 		switch(option) {
-		case FULL_CONV:
-			nRows = data.rows() + filter.rows() -1;
-			nCols = data.columns() + filter.columns() -1;
-			input = Nd4j.zeros(nRows+ filter.rows() -1, nCols + filter.columns() - 1);
-			input.put(new NDArrayIndex[] {NDArrayIndex.interval(filter.rows() - 1, filter.rows() + data.rows() - 1), 
-					NDArrayIndex.interval(filter.columns() - 1, filter.columns() + data.columns() - 1)},
-					data);
-			break;
+			case FULL_CONV:
+				nRows = data.rows() + filter.rows() -1;
+				nCols = data.columns() + filter.columns() -1;
+				input = Nd4j.zeros(nRows+ filter.rows() -1, nCols + filter.columns() - 1);
+				for (int i = 0; i < data.rows(); i++) {
+					for (int j = 0; j < data.columns(); j++) {
+						input.put(filter.rows() - 1 + i, filter.columns() -1 + j, data.getDouble(i, j));
+					}
+				}
+				break;
 		case SAME_CONV:
 			nRows = data.rows();
 			nCols = data.columns();

@@ -55,6 +55,21 @@ public class ActivatorFactory {
 					return null;
 				}
 			};
+		case NONE:
+			return new Activator() {
+				
+				@Override
+				public INDArray output(INDArray input) {
+					// TODO Auto-generated method stub
+					return input.dup();
+				}
+				
+				@Override
+				public INDArray derivative(INDArray input) {
+					// TODO Auto-generated method stub
+					return Nd4j.ones(input.shape());
+				}
+			};
 		default:
 			return null;
 		}

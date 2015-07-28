@@ -30,14 +30,14 @@ public class ActivatorFactory {
 			return new Activator() {
 				@Override
 				public INDArray output(INDArray input) {
-					// TODO Auto-generated method stub
-					return null;
+					INDArray idx = input.gt(0);
+					return input.mul(idx);
 				}
 				
 				@Override
 				public INDArray derivative(INDArray input) {
-					// TODO Auto-generated method stub
-					return null;
+					INDArray idx = input.gt(0);
+					return Nd4j.ones(input.shape()).mul(idx);
 				}
 			};
 			

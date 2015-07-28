@@ -36,7 +36,8 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		
 		w.w = Nd4j.randn(dimW);
 		w.b = Nd4j.ones(1, dimW[1]).muli(0.01);
-		
+
+		System.out.println("convolution weight: " + w.toString());
 		return w;
 	}
 

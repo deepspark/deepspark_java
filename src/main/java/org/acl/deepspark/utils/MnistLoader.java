@@ -156,15 +156,12 @@ public class MnistLoader implements Serializable {
 					featureVec[i] = Double.parseDouble(feature[i]);
 				
 				Sample s = new Sample();
-				DoubleMatrix[] sample = new DoubleMatrix[1];
-				sample[0] = new DoubleMatrix(dimRows, dimRows, featureVec.clone()).transpose();
-				
-				if(normalize)
-					sample[0].divi(256);
 				int[] dimData = {1, dimRows, dimRows};
 				
 				s.data = Nd4j.zeros(dimData);
 				s.data.setData(Nd4j.createBuffer(featureVec));
+				s.data.transposei();
+				s.data.divi(256);
 				s.label = Nd4j.zeros(dimLabel,1);
 				s.label.setData(Nd4j.createBuffer(labelVec));;
 				

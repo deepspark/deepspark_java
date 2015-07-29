@@ -9,6 +9,7 @@ import org.acl.deepspark.nn.layers.FullyConnectedLayer;
 import org.acl.deepspark.nn.layers.Layer;
 import org.acl.deepspark.nn.layers.PoolingLayer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,7 +76,7 @@ public class NeuralNet {
         return layers.length;
     }
 
-    public Weight[] train(Sample in) {
+    public Weight[] train(Sample in) throws Exception {
         Weight[] gradient = new Weight[layers.length];
         INDArray[] output = new INDArray[layers.length];
         INDArray[] input = new INDArray[layers.length + 1];
@@ -89,6 +90,13 @@ public class NeuralNet {
         INDArray delta = input[layers.length].sub(in.label);
         for (int i = layers.length-1; i >= 0; i--) {
             delta = layers[i].deriveDelta(output[i], delta);
+            
+            for(int k = 0; k < delta.data().length() ; k++) {
+            	if(Double.isNaN(delta.data().asDouble()[k])) {
+                	throw new Exception(String.format("NaN occured in layer %d",i));
+                }
+            }
+            	
             gradient[i] = layers[i].gradient(input[i], delta);
             if (i > 0)
                 delta = layers[i].calculateBackprop(weights[i], delta);
@@ -112,12 +120,24 @@ public class NeuralNet {
         for (int i = 0 ; i < weights.length; i++) {
             if (weights[i] != null) {
                 System.out.println("weight:" + weights[i].toString());
+                weightUpdates[i].w.muli(momentum);
+                weightUpdates[i].w.subi(weights[i].w.mul(learningRate * decayLambda));
+                weightUpdates[i].w.subi(deltaWeight[i].w.mul(learningRate));
+                
+                weightUpdates[i].b.muli(momentum);
+                weightUpdates[i].b.subi(deltaWeight[i].b.mul(learningRate));      
+                
+                weights[i].w.addi(weightUpdates[i].w);
+                weights[i].b.addi(weightUpdates[i].b);
+                /*
                 weightUpdates[i].muli(momentum)
                         .subi(weights[i].mul(learningRate * decayLambda))
                         .subi(deltaWeight[i].mul(learningRate));
                 weights[i].addi(weightUpdates[i]);
+                */
                 System.out.println("weight update:" + weightUpdates[i].toString());
                 System.out.println("weight:" + weights[i].toString());
+                
             }
         }
     }

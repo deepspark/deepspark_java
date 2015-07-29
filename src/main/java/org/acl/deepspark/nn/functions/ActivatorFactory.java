@@ -17,10 +17,15 @@ public class ActivatorFactory {
 				}
 				
 				@Override
-				public INDArray derivative(INDArray input) {
-					INDArray ret = Nd4j.onesLike(input);
-					INDArray f = output(input);
-					return ret.subi(f).muli(f);
+				public INDArray derivative(INDArray input, boolean output) {
+					if(output) {
+						INDArray result = Nd4j.ones(input.shape());
+						return result.subi(input).muli(input);
+					} else {
+						INDArray ret = Nd4j.onesLike(input);
+						INDArray f = output(input);
+						return ret.subi(f).muli(f);
+					}
 				}
 			};
 			
@@ -33,7 +38,8 @@ public class ActivatorFactory {
 				}
 				
 				@Override
-				public INDArray derivative(INDArray input) {
+				public INDArray derivative(INDArray input, boolean output) {
+					// TODO Auto-generated method stub
 					return input.gt(0);
 				}
 			};
@@ -43,13 +49,14 @@ public class ActivatorFactory {
 				@Override
 				public INDArray output(INDArray input) {
 					// exp(theta_j^T X) / sum(exp(theta_j^T X))
-					INDArray output = Transforms.exp(input,true);  
+					INDArray movedInput = input.sub(Nd4j.max(input));
+					INDArray output = Transforms.exp(movedInput,true);  
 					output.divi(Nd4j.sum(output));
 					return output;
 				}
 				
 				@Override
-				public INDArray derivative(INDArray input) {
+				public INDArray derivative(INDArray input, boolean output) {
 					return Nd4j.ones(input.shape());
 				}
 			};
@@ -63,7 +70,7 @@ public class ActivatorFactory {
 				}
 				
 				@Override
-				public INDArray derivative(INDArray input) {
+				public INDArray derivative(INDArray input, boolean output) {
 					// TODO Auto-generated method stub
 					return Nd4j.ones(input.shape());
 				}

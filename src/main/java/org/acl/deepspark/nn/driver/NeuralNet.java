@@ -79,25 +79,23 @@ public class NeuralNet {
     public Weight[] train(Sample in) throws Exception {
         Weight[] gradient = new Weight[layers.length];
         INDArray[] output = new INDArray[layers.length];
-        INDArray[] input = new INDArray[layers.length + 1];
-        input[0] = in.data;
+        INDArray[] activated = new INDArray[layers.length + 1];
+        activated[0] = in.data;
 
         for (int i = 0; i < layers.length; i++) {
-            output[i] = layers[i].generateOutput(weights[i], input[i]);
-            input[i+1] = layers[i].activate(output[i]);
+            output[i] = layers[i].generateOutput(weights[i], activated[i]);
+            activated[i+1] = layers[i].activate(output[i]);
         }
 
-        INDArray delta = input[layers.length].sub(in.label);
+        INDArray delta = activated[layers.length].sub(in.label);
+        
+        System.out.println(Nd4j.sum(delta.mul(delta)));
+        
         for (int i = layers.length-1; i >= 0; i--) {
-            delta = layers[i].deriveDelta(output[i], delta);
-            
-            for(int k = 0; k < delta.data().length() ; k++) {
-            	if(Double.isNaN(delta.data().asDouble()[k])) {
-                	throw new Exception(String.format("NaN occured in layer %d",i));
-                }
-            }
+            delta = layers[i].deriveDelta(activated[i+1], delta);
             	
-            gradient[i] = layers[i].gradient(input[i], delta);
+            gradient[i] = layers[i].gradient(activated[i], delta);
+            
             if (i > 0)
                 delta = layers[i].calculateBackprop(weights[i], delta);
         }
@@ -119,7 +117,6 @@ public class NeuralNet {
     //        throw new Exception("Weight dimension mismatch");
         for (int i = 0 ; i < weights.length; i++) {
             if (weights[i] != null) {
-                System.out.println("weight:" + weights[i].toString());
                 weightUpdates[i].w.muli(momentum);
                 weightUpdates[i].w.subi(weights[i].w.mul(learningRate * decayLambda));
                 weightUpdates[i].w.subi(deltaWeight[i].w.mul(learningRate));
@@ -129,14 +126,6 @@ public class NeuralNet {
                 
                 weights[i].w.addi(weightUpdates[i].w);
                 weights[i].b.addi(weightUpdates[i].b);
-                /*
-                weightUpdates[i].muli(momentum)
-                        .subi(weights[i].mul(learningRate * decayLambda))
-                        .subi(deltaWeight[i].mul(learningRate));
-                weights[i].addi(weightUpdates[i]);
-                */
-                System.out.println("weight update:" + weightUpdates[i].toString());
-                System.out.println("weight:" + weights[i].toString());
                 
             }
         }

@@ -25,16 +25,13 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
 		INDArray data = ArrayUtils.makeColumnVector(input);
-		System.out.println("fullyconn output:" + weight.w.mmul(data).addi(weight.b));
 		return weight.w.mmul(data).addi(weight.b);
 	}
 
 	// complete
 	@Override
 	public INDArray deriveDelta(INDArray output, INDArray error) {
-		System.out.println("fullyconn error:" + error);
-		System.out.println("fullyconn derivative:" + error.mul(activator.derivative(output)));
-		return error.mul(activator.derivative(output));
+		return error.mul(activator.derivative(output,true));
 	}
 
 	// complete
@@ -44,7 +41,6 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 		Weight w = new Weight();
 		w.w = error.mmul(data.transpose());
 		w.b = error;
-		System.out.println("fullyconn gradient:" + w.toString());
 		return w;
 	}
 
@@ -65,7 +61,6 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	// complete
 	@Override
 	public INDArray activate(INDArray output) {
-		System.out.println("fullyconn activate:" + activator.output(output));
 		return activator.output(output);
 	}
 
@@ -81,8 +76,6 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	@Override
 	public INDArray calculateBackprop(Weight weight, INDArray delta) {
 		INDArray data = weight.w.transpose().mmul(delta);
-		System.out.println("fullyconn delta:" + delta);
-		System.out.println("fullyconn backprop:" + data);
 		return data.reshape(getInputShape());
 	}
 }

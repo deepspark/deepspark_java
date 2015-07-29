@@ -35,7 +35,7 @@ public class NeuralNetRunner {
         return this;
     }
 
-    public void train(Sample[] data) {
+    public void train(Sample[] data) throws Exception {
         int dataSize = data.length;
         for (int i = 0 ; i < iteration; i++) {
         	System.out.println(String.format("%d(th) iteration...", i + 1));

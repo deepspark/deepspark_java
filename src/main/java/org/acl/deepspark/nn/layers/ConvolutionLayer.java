@@ -5,9 +5,7 @@ import java.io.Serializable;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.utils.ArrayUtils;
-import org.jblas.DoubleMatrix;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.convolution.Convolution;
 import org.nd4j.linalg.factory.Nd4j;
 
 public class ConvolutionLayer extends BaseLayer implements Serializable {
@@ -34,7 +32,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		dimW[2] = (Integer) conf.get("filterRow"); // x
 		dimW[3] = (Integer) conf.get("filterCol"); // y
 		
-		w.w = Nd4j.randn(dimW);
+		w.w = Nd4j.randn(dimW).muli(0.1);
 		w.b = Nd4j.ones(1, dimW[1]).muli(0.01);
 
 		return w;
@@ -62,7 +60,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 				output.slice(i).addi(ArrayUtils.convolution(input.slice(j), weight.w.slice(j).slice(i), ArrayUtils.VALID_CONV)); // valid conv
 			output.slice(i).addi(weight.b.getScalar(i));
 		}
-		System.out.println("convolution out:" + output);
+		
 		return output;
 	}
 
@@ -77,7 +75,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		dim[2] = dimRow;
 		dim[3] = dimCol;
 
-		error.reshape(numFilter, inputDim[1] - dimRow + 1, inputDim[2] - dimCol + 1);
+		error = error.reshape(numFilter, inputDim[1] - dimRow + 1, inputDim[2] - dimCol + 1);
 		
 		Weight w = new Weight();
 		w.w = Nd4j.zeros(dim);
@@ -94,7 +92,6 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 				w.w.slice(i).slice(j).addi(ArrayUtils.convolution(input.slice(i), error.slice(j), ArrayUtils.VALID_CONV)); // valid conv
 			}
 		}
-		System.out.println("convolution gradient:" + w.toString());
 		return w;
 	}
 
@@ -115,9 +112,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public INDArray deriveDelta(INDArray output, INDArray error) {
-		System.out.println("convolution error:" + error);
-		System.out.println("convolution derivative:" + error.mul(activator.derivative(output)));
-		return error.mul(activator.derivative(output));
+		return error.mul(activator.derivative(output,true));
 	}
 
 
@@ -136,7 +131,6 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 						ArrayUtils.FULL_CONV)); 											// full conv
 			}
 		}
-		System.out.println("convolution backprop:" + output);
 		return output;
 	}
 }

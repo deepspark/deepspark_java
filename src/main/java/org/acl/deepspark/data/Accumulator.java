@@ -2,9 +2,6 @@ package org.acl.deepspark.data;
 
 import java.io.Serializable;
 
-import org.jblas.DoubleMatrix;
-import org.nd4j.linalg.api.ndarray.INDArray;
-
 public class Accumulator implements Serializable {
 	/**
 	 * 
@@ -39,14 +36,13 @@ public class Accumulator implements Serializable {
 		for (int i = 0; i < gradWList.length; i++)
 			if (gradWList[i] != null)
 				result[i] = gradWList[i].div(num);
-		System.out.println("Accumulator result");
 		return result;
 	}
 
 	public void clear() {
-		System.out.println("Accumulator clear");
-		for(Weight grad : gradWList)
-			grad = null;
+		
+		for (int i = 0; i < gradWList.length; i++)
+			gradWList[i] = null;
 		num = 0;
 	}
 }

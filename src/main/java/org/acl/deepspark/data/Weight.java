@@ -66,7 +66,7 @@ public class Weight implements Serializable {
 	public Weight mul(double d) {
 		Weight result = new Weight();
 		result.w = this.w.mul(d);
-		result.b = this.b.sub(d);
+		result.b = this.b.mul(d);
 		return result;
 	}
 

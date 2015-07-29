@@ -62,6 +62,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 				output.slice(i).addi(ArrayUtils.convolution(input.slice(j), weight.w.slice(j).slice(i), ArrayUtils.VALID_CONV)); // valid conv
 			output.slice(i).addi(weight.b.getScalar(i));
 		}
+		System.out.println("convolution out:" + output);
 		return output;
 	}
 
@@ -93,6 +94,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 				w.w.slice(i).slice(j).addi(ArrayUtils.convolution(input.slice(i), error.slice(j), ArrayUtils.VALID_CONV)); // valid conv
 			}
 		}
+		System.out.println("convolution gradient:" + w.toString());
 		return w;
 	}
 
@@ -113,6 +115,8 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public INDArray deriveDelta(INDArray output, INDArray error) {
+		System.out.println("convolution error:" + error);
+		System.out.println("convolution derivative:" + error.mul(activator.derivative(output)));
 		return error.mul(activator.derivative(output));
 	}
 
@@ -132,6 +136,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 						ArrayUtils.FULL_CONV)); 											// full conv
 			}
 		}
+		System.out.println("convolution backprop:" + output);
 		return output;
 	}
 }

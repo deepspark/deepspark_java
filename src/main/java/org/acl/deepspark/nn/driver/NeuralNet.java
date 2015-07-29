@@ -82,20 +82,16 @@ public class NeuralNet {
         input[0] = in.data;
 
         for (int i = 0; i < layers.length; i++) {
-            Date start = new Date();
             output[i] = layers[i].generateOutput(weights[i], input[i]);
             input[i+1] = layers[i].activate(output[i]);
-            Date end = new Date();
         }
 
         INDArray delta = input[layers.length].sub(in.label);
         for (int i = layers.length-1; i >= 0; i--) {
-            Date start = new Date();
             delta = layers[i].deriveDelta(output[i], delta);
             gradient[i] = layers[i].gradient(input[i], delta);
             if (i > 0)
                 delta = layers[i].calculateBackprop(weights[i], delta);
-            Date end = new Date();
         }
         return gradient;
     }
@@ -115,10 +111,13 @@ public class NeuralNet {
     //        throw new Exception("Weight dimension mismatch");
         for (int i = 0 ; i < weights.length; i++) {
             if (weights[i] != null) {
+                System.out.println("weight:" + weights[i].toString());
                 weightUpdates[i].muli(momentum)
                         .subi(weights[i].mul(learningRate * decayLambda))
                         .subi(deltaWeight[i].mul(learningRate));
                 weights[i].addi(weightUpdates[i]);
+                System.out.println("weight update:" + weightUpdates[i].toString());
+                System.out.println("weight:" + weights[i].toString());
             }
         }
     }

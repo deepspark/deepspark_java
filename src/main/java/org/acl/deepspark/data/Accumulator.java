@@ -39,12 +39,14 @@ public class Accumulator implements Serializable {
 		for (int i = 0; i < gradWList.length; i++)
 			if (gradWList[i] != null)
 				result[i] = gradWList[i].div(num);
+		System.out.println("Accumulator result");
 		return result;
 	}
 
 	public void clear() {
-		for(Weight weight : gradWList)
-			weight = null;
+		System.out.println("Accumulator clear");
+		for(Weight grad : gradWList)
+			grad = null;
 		num = 0;
 	}
 }

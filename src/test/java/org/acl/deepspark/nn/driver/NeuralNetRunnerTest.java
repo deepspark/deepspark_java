@@ -12,8 +12,8 @@ import org.acl.deepspark.utils.MnistLoader;
 
 public class NeuralNetRunnerTest {
 
-	public static final int minibatch = 100;
-	public static final int numIteration = 150;
+	public static final int minibatch = 1;
+	public static final int numIteration = 6000;
 
 	public static final double learningRate = 0.1;
 	public static final double decayLambda = 0.0005;
@@ -22,8 +22,8 @@ public class NeuralNetRunnerTest {
 	public static void main(String[] args) throws Exception {
 
 		System.out.println("Data Loading...");
-		Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Hanjoo Kim/Downloads/mnist_train.txt", true);
-		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Hanjoo Kim/Downloads/mnist_test_mini.txt", true);;
+		Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_train.txt", true);
+		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);;
 
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
 		layer1.set("numFilters", 2);

@@ -8,7 +8,7 @@ public class Accumulator implements Serializable {
 	 */
 	private static final long serialVersionUID = -948972344668801995L;
 	
-	private Weight[] gradWList;
+	public Weight[] gradWList;
 	private int num;
 	
 	public Accumulator(int numLayer) {
@@ -21,8 +21,11 @@ public class Accumulator implements Serializable {
 			System.out.println("Weight dimension mismatch");
 		//	throw new Exception("Weight dimension mismatch");
 		for (int i = 0 ; i < gradWList.length; i++) {
-			if (gradWList[i] == null)
-				gradWList[i] = weights[i];
+			if (gradWList[i] == null) {
+				if (weights[i] != null)
+					gradWList[i] = weights[i].dup();
+			}
+
 			else
 				gradWList[i].addi(weights[i]);
 		}

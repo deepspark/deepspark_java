@@ -93,7 +93,6 @@ public class NeuralNet {
         
         for (int i = layers.length-1; i >= 0; i--) {
             delta = layers[i].deriveDelta(activated[i+1], delta);
-            	
             gradient[i] = layers[i].gradient(activated[i], delta);
             
             if (i > 0)
@@ -122,8 +121,9 @@ public class NeuralNet {
                 weightUpdates[i].w.subi(deltaWeight[i].w.mul(learningRate));
                 
                 weightUpdates[i].b.muli(momentum);
-                weightUpdates[i].b.subi(deltaWeight[i].b.mul(learningRate));      
-                
+                weightUpdates[i].b.subi(deltaWeight[i].b.mul(learningRate));
+
+
                 weights[i].w.addi(weightUpdates[i].w);
                 weights[i].b.addi(weightUpdates[i].b);
                 

@@ -66,14 +66,14 @@ public class ArrayUtils {
 					}
 				}
 				break;
-		case SAME_CONV:
-			nRows = data.rows();
-			nCols = data.columns();
-			input = Nd4j.zeros(nRows+ filter.rows() - 1 , nCols + filter.columns() - 1);
-			input.put(new NDArrayIndex[] {NDArrayIndex.interval(filter.rows() / 2, filter.rows() / 2 + data.rows()), 
-					NDArrayIndex.interval(filter.columns() / 2, filter.columns() /2  + data.columns())},
-					data);
-			break;
+			case SAME_CONV:
+				nRows = data.rows();
+				nCols = data.columns();
+				input = Nd4j.zeros(nRows+ filter.rows() - 1 , nCols + filter.columns() - 1);
+				input.put(new NDArrayIndex[] {NDArrayIndex.interval(filter.rows() / 2, filter.rows() / 2 + data.rows()), 
+						NDArrayIndex.interval(filter.columns() / 2, filter.columns() /2  + data.columns())},
+						data);
+				break;
 			case VALID_CONV:
 				nRows = data.rows() - filter.rows() + 1;
 				nCols = data.columns() - filter.columns() + 1;
@@ -86,9 +86,14 @@ public class ArrayUtils {
 		result = Nd4j.zeros(nRows, nCols);
 		for(int r = 0; r < nRows ; r++) {
 			for(int c = 0 ; c < nCols ; c++) {
-				INDArray d = input.get(NDArrayIndex.interval(r, r + filter.rows()),
-						NDArrayIndex.interval(c, c + filter.columns()));
-				result.put(r,c, Nd4j.sum(d.mul(filter)));
+				double sum = 0;
+				for(int i = 0; i < filter.rows(); i++) {
+					for(int j = 0; j < filter.columns();j++) {
+						sum += input.getDouble(r+i, c+j) * filter.getDouble(i,j);
+					}
+				}
+				
+				result.put(r,c, sum);
 			}
 		}
 		

@@ -22,11 +22,27 @@ public class ArrayUtilsTest {
         INDArray valid2 = ArrayUtils.convolution(a, c, ArrayUtils.VALID_CONV);
         INDArray full2 = ArrayUtils.convolution(a, c, ArrayUtils.FULL_CONV);
 
+        /*
+         * valid: 44.0
+			full: [[0.0, 1.0, 6.0, 11.0, 6.0]
+			 [2.0, 11.0, 18.0, 22.0, 16.0]
+			  ,[5.0, 8.0, 44.0, 30.0, 13.0]
+			 ]
+         */
+        
         System.out.println("input_a: " + a);
         System.out.println("input_b: " + b);
         System.out.println("valid: " + valid1);
         System.out.println("full: " + full1);
 
+        /*
+          	valid: [[-13.0, -5.0]
+ 					[24.0, 33.0]]
+        	full: [[3.0, 12.0, 9.0, 0.0]
+        		 [4.0, -13.0, -5.0, 3.0]
+        		  ,[-10.0, 24.0, 33.0, -1.0]
+        		 ]
+		 */
         System.out.println("input_a: " + a);
         System.out.println("input_c: " + c);
         System.out.println("valid: " + valid2);

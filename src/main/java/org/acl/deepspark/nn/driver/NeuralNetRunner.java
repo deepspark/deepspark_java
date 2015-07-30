@@ -22,7 +22,7 @@ public class NeuralNetRunner {
 
         /* default configuration */
         this.iteration = 10000;
-        this.batchSize = 1;
+        this.batchSize = 100;
     }
 
     public NeuralNetRunner setIterations(int iteration) {

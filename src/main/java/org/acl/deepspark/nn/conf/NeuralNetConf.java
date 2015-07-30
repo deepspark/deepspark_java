@@ -23,7 +23,7 @@ public class NeuralNetConf implements Serializable {
 
 		// default value for network configuration
 		params.put("learningRate", 0.1);
-		params.put("decayLambda", 0.0001);
+		params.put("decayLambda", 0.0005);
 		params.put("momentum", 0.9);
 		params.put("dropOutRate", 0.0);
 	}

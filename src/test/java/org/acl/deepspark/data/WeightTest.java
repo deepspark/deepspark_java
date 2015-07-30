@@ -39,34 +39,7 @@ public class WeightTest {
         weight1.subi(weight2);
         System.out.println("weight1.subi(weight2):" + weight1.toString());
 
-        Accumulator accumulator = new Accumulator(1);
-
-        Weight[] arr1 = new Weight[] { weight1 };
-        Weight[] arr2 = new Weight[] { weight2 };
-
-        System.out.println("accumulator.accum(weight1)");
-        accumulator.accumulate(arr1);
-        System.out.println(accumulator.gradWList[0]);
-
-        System.out.println("accumulator.accum(weight2)");
-        accumulator.accumulate(arr2);
-        System.out.println(accumulator.gradWList[0]);
-
-        System.out.println("accumulator.getAverage()");
-        System.out.println(accumulator.getAverage()[0]);
-
-        System.out.println("accumulator.clear()");
-        accumulator.clear();
-        System.out.println(accumulator.gradWList[0]);
-
-        System.out.println("accumulator.accum(weight1)");
-        accumulator.accumulate(arr1);
-        System.out.println(accumulator.gradWList[0]);
-
-        System.out.println("accumulator.accum(weight1)");
-        accumulator.accumulate(arr1);
-        System.out.println(accumulator.gradWList[0]);
-
+        /** Weight Test complete **/
     }
 
 }

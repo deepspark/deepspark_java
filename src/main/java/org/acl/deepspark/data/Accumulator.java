@@ -1,5 +1,7 @@
 package org.acl.deepspark.data;
 
+import org.apache.commons.math.DimensionMismatchException;
+
 import java.io.Serializable;
 
 public class Accumulator implements Serializable {
@@ -18,14 +20,13 @@ public class Accumulator implements Serializable {
 
 	public void accumulate(Weight[] weights) {
 		if (gradWList.length != weights.length)
-			System.out.println("Weight dimension mismatch");
-		//	throw new Exception("Weight dimension mismatch");
+			System.err.println(String.format("Weight dim mismatch: %d, %d", gradWList.length, weights.length));
+
 		for (int i = 0 ; i < gradWList.length; i++) {
 			if (gradWList[i] == null) {
 				if (weights[i] != null)
 					gradWList[i] = weights[i].dup();
 			}
-
 			else
 				gradWList[i].addi(weights[i]);
 		}
@@ -43,7 +44,6 @@ public class Accumulator implements Serializable {
 	}
 
 	public void clear() {
-		
 		for (int i = 0; i < gradWList.length; i++)
 			gradWList[i] = null;
 		num = 0;

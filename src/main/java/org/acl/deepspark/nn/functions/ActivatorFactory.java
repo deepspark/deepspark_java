@@ -58,6 +58,7 @@ public class ActivatorFactory {
 				@Override
 				public INDArray derivative(INDArray input, boolean output) {
 					return Nd4j.ones(input.shape());
+
 				}
 			};
 		case NONE:

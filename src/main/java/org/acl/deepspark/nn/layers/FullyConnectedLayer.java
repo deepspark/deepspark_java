@@ -21,20 +21,18 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 2662945560065918864L;
-	// complete// complete
+
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
 		INDArray data = ArrayUtils.makeColumnVector(input);
 		return weight.w.mmul(data).addi(weight.b);
 	}
 
-	// complete
 	@Override
 	public INDArray deriveDelta(INDArray output, INDArray error) {
 		return error.mul(activator.derivative(output,true));
 	}
 
-	// complete
 	@Override
 	public Weight gradient(INDArray input,INDArray error) {
 		INDArray data = ArrayUtils.makeColumnVector(input);
@@ -44,7 +42,6 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 		return w;
 	}
 
-	// complete
 	@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
 		int dimOut = (Integer) conf.get("numNodes");
@@ -58,13 +55,11 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 		return w;
 	}
 
-	// complete
 	@Override
 	public INDArray activate(INDArray output) {
 		return activator.output(output);
 	}
 
-	// complete
 	@Override
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
 		int[] ret = new int[2];
@@ -72,7 +67,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 		ret[1] = 1;
 		return ret;
 	}
-	// complete
+
 	@Override
 	public INDArray calculateBackprop(Weight weight, INDArray delta) {
 		INDArray data = weight.w.transpose().mmul(delta);

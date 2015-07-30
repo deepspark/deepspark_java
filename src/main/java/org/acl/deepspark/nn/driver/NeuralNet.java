@@ -22,10 +22,10 @@ public class NeuralNet {
     private Weight[]    weights;
     private Weight[]    weightUpdates;
 
-    double learningRate;
-    double decayLambda;
-    double momentum;
-    double dropOutRate;
+    private double learningRate;
+    private double decayLambda;
+    private double momentum;
+    private double dropOutRate;
 
     public NeuralNet(final NeuralNetConf conf) {
         learningRate = conf.getLearningRate();
@@ -123,10 +123,8 @@ public class NeuralNet {
                 weightUpdates[i].b.muli(momentum);
                 weightUpdates[i].b.subi(deltaWeight[i].b.mul(learningRate));
 
-
                 weights[i].w.addi(weightUpdates[i].w);
                 weights[i].b.addi(weightUpdates[i].b);
-                
             }
         }
     }

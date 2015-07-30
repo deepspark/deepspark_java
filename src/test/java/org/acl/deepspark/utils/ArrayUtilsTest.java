@@ -31,5 +31,7 @@ public class ArrayUtilsTest {
         System.out.println("input_c: " + c);
         System.out.println("valid: " + valid2);
         System.out.println("full: " + full2);
+
+        /** convolution test complete **/
     }
 }

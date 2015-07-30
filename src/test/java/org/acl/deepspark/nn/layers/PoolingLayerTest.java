@@ -42,6 +42,10 @@ public class PoolingLayerTest {
 
 		System.out.println(String.format("delta dim : (%d, %d, %d)", propDelta.size(0), propDelta.size(1), propDelta.size(2)));
 		System.out.println(propDelta.slice(channelIdx));
+
+
+		/** feedforward test complete **/
+		/** back propagation test complete **/
 	}
 	
 }

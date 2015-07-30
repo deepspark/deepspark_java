@@ -23,19 +23,16 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		this.poolCol = (Integer) conf.get("poolCol");
 	}
 
-	// complete //
 	@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
 		return null;
 	}
 
-	// complete //
 	@Override
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
 		return new int[] {input[0], input[1]/poolRow, input[2]/poolCol};
 	}
 
-	// complete //
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
 		int numChannel = input.size(0);
@@ -64,26 +61,21 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		return output;
 	}
 
-	// complete //
 	@Override
 	public INDArray activate(INDArray output) {
 		return output;
 	}
 
-	// complete //
 	@Override
 	public INDArray deriveDelta(INDArray output, INDArray error) {
 		return error;
 	}
 
-	// complete //
 	@Override
 	public Weight gradient(INDArray input, INDArray error) {
 		return null;
 	}
 
-
-	// complete
 	@Override
 	public INDArray calculateBackprop(Weight weight, INDArray error) {
 		INDArray propDelta = Nd4j.create(getInputShape());

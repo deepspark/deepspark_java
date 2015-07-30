@@ -89,6 +89,10 @@ public class Weight implements Serializable {
 		return this;
 	}
 
+	public Weight dup() {
+		return new Weight(w.dup(), b.dup());
+	}
+
 	public void clear() {
 		if (w != null && b != null) {
 

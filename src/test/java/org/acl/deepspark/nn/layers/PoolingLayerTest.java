@@ -29,7 +29,7 @@ public class PoolingLayerTest {
 		int[] dimOut = poolingLayer.calculateOutputDimension(layerConf, dimIn);
 		INDArray output = poolingLayer.generateOutput(weight, input);
 
-		int channelIdx = 0;
+		int channelIdx = 2;
 
 		System.out.println(String.format("input dim : (%d, %d, %d)", input.size(0), input.size(1), input.size(2)));
 		System.out.println(input.slice(channelIdx));

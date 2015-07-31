@@ -13,7 +13,7 @@ import org.acl.deepspark.utils.MnistLoader;
 public class NeuralNetRunnerTest {
 
 	public static final int minibatch = 100;
-	public static final int numIteration = 600;
+	public static final int numIteration = 100;
 
 	public static final double learningRate = 0.1;
 	public static final double decayLambda = 0.0005;
@@ -27,9 +27,9 @@ public class NeuralNetRunnerTest {
 		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);;
 
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
-		layer1.set("numFilters", 20);
-		layer1.set("filterRow", 9);
-		layer1.set("filterCol", 9);
+		layer1.set("numFilters", 10);
+		layer1.set("filterRow", 5);
+		layer1.set("filterCol", 5);
 		layer1.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);
@@ -37,13 +37,24 @@ public class NeuralNetRunnerTest {
 		layer2.set("poolCol", 2);
 		layer2.set("activator", ActivatorType.NONE);
 
-		LayerConf layer3 = new LayerConf(LayerType.FULLYCONN);
-		layer3.set("numNodes", 120);
+		LayerConf layer3 = new LayerConf(LayerType.CONVOLUTION);
+		layer3.set("numFilters", 20);
+		layer3.set("filterRow", 5);
+		layer3.set("filterCol", 5);
 		layer3.set("activator", ActivatorType.SIGMOID);
 
-		LayerConf layer4 = new LayerConf(LayerType.FULLYCONN);
-		layer4.set("numNodes", 10);
-		layer4.set("activator", ActivatorType.SOFTMAX);
+		LayerConf layer4 = new LayerConf(LayerType.POOLING);
+		layer4.set("poolRow", 2);
+		layer4.set("poolCol", 2);
+		layer4.set("activator", ActivatorType.NONE);
+
+		LayerConf layer5 = new LayerConf(LayerType.FULLYCONN);
+		layer5.set("numNodes", 120);
+		layer5.set("activator", ActivatorType.SIGMOID);
+
+		LayerConf layer6 = new LayerConf(LayerType.FULLYCONN);
+		layer6.set("numNodes", 10);
+		layer6.set("activator", ActivatorType.SOFTMAX);
 
 		NeuralNet net = new NeuralNetConf()
 							.setLearningRate(learningRate)
@@ -54,8 +65,10 @@ public class NeuralNetRunnerTest {
 							.setOutputDim(new int[]{10})
 							.addLayer(layer1)
 							.addLayer(layer2)
-							.addLayer(layer3)
-							.addLayer(layer4)
+	//						.addLayer(layer3)
+	//						.addLayer(layer4)
+							.addLayer(layer5)
+							.addLayer(layer6)
 							.build();
 
 		NeuralNetRunner driver = new NeuralNetRunner(net).setIterations(numIteration)

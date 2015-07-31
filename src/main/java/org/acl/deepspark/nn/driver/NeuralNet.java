@@ -88,13 +88,12 @@ public class NeuralNet {
         }
 
         INDArray delta = activated[layers.length].sub(in.label);
-        
         System.out.println(Nd4j.sum(delta.mul(delta)));
         
         for (int i = layers.length-1; i >= 0; i--) {
             delta = layers[i].deriveDelta(activated[i+1], delta);
             gradient[i] = layers[i].gradient(activated[i], delta);
-            
+
             if (i > 0)
                 delta = layers[i].calculateBackprop(weights[i], delta);
         }
@@ -125,6 +124,9 @@ public class NeuralNet {
 
                 weights[i].w.addi(weightUpdates[i].w);
                 weights[i].b.addi(weightUpdates[i].b);
+
+                System.out.println("updates w:" + weightUpdates[i].w);
+                System.out.println("updates b:" + weightUpdates[i].b);
             }
         }
     }

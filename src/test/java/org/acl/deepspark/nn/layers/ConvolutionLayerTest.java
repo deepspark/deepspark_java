@@ -4,6 +4,7 @@ import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.LayerType;
+import org.acl.deepspark.utils.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -20,7 +21,7 @@ public class ConvolutionLayerTest {
 		int[] dimIn = new int[] {4, 3, 3};
 		INDArray input = Nd4j.create(data, dimIn);
 		LayerConf layerConf = new LayerConf(LayerType.CONVOLUTION);
-		layerConf.set("numFilter", 5);
+		layerConf.set("numFilters", 5);
 		layerConf.set("filterRow", 2);
 		layerConf.set("filterCol", 2);
 		layerConf.set("activator", ActivatorType.SIGMOID);
@@ -38,8 +39,18 @@ public class ConvolutionLayerTest {
 
 		INDArray propDelta = convLayer.calculateBackprop(weight, output);
 		System.out.println(String.format("delta dim: (%d, %d, %d)", propDelta.size(0), propDelta.size(1), propDelta.size(2)));
+
+
+
+		System.out.println(input);
+		INDArray ret = ArrayUtils.makeColumnVector(input);
+
+		System.out.println(ret.reshape(dimIn));
+
+
 	}
 
 		/** feedforward test complete **/
-	
+
+
 }

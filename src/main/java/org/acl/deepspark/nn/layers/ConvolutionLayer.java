@@ -33,7 +33,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		dimW[3] = (Integer) conf.get("filterCol"); // y
 		
 		w.w = Nd4j.randn(dimW).muli(0.1);
-		w.b = Nd4j.randn(1, dimW[1]).muli(0.01);
+		w.b = Nd4j.zeros(1, dimW[1]).muli(0.01);
 
 		return w;
 	}

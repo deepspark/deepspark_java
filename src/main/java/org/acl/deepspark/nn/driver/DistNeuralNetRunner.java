@@ -12,8 +12,6 @@ import org.apache.spark.broadcast.Broadcast;
 import org.jblas.util.Random;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
-import java.util.Iterator;
-
 /**
  * Created by Jaehong on 2015-07-31.
  */
@@ -21,7 +19,7 @@ public class DistNeuralNetRunner {
 
     private JavaSparkContext sc;
     private NeuralNet net;
-
+    private Weight[] weight;
 
     private int iteration;
     private int batchSize;
@@ -47,17 +45,7 @@ public class DistNeuralNetRunner {
     }
 
     public void train(JavaRDD<Sample> data) throws Exception {
-/*
-        for (int i = 0 ; i < iteration; i++) {
-            System.out.println(String.format("%d(th) iteration...", i + 1));
 
-            for (int j = 0; j < batchSize; j++) {
-                weightAccum.accumulate(net.train(data[Random.nextInt(dataSize)]));
-            }
-            net.updateWeight(weightAccum.getAverage());
-            weightAccum.clear();
-        }
-*/
         System.out.println("Start learning...");
         System.out.println(String.format("Partitioning into %d pieces", (int) data.count() / batchSize));
 
@@ -67,89 +55,30 @@ public class DistNeuralNetRunner {
             weights[i] = 1.0;
         }
 
-        JavaRDD<Sample>[] partition = data.randomSplit(weights);
-        for (JavaRDD<Sample> rdd : partition) {
-            rdd.cache();
+        JavaRDD<Sample>[] partition = data.cache().randomSplit(weights);
+        final Accumulator<Weight[]> weightAccum = sc.accumulator(null, new DistAccumulator());
+
+        for (int i = 0 ; i < iteration; i++) {
+            final Broadcast<Weight[]> broadcast = sc.broadcast(net.getWeights());
+            JavaRDD<Sample> rdd = partition[Random.nextInt(numPartition)]; // Test needed
+            /** TODO: check whether net is updated for each iterations */
+
+            rdd.foreach(new VoidFunction<Sample>() {
+                @Override
+                public void call(Sample sample) throws Exception {
+                    net.setWeights(broadcast.getValue());
+                    weightAccum.add(net.train(sample));
+                }
+            });
+
+            Weight[] delta = weightAccum.value();
+            for (int j = 0; j < delta.length; j++) {
+                delta[i].divi(batchSize);
+            }
+            net.updateWeight(delta);
+            weightAccum.zero();
         }
 
-        final Accumulator<Weight[]> weightAccumulator = sc.accumulator(net.getWeights(), new DistAccumulator());
-        Broadcast<NeuralNet> broadcastNet = sc.broadcast(net);
-
-
-
-
-        // getting output;
-        JavaRDD<DoubleMatrix> delta = data.map(new Function<Sample, DoubleMatrix>() {
-            @Override
-            public DoubleMatrix call(Sample v1) throws Exception {
-                BaseLayer[] layerList = layers.value();
-                DoubleMatrix[] output = v1.data;
-                for(int l = 0; l < layerList.length; l++) {
-                    BaseLayer a = layerList[l];
-                    a.setInput(output);
-                    output = a.getOutput();
-                }
-                DoubleMatrix error = output[0].sub(v1.label);
-                System.out.println(error.sum() / error.length);
-
-                return error;
-            }
-        });
-
-        //backpropagation
-        JavaRDD<Accumulator> dWeight = delta.map(new Function<DoubleMatrix, Accumulator>() {
-            @Override
-            public Accumulator call(DoubleMatrix arg0) throws Exception {
-                BaseLayer[] layerList = layers.value();
-                DoubleMatrix[] error = new DoubleMatrix[1];
-                error[0] = arg0;
-
-                Accumulator deltas = new Accumulator(layerList.length);
-
-                // Back-propagation
-                for(int l = layerList.length - 1; l >=0 ; l--) {
-                    BaseLayer a =layerList[l];
-                    a.setDelta(error);
-
-                    deltas.gradWList[l] = a.deriveGradientW();
-
-                    if(a.getDelta() != null) {
-                        double[] b = new double[a.getDelta().length];
-                        for(int i = 0; i < a.getDelta().length; i++)
-                            b[i] = a.getDelta()[i].sum();
-                        deltas.gradBList[l] = b;
-                    }
-
-                    error = a.deriveDelta();
-                }
-
-                return deltas;
-            }
-        });
-
-        Accumulator gradient = dWeight.fold(getEmptyDeltaWeight(), new Function2<Accumulator, Accumulator, Accumulator>() {
-            @Override
-            public Accumulator call(Accumulator v1, Accumulator v2) throws Exception {
-                for(int i1 = 0; i1 < v1.gradWList.length; i1++) {
-                    if(v1.gradWList[i1] != null && v2.gradWList[i1] != null) {
-                        for(int j1 = 0; j1 < v1.gradWList[i1].length; j1++) {
-                            for(int k = 0; k < v1.gradWList[i1][j1].length;k++) {
-                                v1.gradWList[i1][j1][k].addi(v2.gradWList[i1][j1][k]);
-                            }
-                        }
-
-                        for(int j1 = 0; j1 < v1.gradBList[i1].length; j1++) {
-                            v1.gradBList[i1][j1] += v2.gradBList[i1][j1];
-                        }
-                    }
-                }
-
-                return v1;
-            }
-        });
-
-        //update
-        update(gradient, minibatchSize);
     }
 
     public INDArray[] predict(Sample[] data) {

@@ -125,8 +125,8 @@ public class NeuralNet {
                 weights[i].w.addi(weightUpdates[i].w);
                 weights[i].b.addi(weightUpdates[i].b);
 
-                System.out.println("updates w:" + weightUpdates[i].w);
-                System.out.println("updates b:" + weightUpdates[i].b);
+            //    System.out.println("updates w:" + weightUpdates[i].w);
+            //    System.out.println("updates b:" + weightUpdates[i].b);
             }
         }
     }

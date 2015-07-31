@@ -13,7 +13,7 @@ import org.acl.deepspark.utils.MnistLoader;
 public class NeuralNetRunnerTest {
 
 	public static final int minibatch = 100;
-	public static final int numIteration = 100;
+	public static final int numIteration = 500;
 
 	public static final double learningRate = 0.1;
 	public static final double decayLambda = 0.0005;

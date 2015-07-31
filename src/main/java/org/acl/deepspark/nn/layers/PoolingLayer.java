@@ -93,4 +93,40 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		}
 		return propDelta;
 	}
+
+	@Override
+	public INDArray generateOutputBatch(Weight weight, INDArray input) {
+		// TODO Auto-generated method stub
+		int numSample= input.size(0);
+		int numChannel = input.size(1);
+		int rows = input.size(2);
+		int cols = input.size(3);
+
+		INDArray output = Nd4j.create(numSample, numChannel, (rows / poolRow), (cols / poolCol));
+		for(int i =0; i < numSample; i++)
+			output.putSlice(i, generateOutput(weight, input.slice(0)));
+
+		return output;
+	}
+
+	@Override
+	public Weight gradientBatch(INDArray input, INDArray error) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public INDArray calculateBackpropBatch(Weight weight, INDArray error) {
+		int[] dim = new int[getInputShape().length +1];
+		dim[0] = error.shape()[0];
+		System.arraycopy(getInputShape(), 0, dim, 1, getInputShape().length);
+		
+		INDArray propDelta = Nd4j.create(dim);
+		int numSample = dim[0];
+		
+		for(int i = 0; i < numSample; i++)
+			propDelta.putSlice(i, calculateBackprop(weight, error.slice(0)));
+			
+		return propDelta;
+	}
 }

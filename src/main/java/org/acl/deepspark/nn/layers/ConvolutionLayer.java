@@ -133,4 +133,91 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		}
 		return output;
 	}
+
+	@Override
+	public INDArray generateOutputBatch(Weight weight, INDArray input) {
+		int[] dim = new int[4]; // sampleSize, filter, x, y 
+		int[] inputDim = getInputShape(); // 0: # of samples, 1: # of channel, 2: x, 3: y;
+		int[] kernelDim = weight.getWeightShape(); // 0: # of channel, 1: # of filter, 2: x, 3: y;
+		
+		int numChannels = kernelDim[0];
+		int numFilters = kernelDim[1];
+		
+		dim[0] = inputDim[0];
+		dim[1] = numFilters;
+		dim[2] = inputDim[2] - kernelDim[2] + 1;
+		dim[3] = inputDim[3] - kernelDim[3] + 1;
+		
+		INDArray output = Nd4j.zeros(dim);
+		
+		// TODO: check dims(image) > dims(filter)
+		for(int m = 0; m < inputDim[0];m++) {
+			for(int i = 0; i < numFilters; i++) {
+				for(int j = 0; j < numChannels; j++)
+					output.slice(m).slice(i).addi(ArrayUtils.convolution(input.slice(m).slice(j), weight.w.slice(j).slice(i), ArrayUtils.VALID_CONV)); // valid conv
+				output.slice(m).slice(i).addi(weight.b.getScalar(i));
+			}
+		}
+		
+		return output;
+	}
+
+	@Override
+	public Weight gradientBatch(INDArray input, INDArray error) {
+		// TODO Auto-generated method stub
+		int[] dim = new int[4];
+		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
+		
+		// 0: # of channel, 1: # of filter, 2: x, 3: y;
+		dim[0] = inputDim[0];
+		dim[1] = numFilter; 
+		dim[2] = dimRow;
+		dim[3] = dimCol;
+
+		error = error.reshape(numFilter, inputDim[1] - dimRow + 1, inputDim[2] - dimCol + 1);
+		
+		Weight w = new Weight();
+		w.w = Nd4j.zeros(dim);
+		w.b = Nd4j.zeros(1, numFilter);
+		
+		int numSample = input.shape()[0];
+		//bias
+		for(int m = 0; m < numSample; m++)
+			for(int j = 0; j < numFilter; j++) {
+				w.b.addi(j, Nd4j.sum(error.slice(m).slice(j)).divi(numSample));
+			}
+		
+		//weight
+		for(int m = 0; m < numSample; m++)
+			for(int i = 0; i < inputDim[0]; i++) {
+				for (int j = 0; j < numFilter; j++) {
+					w.w.slice(i).slice(j).addi(ArrayUtils.convolution(input.slice(m).slice(i), error.slice(m).slice(j), ArrayUtils.VALID_CONV).divi(numSample)); // valid conv
+				}
+			}
+		return w;
+	}
+
+	@Override
+	public INDArray calculateBackpropBatch(Weight weight, INDArray error) {
+		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
+		int[] errDim = new int[inputDim.length+1]; // 0: # of samples, 1: # of channel, 2: x, 3: y;
+		
+		int numChannel = inputDim[0];
+		int numSample = error.shape()[0];
+		errDim[0] = numSample;
+		System.arraycopy(inputDim, 0, errDim, 1, inputDim.length);
+		
+		INDArray output = Nd4j.zeros(errDim);
+
+		// TODO: check dims(image) > dims(filter)
+		for(int m =0; m < numSample; m++)
+			for(int i = 0; i < numChannel; i++) {
+				for(int j = 0; j < numFilter; j++) {
+					output.slice(m).slice(i).addi(ArrayUtils.convolution(error.slice(m).slice(j),
+							ArrayUtils.rot90(ArrayUtils.rot90(weight.w.slice(i).slice(j))),		// flip weight
+							ArrayUtils.FULL_CONV)); 											// full conv
+				}
+			}
+		return output;
+	}
 }

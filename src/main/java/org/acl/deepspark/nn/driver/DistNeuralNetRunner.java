@@ -56,7 +56,7 @@ public class DistNeuralNetRunner {
         }
 
         JavaRDD<Sample>[] partition = data.cache().randomSplit(weights);
-        final Accumulator<Weight[]> weightAccum = sc.accumulator(null, new DistAccumulator());
+        final Accumulator<Weight[]> deltaAccum = sc.accumulator(null, new DistAccumulator());
 
         for (int i = 0 ; i < iteration; i++) {
             final Broadcast<Weight[]> broadcast = sc.broadcast(net.getWeights());
@@ -67,16 +67,16 @@ public class DistNeuralNetRunner {
                 @Override
                 public void call(Sample sample) throws Exception {
                     net.setWeights(broadcast.getValue());
-                    weightAccum.add(net.train(sample));
+                    deltaAccum.add(net.train(sample));
                 }
             });
 
-            Weight[] delta = weightAccum.value();
+            Weight[] delta = deltaAccum.value();
             for (int j = 0; j < delta.length; j++) {
                 delta[i].divi(batchSize);
             }
             net.updateWeight(delta);
-            weightAccum.zero();
+            deltaAccum.zero();
         }
 
     }

@@ -12,8 +12,12 @@ public class DistAccumulator implements AccumulatorParam<Weight[]> {
         if (current.length != param.length)
             throw new IllegalArgumentException("Weight dimension mismatch");
 
-        for (int i = 0 ; i < current.length; i++)
-            current[i].addi(param[i]);
+        for (int i = 0 ; i < current.length; i++) {
+            if (current[i] != null)
+                current[i].addi(param[i]);
+            else
+                current[i] = param[i];
+        }
         return current;
     }
 
@@ -22,8 +26,12 @@ public class DistAccumulator implements AccumulatorParam<Weight[]> {
         if (current.length != param.length)
             throw new IllegalArgumentException("Weight dimension mismatch");
 
-        for (int i = 0 ; i < current.length; i++)
-            current[i].addi(param[i]);
+        for (int i = 0 ; i < current.length; i++) {
+            if (current[i] != null)
+                current[i].addi(param[i]);
+            else
+                current[i] = param[i];
+        }
         return current;
     }
 

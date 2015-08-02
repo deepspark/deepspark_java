@@ -13,7 +13,7 @@ import org.acl.deepspark.utils.MnistLoader;
 public class NeuralNetRunnerTest {
 
 	public static final int minibatch = 100;
-	public static final int numIteration = 500;
+	public static final int numIteration = 1200;
 
 	public static final double learningRate = 0.1;
 	public static final double decayLambda = 0.0005;
@@ -49,7 +49,7 @@ public class NeuralNetRunnerTest {
 		layer4.set("activator", ActivatorType.NONE);
 
 		LayerConf layer5 = new LayerConf(LayerType.FULLYCONN);
-		layer5.set("numNodes", 120);
+		layer5.set("numNodes", 200);
 		layer5.set("activator", ActivatorType.SIGMOID);
 
 		LayerConf layer6 = new LayerConf(LayerType.FULLYCONN);
@@ -65,8 +65,8 @@ public class NeuralNetRunnerTest {
 							.setOutputDim(new int[]{10})
 							.addLayer(layer1)
 							.addLayer(layer2)
-	//						.addLayer(layer3)
-	//						.addLayer(layer4)
+							.addLayer(layer3)
+							.addLayer(layer4)
 							.addLayer(layer5)
 							.addLayer(layer6)
 							.build();

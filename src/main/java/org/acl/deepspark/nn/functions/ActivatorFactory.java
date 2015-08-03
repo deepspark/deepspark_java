@@ -5,7 +5,9 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.NDArrayUtil;
 
-public class ActivatorFactory {
+import java.io.Serializable;
+
+public class ActivatorFactory implements Serializable {
 	public static Activator getActivator(ActivatorType t) {
 		switch(t) {
 		case SIGMOID:

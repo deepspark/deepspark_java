@@ -82,7 +82,7 @@
 	                    </execution>
 	                </executions>
 	                <configuration>
-	                    <scalaVersion>${scala.version}</scalaVersion>
+	                    <scalaVersion>${scala.binary.version}</scalaVersion>
 	                </configuration>
 	            </plugin>
 

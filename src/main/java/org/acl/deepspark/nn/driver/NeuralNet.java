@@ -11,13 +11,14 @@ import org.acl.deepspark.nn.layers.PoolingLayer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * Created by Jaehong on 2015-07-16.
  */
-public class NeuralNet {
+public class NeuralNet implements Serializable {
     private Layer[]     layers;
     private Weight[]    weights;
     private Weight[]    weightUpdates;

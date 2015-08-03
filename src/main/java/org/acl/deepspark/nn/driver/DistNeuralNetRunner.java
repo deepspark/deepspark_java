@@ -12,10 +12,12 @@ import org.apache.spark.broadcast.Broadcast;
 import org.jblas.util.Random;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
+import java.io.Serializable;
+
 /**
  * Created by Jaehong on 2015-07-31.
  */
-public class DistNeuralNetRunner {
+public class DistNeuralNetRunner implements Serializable {
 
     private JavaSparkContext sc;
     private NeuralNet net;
@@ -56,7 +58,13 @@ public class DistNeuralNetRunner {
         }
 
         JavaRDD<Sample>[] partition = data.cache().randomSplit(weights);
-        final Accumulator<Weight[]> deltaAccum = sc.accumulator(null, new DistAccumulator());
+
+        Weight[] init = new Weight[net.getWeights().length];
+        for (int i = 0 ; i < net.getWeights().length; i++) {
+            init[i] = new Weight(net.getWeights()[i].getWeightShape(), net.getWeights()[i].getBiasShape());
+        }
+
+        final Accumulator<Weight[]> deltaAccum = sc.accumulator(init, new DistAccumulator());
 
         for (int i = 0 ; i < iteration; i++) {
             final Broadcast<Weight[]> broadcast = sc.broadcast(net.getWeights());

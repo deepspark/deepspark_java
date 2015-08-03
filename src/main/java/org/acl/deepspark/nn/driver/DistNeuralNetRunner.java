@@ -19,16 +19,13 @@ import java.io.Serializable;
  */
 public class DistNeuralNetRunner implements Serializable {
 
-    private JavaSparkContext sc;
     private NeuralNet net;
     private Weight[] weight;
 
     private int iteration;
     private int batchSize;
 
-    public DistNeuralNetRunner(JavaSparkContext sc, NeuralNet net) {
-
-        this.sc = sc;
+    public DistNeuralNetRunner(NeuralNet net) {
         this.net = net;
 
         /** default configuration **/
@@ -46,7 +43,7 @@ public class DistNeuralNetRunner implements Serializable {
         return this;
     }
 
-    public void train(JavaRDD<Sample> data) throws Exception {
+    public void train(JavaSparkContext sc, JavaRDD<Sample> data) throws Exception {
 
         System.out.println("Start learning...");
         System.out.println(String.format("Partitioning into %d pieces", (int) data.count() / batchSize));
@@ -61,9 +58,9 @@ public class DistNeuralNetRunner implements Serializable {
 
         Weight[] init = new Weight[net.getWeights().length];
         for (int i = 0 ; i < net.getWeights().length; i++) {
-            init[i] = new Weight(net.getWeights()[i].getWeightShape(), net.getWeights()[i].getBiasShape());
+            if (net.getWeights()[i] != null)
+                init[i] = new Weight(net.getWeights()[i].getWeightShape(), net.getWeights()[i].getBiasShape());
         }
-
         final Accumulator<Weight[]> deltaAccum = sc.accumulator(init, new DistAccumulator());
 
         for (int i = 0 ; i < iteration; i++) {

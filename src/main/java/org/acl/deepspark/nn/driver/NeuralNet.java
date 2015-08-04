@@ -14,19 +14,20 @@ import org.nd4j.linalg.factory.Nd4j;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.IllegalFormatException;
 
 /**
  * Created by Jaehong on 2015-07-16.
  */
 public class NeuralNet implements Serializable {
+    public double learningRate;
+    public double decayLambda;
+    public double momentum;
+    public double dropOutRate;
+
     private Layer[]     layers;
     private Weight[]    weights;
     private Weight[]    weightUpdates;
-
-    private double learningRate;
-    private double decayLambda;
-    private double momentum;
-    private double dropOutRate;
 
     public NeuralNet(final NeuralNetConf conf) {
         learningRate = conf.getLearningRate();
@@ -112,8 +113,8 @@ public class NeuralNet implements Serializable {
 
     public void updateWeight(Weight[] deltaWeight) {
         if (weights.length != deltaWeight.length)
-            System.out.println("Weight update dimension mismatch");
-    //        throw new Exception("Weight dimension mismatch");
+            throw new IllegalArgumentException("Weight update dimension mismatch");
+
         for (int i = 0 ; i < weights.length; i++) {
             if (weights[i] != null) {
                 weightUpdates[i].w.muli(momentum);
@@ -125,9 +126,6 @@ public class NeuralNet implements Serializable {
 
                 weights[i].w.addi(weightUpdates[i].w);
                 weights[i].b.addi(weightUpdates[i].b);
-
-            //    System.out.println("updates w:" + weightUpdates[i].w);
-            //    System.out.println("updates b:" + weightUpdates[i].b);
             }
         }
     }

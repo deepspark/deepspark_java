@@ -10,7 +10,8 @@ public class DistAccumulator implements AccumulatorParam<Weight[]> {
     @Override
     public Weight[] addAccumulator(Weight[] current, Weight[] param) {
         if (current.length != param.length)
-            throw new IllegalArgumentException("Weight dimension mismatch");
+            throw new IllegalArgumentException(String.format
+                    ("Weight dimension mismatch; current %d, param %d", current.length, param.length));
 
         for (int i = 0 ; i < current.length; i++) {
             if (current[i] != null)
@@ -24,7 +25,8 @@ public class DistAccumulator implements AccumulatorParam<Weight[]> {
     @Override
     public Weight[] addInPlace(Weight[] current, Weight[] param) {
         if (current.length != param.length)
-            throw new IllegalArgumentException("Weight dimension mismatch");
+            throw new IllegalArgumentException(String.format
+                    ("Weight dimension mismatch; current %d, param %d", current.length, param.length));
 
         for (int i = 0 ; i < current.length; i++) {
             if (current[i] != null)
@@ -37,8 +39,10 @@ public class DistAccumulator implements AccumulatorParam<Weight[]> {
 
     @Override
     public Weight[] zero(Weight[] weights) {
-        for (int i = 0 ; i < weights.length; i++)
-            weights[i] = new Weight(weights[i].getWeightShape(), weights[i].getBiasShape());
+        for (int i = 0 ; i < weights.length; i++) {
+            if (weights[i] != null)
+                weights[i] = new Weight(weights[i].getWeightShape(), weights[i].getBiasShape());
+        }
         return weights;
     }
 }

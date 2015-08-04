@@ -20,17 +20,12 @@ import java.io.Serializable;
 public class DistNeuralNetRunner implements Serializable {
 
     private NeuralNet net;
-    private Weight[] weight;
 
     private int iteration;
     private int batchSize;
 
     public DistNeuralNetRunner(NeuralNet net) {
         this.net = net;
-
-        /** default configuration **/
-        iteration = 0;
-        batchSize = 1;
     }
 
     public DistNeuralNetRunner setIterations(int iteration) {
@@ -43,18 +38,24 @@ public class DistNeuralNetRunner implements Serializable {
         return this;
     }
 
-    public void train(JavaSparkContext sc, JavaRDD<Sample> data) throws Exception {
+    public void train(JavaSparkContext sc, JavaRDD<Sample> data) {
+        int numPartition = (int) data.cache().count() / batchSize;
 
         System.out.println("Start learning...");
-        System.out.println(String.format("Partitioning into %d pieces", (int) data.count() / batchSize));
+        System.out.println(String.format("batchSize: %d", batchSize));
+        System.out.println(String.format("iterations: %d", iteration));
+        System.out.println(String.format("learningRate: %4f", net.learningRate));
+        System.out.println(String.format("momentum: %4f", net.momentum));
+        System.out.println(String.format("decayLambda: %4f", net.decayLambda));
+        System.out.println(String.format("dropOutRate: %4f", net.dropOutRate));
 
-        int numPartition = (int) data.count() / batchSize;
+        System.out.println(String.format("Partitioning into %d pieces", (int) data.count() / batchSize));
         double[] weights = new double[numPartition];
         for (int i = 0 ; i < numPartition; i++) {
             weights[i] = 1.0;
         }
 
-        JavaRDD<Sample>[] partition = data.cache().randomSplit(weights);
+        JavaRDD<Sample>[] partition = data.randomSplit(weights);
 
         Weight[] init = new Weight[net.getWeights().length];
         for (int i = 0 ; i < net.getWeights().length; i++) {
@@ -65,10 +66,9 @@ public class DistNeuralNetRunner implements Serializable {
 
         for (int i = 0 ; i < iteration; i++) {
             final Broadcast<Weight[]> broadcast = sc.broadcast(net.getWeights());
-            JavaRDD<Sample> rdd = partition[Random.nextInt(numPartition)]; // Test needed
-            /** TODO: check whether net is updated for each iterations */
+            JavaRDD<Sample> miniBatch = partition[Random.nextInt(numPartition)];
 
-            rdd.foreach(new VoidFunction<Sample>() {
+            miniBatch.foreach(new VoidFunction<Sample>() {
                 @Override
                 public void call(Sample sample) throws Exception {
                     net.setWeights(broadcast.getValue());
@@ -78,7 +78,8 @@ public class DistNeuralNetRunner implements Serializable {
 
             Weight[] delta = deltaAccum.value();
             for (int j = 0; j < delta.length; j++) {
-                delta[i].divi(batchSize);
+                if (delta[j] != null)
+                    delta[j].divi(batchSize);
             }
             net.updateWeight(delta);
             deltaAccum.zero();

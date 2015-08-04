@@ -20,7 +20,8 @@ public class Accumulator implements Serializable {
 
 	public void accumulate(Weight[] weights) {
 		if (gradWList.length != weights.length)
-			throw new IllegalArgumentException("Only rotating matrices");
+			throw new IllegalArgumentException(String.format
+					("Number of layers mismatch; current %d, param %d", gradWList.length, weights.length));
 
 		for (int i = 0 ; i < gradWList.length; i++) {
 			if (gradWList[i] == null) {

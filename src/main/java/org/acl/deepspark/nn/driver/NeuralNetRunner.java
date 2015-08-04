@@ -19,10 +19,6 @@ public class NeuralNetRunner {
     public NeuralNetRunner(NeuralNet net) {
         this.net = net;
         this.weightAccum = new Accumulator(net.getNumLayers());
-
-        /* default configuration */
-        this.iteration = 10000;
-        this.batchSize = 100;
     }
 
     public NeuralNetRunner setIterations(int iteration) {

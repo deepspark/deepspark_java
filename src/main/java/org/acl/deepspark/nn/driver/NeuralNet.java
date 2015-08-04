@@ -113,7 +113,8 @@ public class NeuralNet implements Serializable {
 
     public void updateWeight(Weight[] deltaWeight) {
         if (weights.length != deltaWeight.length)
-            throw new IllegalArgumentException("Weight update dimension mismatch");
+            throw new IllegalArgumentException(String.format
+                    ("Number of layers mismatch; current %d, deltaWeight %d", weights.length, deltaWeight.length));
 
         for (int i = 0 ; i < weights.length; i++) {
             if (weights[i] != null) {

@@ -1,7 +1,5 @@
 package org.acl.deepspark.data;
 
-import org.apache.commons.math.DimensionMismatchException;
-
 import java.io.Serializable;
 
 public class Accumulator implements Serializable {
@@ -11,11 +9,11 @@ public class Accumulator implements Serializable {
 	private static final long serialVersionUID = -948972344668801995L;
 	
 	public Weight[] gradWList;
-	private int num;
+	private int count;
 	
 	public Accumulator(int numLayer) {
 		gradWList = new Weight[numLayer];
-		num = 0;
+		count = 0;
 	}
 
 	public void accumulate(Weight[] weights) {
@@ -31,22 +29,26 @@ public class Accumulator implements Serializable {
 			else
 				gradWList[i].addi(weights[i]);
 		}
-		num++;
+		count++;
+	}
+
+	public int getCount() {
+		return count;
 	}
 
 	public Weight[] getAverage() {
-		if (num <= 0) return null;
+		if (count <= 0) return null;
 
 		Weight[] result = new Weight[gradWList.length];
 		for (int i = 0; i < gradWList.length; i++)
 			if (gradWList[i] != null)
-				result[i] = gradWList[i].div(num);
+				result[i] = gradWList[i].div(count);
 		return result;
 	}
 
 	public void clear() {
 		for (int i = 0; i < gradWList.length; i++)
 			gradWList[i] = null;
-		num = 0;
+		count = 0;
 	}
 }

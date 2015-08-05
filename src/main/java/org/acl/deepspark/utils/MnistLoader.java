@@ -11,6 +11,9 @@ import org.acl.deepspark.data.Sample;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
 import org.jblas.DoubleMatrix;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -72,6 +75,45 @@ public class MnistLoader implements Serializable {
 
 		System.out.println(String.format("Loaded %d samples from %s", samples.size(), path));
 		return arr;
+	}
+	
+	public static JavaRDD<Sample> loadRDDFromHDFS(String path, final boolean normalize, JavaSparkContext sc) {
+		JavaRDD<String> lines = sc.textFile(path);
+		JavaRDD<Sample> ret = lines.map(new Function<String, Sample>() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Sample call(String v1) throws Exception {
+				String[] feature = v1.split("\t");
+				double label = Double.parseDouble(feature[dimRows * dimRows]);
+				double[] featureVec = new double[dimRows * dimRows];
+				double[] labelVec = new double[dimLabel];
+				for (int i = 0; i < dimLabel; i++) {
+					labelVec[i] = (label == i) ? 1.0 : 0.0;
+				}
+
+				for (int i = 0; i < feature.length -1; i++)
+					featureVec[i] = Double.parseDouble(feature[i]);
+				
+				Sample s = new Sample();
+				int[] dimData = {1, dimRows, dimRows};
+
+				s.data = Nd4j.zeros(dimData);
+				s.data.setData(Nd4j.createBuffer(featureVec));
+				s.data.transposei();
+				if (normalize)
+					s.data.divi(256);
+				s.label = Nd4j.zeros(dimLabel, 1);
+				s.label.setData(Nd4j.createBuffer(labelVec));
+
+				return s;
+			}
+		});
+		return ret;
 	}
 
 	public static Sample[] loadFromHDFS(String path, boolean normalize) {

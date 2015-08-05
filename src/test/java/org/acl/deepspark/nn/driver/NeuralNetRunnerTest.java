@@ -22,12 +22,11 @@ public class NeuralNetRunnerTest {
 	
 	public static void main(String[] args) throws Exception {
 
-		System.out.println("Data Loading...");
 		Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_train.txt", true);
 		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);;
 
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
-		layer1.set("numFilters", 10);
+		layer1.set("numFilters", 20);
 		layer1.set("filterRow", 5);
 		layer1.set("filterCol", 5);
 		layer1.set("activator", ActivatorType.SIGMOID);
@@ -38,7 +37,7 @@ public class NeuralNetRunnerTest {
 		layer2.set("activator", ActivatorType.NONE);
 
 		LayerConf layer3 = new LayerConf(LayerType.CONVOLUTION);
-		layer3.set("numFilters", 20);
+		layer3.set("numFilters", 50);
 		layer3.set("filterRow", 5);
 		layer3.set("filterCol", 5);
 		layer3.set("activator", ActivatorType.SIGMOID);

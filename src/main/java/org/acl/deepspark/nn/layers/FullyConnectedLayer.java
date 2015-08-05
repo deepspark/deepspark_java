@@ -51,7 +51,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 
 		Weight w= new Weight();
 		w.w = Nd4j.randn(dimOut, dimIn).mul(0.1);
-		w.b = Nd4j.zeros(dimOut, 1).mul(0.01);
+		w.b = Nd4j.zeros(dimOut, 1);
 		return w;
 	}
 

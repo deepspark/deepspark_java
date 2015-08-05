@@ -74,32 +74,28 @@ public class DistAsyncNeuralNetRunner implements Serializable {
                 public void call(Iterator<Sample> samples) throws Exception {
 					//initialize
 					Accumulator w = new Accumulator(net.getNumLayers());
-					int count = 0;
 					
 					while(samples.hasNext()) {
-						if(count == 0) {
+						if(w.getCount() == 0) {
 							w.clear();
 						}
 						
 						Sample sample = samples.next();
 						w.accumulate(net.train(sample));
-	                    
-	                    count++;
-	                    if(count == batchSize) {
+
+	                    if(w.getCount() == batchSize) {
 	                    	ParameterClient.sendDelta(host, port, w.getAverage());
 	                    	net.setWeights(ParameterClient.getWeights(host, port));
 	                    	
 	                    	w.clear();
-	                    	count = 0;
 	                    }
 					}
 					
-					if(count != 0) {
+					if(w.getCount() != 0) {
 						ParameterClient.sendDelta(host, port, w.getAverage());
                     	net.setWeights(ParameterClient.getWeights(host, port));
                     	
                     	w.clear();
-                    	count = 0;
 					}
                 }
             });

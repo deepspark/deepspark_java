@@ -65,13 +65,11 @@ public class DistNeuralNetRunner implements Serializable {
         final Accumulator<Weight[]> deltaAccum = sc.accumulator(init, new DistAccumulator());
 
         for (int i = 0 ; i < iteration; i++) {
-            final Broadcast<Weight[]> broadcast = sc.broadcast(net.getWeights());
             JavaRDD<Sample> miniBatch = partition[Random.nextInt(numPartition)];
 
             miniBatch.foreach(new VoidFunction<Sample>() {
                 @Override
                 public void call(Sample sample) throws Exception {
-                    net.setWeights(broadcast.getValue());
                     deltaAccum.add(net.train(sample));
                 }
             });

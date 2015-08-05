@@ -27,6 +27,7 @@ public class MnistLoader implements Serializable {
 	private static final int dimLabel = 10;
 
 	public static Sample[] loadIntoSamples(String path, boolean normalize) {
+		System.out.println("Data Loading...");
 		BufferedReader reader = null;
 		double label;
 		ArrayList<Sample> samples = new ArrayList<Sample>();

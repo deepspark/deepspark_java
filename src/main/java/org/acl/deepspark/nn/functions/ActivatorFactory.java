@@ -41,7 +41,6 @@ public class ActivatorFactory implements Serializable {
 				
 				@Override
 				public INDArray derivative(INDArray input, boolean output) {
-					// TODO Auto-generated method stub
 					return input.gt(0);
 				}
 			};

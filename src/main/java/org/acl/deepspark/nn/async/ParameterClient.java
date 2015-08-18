@@ -16,11 +16,9 @@ public class ParameterClient {
 	}
 	
 	public static Weight[] getWeights(String host, int port) throws IOException, ClassNotFoundException {
-		Weight[] w = null;
-		
 		Socket s = new Socket(host, port);
 		ObjectInputStream os = new ObjectInputStream(s.getInputStream());
-		w = (Weight[]) os.readObject();
+		Weight[] w = (Weight[]) os.readObject();
 		s.close();
 		
 		return w;

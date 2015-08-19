@@ -21,7 +21,7 @@ public class ParameterServer {
 	
 	private Thread[] threads;
 	
-	public ParameterServer(NeuralNet net, int[] port) {
+	public ParameterServer(NeuralNet net, int minibatch, int[] port) {
 		p = net;
 		listenPort = port[0];
 		castPort = port[1];
@@ -38,8 +38,8 @@ public class ParameterServer {
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-
-
+		
+		
 	}
 	
 	public void startServer() throws IOException {

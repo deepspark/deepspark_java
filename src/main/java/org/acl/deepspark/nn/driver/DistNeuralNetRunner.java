@@ -40,6 +40,7 @@ public class DistNeuralNetRunner implements Serializable {
 
     public void train(JavaSparkContext sc, JavaRDD<Sample> data) {
         int numPartition = (int) data.cache().count() / batchSize;
+
         System.out.println("Start learning...");
         System.out.println(String.format("batchSize: %d", batchSize));
         System.out.println(String.format("iterations: %d", iteration));
@@ -48,7 +49,6 @@ public class DistNeuralNetRunner implements Serializable {
         System.out.println(String.format("decayLambda: %4f", net.decayLambda));
         System.out.println(String.format("dropOutRate: %4f", net.dropOutRate));
 
-        // TODO: check data.count > batchSize
         System.out.println(String.format("Partitioning into %d pieces", (int) data.count() / batchSize));
         double[] weights = new double[numPartition];
         for (int i = 0 ; i < numPartition; i++) {
@@ -82,6 +82,7 @@ public class DistNeuralNetRunner implements Serializable {
             net.updateWeight(delta);
             deltaAccum.zero();
         }
+
     }
 
     public INDArray[] predict(Sample[] data) {

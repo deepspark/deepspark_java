@@ -72,7 +72,7 @@ public class Weight implements Serializable {
 
 	public Weight muli(double d) {
 		w.muli(d);
-		b.subi(d);
+		b.muli(d);
 		return this;
 	}
 

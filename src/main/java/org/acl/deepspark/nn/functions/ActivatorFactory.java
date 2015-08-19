@@ -59,6 +59,7 @@ public class ActivatorFactory implements Serializable {
 				@Override
 				public INDArray derivative(INDArray input, boolean output) {
 					return Nd4j.ones(input.shape());
+
 				}
 			};
 		case NONE:
@@ -66,11 +67,13 @@ public class ActivatorFactory implements Serializable {
 				
 				@Override
 				public INDArray output(INDArray input) {
+					// TODO Auto-generated method stub
 					return input.dup();
 				}
 				
 				@Override
 				public INDArray derivative(INDArray input, boolean output) {
+					// TODO Auto-generated method stub
 					return Nd4j.ones(input.shape());
 				}
 			};

@@ -7,6 +7,7 @@ import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.LayerType;
+import org.acl.deepspark.utils.CIFARLoader;
 import org.acl.deepspark.utils.MnistLoader;
 
 
@@ -22,14 +23,14 @@ public class NeuralNetRunnerTest {
 	
 	public static void main(String[] args) throws Exception {
 
-		Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_train.txt", true);
-		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);;
+		Sample[] training_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/train_batch.bin", true);
+		Sample[] test_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/test_batch.bin", true);;
 
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
-		layer1.set("numFilters", 10);
+		layer1.set("numFilters", 20);
 		layer1.set("filterRow", 5);
 		layer1.set("filterCol", 5);
-		layer1.set("activator", ActivatorType.SIGMOID);
+		layer1.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);
 		layer2.set("poolRow", 2);
@@ -37,10 +38,10 @@ public class NeuralNetRunnerTest {
 		layer2.set("activator", ActivatorType.NONE);
 
 		LayerConf layer3 = new LayerConf(LayerType.CONVOLUTION);
-		layer3.set("numFilters", 20);
+		layer3.set("numFilters", 50);
 		layer3.set("filterRow", 5);
 		layer3.set("filterCol", 5);
-		layer3.set("activator", ActivatorType.SIGMOID);
+		layer3.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer4 = new LayerConf(LayerType.POOLING);
 		layer4.set("poolRow", 2);
@@ -48,8 +49,8 @@ public class NeuralNetRunnerTest {
 		layer4.set("activator", ActivatorType.NONE);
 
 		LayerConf layer5 = new LayerConf(LayerType.FULLYCONN);
-		layer5.set("numNodes", 200);
-		layer5.set("activator", ActivatorType.SIGMOID);
+		layer5.set("numNodes", 500);
+		layer5.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer6 = new LayerConf(LayerType.FULLYCONN);
 		layer6.set("numNodes", 10);
@@ -60,7 +61,7 @@ public class NeuralNetRunnerTest {
 							.setDecayLambda(decayLambda)
 							.setMomentum(momentum)
 							.setDropOutRate(dropOut)
-							.setInputDim(new int[]{1, 28, 28})
+							.setInputDim(new int[]{3, 32, 32})
 							.setOutputDim(new int[]{10})
 							.addLayer(layer1)
 							.addLayer(layer2)

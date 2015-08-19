@@ -45,12 +45,15 @@ public class CIFARLoader implements Serializable {
 				for (int i = 0; i < channel; i++) {
 					in.read(data);
 					featureVec[i] = new double[dimRows * dimRows];
-					for (int j = 0; j < featureVec[i].length; j++)
-						featureVec[i][j] = (double) data[j];
+					for (int j = 0; j < featureVec[i].length; j++) {
+						if (normalize)
+							featureVec[i][j] = (double) data[j] / 256.0;
+						else
+							featureVec[i][j] = (double) data[j];
+					}
 					INDArray channelData = Nd4j.create(featureVec[i]).reshape(dimRows, dimRows).transpose();
 					s.data.putSlice(i, channelData);
 				}
-
 				samples.add(s);
 			}
 		} catch (IOException e) {
@@ -96,8 +99,12 @@ public class CIFARLoader implements Serializable {
 				for (int i = 0; i < channel; i++) {
 					in.read(data);
 					featureVec[i] = new double[dimRows * dimRows];
-					for (int j = 0; j < featureVec[i].length; j++)
-						featureVec[i][j] = (double) data[j];
+					for (int j = 0; j < featureVec[i].length; j++) {
+						if (normalize)
+							featureVec[i][j] = (double) data[j] / 256.0;
+						else
+							featureVec[i][j] = (double) data[j];
+					}
 					INDArray channelData = Nd4j.create(featureVec[i]).reshape(dimRows, dimRows).transpose();
 					s.data.putSlice(i, channelData);
 				}

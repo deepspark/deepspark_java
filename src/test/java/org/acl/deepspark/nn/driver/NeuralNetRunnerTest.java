@@ -16,7 +16,7 @@ public class NeuralNetRunnerTest {
 	public static final int minibatch = 100;
 	public static final int numIteration = 1200;
 
-	public static final double learningRate = 0.1;
+	public static final double learningRate = 0.15;
 	public static final double decayLambda = 0.0005;
 	public static final double momentum = 0.9;
 	public static final double dropOut = 0.0;
@@ -24,7 +24,7 @@ public class NeuralNetRunnerTest {
 	public static void main(String[] args) throws Exception {
 
 		Sample[] training_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/train_batch.bin", true);
-		Sample[] test_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/test_batch.bin", true);;
+		Sample[] test_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/test_batch.bin", true);
 
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
 		layer1.set("numFilters", 20);

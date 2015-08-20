@@ -49,7 +49,7 @@ public class DistNeuralNetRunner implements Serializable {
         System.out.println(String.format("decayLambda: %4f", net.decayLambda));
         System.out.println(String.format("dropOutRate: %4f", net.dropOutRate));
 
-        System.out.println(String.format("Partitioning into %d pieces", (int) data.count() / batchSize));
+        System.out.println(String.format("Partitioning into %d pieces", numPartition));
         double[] weights = new double[numPartition];
         for (int i = 0 ; i < numPartition; i++) {
             weights[i] = 1.0;

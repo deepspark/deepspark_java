@@ -55,7 +55,6 @@ public class CIFARLoader implements Serializable {
 							featureVec[i][j] = (double) value;
 					}
 					INDArray channelData = Nd4j.create(featureVec[i]).reshape(dimRows, dimRows).transpose();
-					System.out.println(channelData);
 					s.data.putSlice(i, channelData);
 				}
 				samples.add(s);

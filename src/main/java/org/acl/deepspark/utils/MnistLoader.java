@@ -59,7 +59,7 @@ public class MnistLoader implements Serializable {
 					s.data.divi(256);
 				s.label = Nd4j.zeros(dimLabel,1);
 				s.label.setData(Nd4j.createBuffer(labelVec));
-				
+
 				samples.add(s);
 			}
 		} catch(IOException e) {

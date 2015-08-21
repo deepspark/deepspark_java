@@ -58,7 +58,7 @@ public class MnistLoader implements Serializable {
 				if (normalize)
 					s.data.divi(256);
 				s.label = Nd4j.zeros(dimLabel,1);
-				s.label.setData(Nd4j.createBuffer(labelVec));;
+				s.label.setData(Nd4j.createBuffer(labelVec));
 				
 				samples.add(s);
 			}

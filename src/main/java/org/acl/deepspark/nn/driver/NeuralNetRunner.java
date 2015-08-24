@@ -2,6 +2,7 @@ package org.acl.deepspark.nn.driver;
 
 import org.acl.deepspark.data.Accumulator;
 import org.acl.deepspark.data.Sample;
+import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.utils.ArrayUtils;
 import org.jblas.util.Random;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -37,7 +38,7 @@ public class NeuralNetRunner {
         	System.out.println(String.format("%d(th) iteration...", i + 1));
 
             for (int j = 0; j < batchSize; j++) {
-                weightAccum.accumulate(net.train(data[Random.nextInt(dataSize)]));
+                weightAccum.accumulate(net.train(data[Random.nextInt(50)]));
             }
             net.updateWeight(weightAccum.getAverage());
             weightAccum.clear();

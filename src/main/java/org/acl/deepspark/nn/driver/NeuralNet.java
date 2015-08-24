@@ -90,8 +90,7 @@ public class NeuralNet implements Serializable {
         }
         //System.out.println("output");
         //System.out.println(activated[layers.length]);
-        //System.out.println("label");
-        //System.out.println(in.label);
+
         INDArray delta = activated[layers.length].sub(in.label);
         System.out.println(Nd4j.sum(delta.mul(delta)));
         

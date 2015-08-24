@@ -51,14 +51,12 @@ public class MnistLoader implements Serializable {
 				
 				Sample s = new Sample();
 				int[] dimData = {1, dimRows, dimRows};
-				
-				s.data = Nd4j.zeros(dimData);
-				s.data.setData(Nd4j.createBuffer(featureVec));
+
+				s.data = Nd4j.create(featureVec, dimData);
 				s.data.transposei();
 				if (normalize)
-					s.data.divi(256);
-				s.label = Nd4j.zeros(dimLabel,1);
-				s.label.setData(Nd4j.createBuffer(labelVec));
+					s.data.divi(256.0);
+				s.label = Nd4j.create(labelVec, new int[] {dimLabel, 1});
 
 				samples.add(s);
 			}
@@ -104,13 +102,11 @@ public class MnistLoader implements Serializable {
 				Sample s = new Sample();
 				int[] dimData = {1, dimRows, dimRows};
 
-				s.data = Nd4j.zeros(dimData);
-				s.data.setData(Nd4j.createBuffer(featureVec));
+				s.data = Nd4j.create(featureVec, dimData);
 				s.data.transposei();
 				if (normalize)
-					s.data.divi(256);
-				s.label = Nd4j.zeros(dimLabel, 1);
-				s.label.setData(Nd4j.createBuffer(labelVec));
+					s.data.divi(256.0);
+				s.label = Nd4j.create(labelVec, new int[] {dimLabel, 1});
 
 				return s;
 			}
@@ -144,13 +140,11 @@ public class MnistLoader implements Serializable {
 				Sample s = new Sample();
 				int[] dimData = {1, dimRows, dimRows};
 
-				s.data = Nd4j.zeros(dimData);
-				s.data.setData(Nd4j.createBuffer(featureVec));
+				s.data = Nd4j.create(featureVec, dimData);
 				s.data.transposei();
 				if (normalize)
-					s.data.divi(256);
-				s.label = Nd4j.zeros(dimLabel, 1);
-				s.label.setData(Nd4j.createBuffer(labelVec));
+					s.data.divi(256.0);
+				s.label = Nd4j.create(labelVec, new int[] {dimLabel, 1});
 
 				samples.add(s);
 			}

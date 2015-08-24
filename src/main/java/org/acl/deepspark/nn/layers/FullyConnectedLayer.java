@@ -25,6 +25,8 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {
 		INDArray data = ArrayUtils.makeColumnVector(input);
+//		System.out.println("fullyconn output");
+//		System.out.println(weight.w.mmul(data));
 		return weight.w.mmul(data).addi(weight.b);
 	}
 

@@ -18,7 +18,7 @@ public abstract class BaseLayer implements Layer,Serializable {
 	
 	public BaseLayer(int[] shapes, LayerConf conf) {
 		inputShape = new int[shapes.length];
-		System.arraycopy(shapes, 0, inputShape, 0, shapes.length);
+		inputShape = shapes.clone();
 		activator = ActivatorFactory.getActivator((ActivatorType) conf.get("activator"));
 	}
 	

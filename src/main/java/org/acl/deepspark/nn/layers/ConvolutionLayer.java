@@ -31,9 +31,9 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		dimW[1] = (Integer) conf.get("numFilters");
 		dimW[2] = (Integer) conf.get("filterRow"); // x
 		dimW[3] = (Integer) conf.get("filterCol"); // y
-		
+
 		w.w = Nd4j.randn(dimW).muli(0.1);
-		w.b = Nd4j.zeros(1, dimW[1]).muli(0.01);
+		w.b = Nd4j.zeros(1, dimW[1]);//.muli(0.01);
 
 		return w;
 	}
@@ -60,7 +60,8 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 				output.slice(i).addi(ArrayUtils.convolution(input.slice(j), weight.w.slice(j).slice(i), ArrayUtils.VALID_CONV)); // valid conv
 			output.slice(i).addi(weight.b.getScalar(i));
 		}
-		
+		//System.out.println("convolution output");
+		//System.out.println(output);
 		return output;
 	}
 

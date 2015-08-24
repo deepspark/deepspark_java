@@ -32,7 +32,6 @@ public class CIFARLoader implements Serializable {
 		try {
 			in = new FileInputStream(path);
 			while ((label = in.read()) != -1) {
-				System.out.println(String.format("label: %d", label));
 				double[] labelVec = new double[dimLabel];
 				double[][] featureVec = new double[channel][];
 				for (int i = 0; i < dimLabel; i++) {
@@ -99,19 +98,20 @@ public class CIFARLoader implements Serializable {
 				s.data = Nd4j.create(sampleDim);
 				s.label = Nd4j.create(labelVec);
 
+				int value;
 				for (int i = 0; i < channel; i++) {
 					in.read(data);
 					featureVec[i] = new double[dimRows * dimRows];
 					for (int j = 0; j < featureVec[i].length; j++) {
+						value = (int) data[j]&0xff;
 						if (normalize)
-							featureVec[i][j] = (double) data[j] / 256.0;
+							featureVec[i][j] = (double) value / 256.0;
 						else
-							featureVec[i][j] = (double) data[j];
+							featureVec[i][j] = (double) value;
 					}
 					INDArray channelData = Nd4j.create(featureVec[i]).reshape(dimRows, dimRows).transpose();
 					s.data.putSlice(i, channelData);
 				}
-
 				samples.add(s);
 			}
 		} catch (IOException e) {

@@ -61,6 +61,7 @@ public class TensorTest {
 
         // Matrix Operation
         Tensor ret;
+        t2 = Tensor.create(data3, dim3);
         System.out.println("add");
         ret = t2.add(t2);
         System.out.println(ret);
@@ -76,9 +77,10 @@ public class TensorTest {
         System.out.println("div");
         ret = t2.div(2.0);
         System.out.println(ret);
-/*
+        // test complete
+
         // Matrix Operation (In place)
-        Tensor tensor = Tensor.create(data3, dim3);;
+        Tensor tensor = Tensor.create(data3, dim3);
         System.out.println("addi");
         tensor.addi(Tensor.ones(dim3));
         System.out.println(tensor);
@@ -94,6 +96,6 @@ public class TensorTest {
         System.out.println("divi");
         tensor.divi(2.0);
         System.out.println(tensor);
-*/
+        // test complete
     }
 }

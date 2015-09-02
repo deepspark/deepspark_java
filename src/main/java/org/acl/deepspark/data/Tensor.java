@@ -1,6 +1,8 @@
 package org.acl.deepspark.data;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jblas.DoubleMatrix;
+import org.jblas.JavaBlas;
 import org.jblas.exceptions.SizeException;
 
 import java.io.Serializable;

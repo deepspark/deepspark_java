@@ -1,8 +1,13 @@
 package org.acl.deepspark.utils;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.NDArrayFactory;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.factory.Nd4jBackend;
+import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
+import org.nd4j.linalg.indexing.NDArrayIndexAll;
+import org.nd4j.linalg.indexing.NDArrayIndexEmpty;
 import org.nd4j.linalg.util.NDArrayUtil;
 
 public class ArrayUtils {
@@ -31,9 +36,7 @@ public class ArrayUtils {
         int count = 0;
         for (int i = rev.length() - 1; i >= 0; i--) {
             ret.putScalar(count++, rev.getFloat(i));
-
         }
-
         return ret.reshape(reverse.shape());
     }
     
@@ -50,10 +53,26 @@ public class ArrayUtils {
     	}
     	return maxIdx;
     }
+
+	// 2D
+	public static INDArray subMatrix(INDArray arr, int[] offset, int[] shape) {
+		assert offset.length == shape.length;
+		INDArrayIndex[] sub = new INDArrayIndex[shape.length];
+		for(int i = 0; i < sub.length; i++) {
+			sub[i] = NDArrayIndex.interval(offset[i], shape[i], false);
+		}
+
+		//arr.get(NDArrayIndex.createCoveringShape())
+		return null;
+	}
+
+
     
     public static INDArray convolution(INDArray data, INDArray filter, int option) {
 		INDArray result;
 		INDArray input;
+
+
 		int nCols, nRows;
 		switch(option) {
 			case FULL_CONV:
@@ -69,8 +88,8 @@ public class ArrayUtils {
 			case SAME_CONV:
 				nRows = data.rows();
 				nCols = data.columns();
-				input = Nd4j.zeros(nRows+ filter.rows() - 1 , nCols + filter.columns() - 1);
-				input.put(new NDArrayIndex[] {NDArrayIndex.interval(filter.rows() / 2, filter.rows() / 2 + data.rows()), 
+				input = Nd4j.zeros(nRows+ filter.rows() - 1, nCols + filter.columns() - 1);
+				input.put(new INDArrayIndex[] {NDArrayIndex.interval(filter.rows() / 2, filter.rows() / 2 + data.rows()),
 						NDArrayIndex.interval(filter.columns() / 2, filter.columns() /2  + data.columns())},
 						data);
 				break;
@@ -92,11 +111,9 @@ public class ArrayUtils {
 						sum += input.getDouble(r+i, c+j) * filter.getDouble(i,j);
 					}
 				}
-				
 				result.put(r,c, sum);
 			}
 		}
-		
 		return result;
 	}
 }

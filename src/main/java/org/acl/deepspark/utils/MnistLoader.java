@@ -44,8 +44,6 @@ public class MnistLoader implements Serializable {
 				for(int i = 0; i < dimLabel; i++) {
 					labelVec[i] = (label == i) ?  1.0 : 0.0;
 				}
-				DoubleMatrix sampleLabel = new DoubleMatrix(labelVec);
-				
 				for(int i = 0; i < feature.length -1;i++)
 					featureVec[i] = Double.parseDouble(feature[i]);
 				

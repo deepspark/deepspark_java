@@ -38,8 +38,6 @@ public class ParameterServer {
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		
-		
 	}
 	
 	public void startServer() throws IOException {
@@ -65,7 +63,6 @@ public class ParameterServer {
 				}
 			}
 		});
-		
 		threads[0].start();
 		
 		threads[1] = new Thread(new Runnable() {

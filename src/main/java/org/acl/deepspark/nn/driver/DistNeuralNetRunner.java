@@ -8,7 +8,6 @@ import org.apache.spark.Accumulator;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.broadcast.Broadcast;
 import org.jblas.util.Random;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
@@ -56,17 +55,14 @@ public class DistNeuralNetRunner implements Serializable {
         }
 
         JavaRDD<Sample>[] partition = data.randomSplit(weights);
-
         Weight[] init = new Weight[net.getWeights().length];
         for (int i = 0 ; i < net.getWeights().length; i++) {
             if (net.getWeights()[i] != null)
                 init[i] = new Weight(net.getWeights()[i].getWeightShape(), net.getWeights()[i].getBiasShape());
         }
         final Accumulator<Weight[]> deltaAccum = sc.accumulator(init, new DistAccumulator());
-
         for (int i = 0 ; i < iteration; i++) {
             JavaRDD<Sample> miniBatch = partition[Random.nextInt(numPartition)];
-
             miniBatch.foreach(new VoidFunction<Sample>() {
                 @Override
                 public void call(Sample sample) throws Exception {

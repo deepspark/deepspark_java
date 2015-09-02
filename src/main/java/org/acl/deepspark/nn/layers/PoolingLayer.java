@@ -4,8 +4,11 @@ import java.io.Serializable;
 
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
+import org.acl.deepspark.utils.ArrayUtils;
+import org.jblas.DoubleMatrix;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.factory.Nd4jBackend;
 
 public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	/**
@@ -15,7 +18,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 
 	private int poolRow;
 	private int poolCol;
-	private INDArray maskArray;
+	private int strides;
 
 	public PoolingLayer(int[] inputShape, LayerConf conf) {
 		super(inputShape, conf);
@@ -25,12 +28,15 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 
 	@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
-		return null;
+		Weight weight = new Weight();
+		weight.w = Nd4j.zeros(calculateOutputDimension(conf, input));
+		weight.b = Nd4j.zeros(1);
+		return weight;
 	}
 
 	@Override
 	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
-		return new int[] {input[0], input[1]/poolRow, input[2]/poolCol};
+		return new int[] {input[0], (input[1]-poolRow)/strides + 1, (input[2]-poolCol)/strides + 1};
 	}
 
 	@Override
@@ -42,18 +48,18 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		double value;
 		double outValue;
 
-		INDArray output = Nd4j.create(numChannel, (rows / poolRow), (cols / poolCol));
-		maskArray = Nd4j.create(output.shape());
+		INDArray output = Nd4j.create(weight.getWeightShape());
 		for (int ch = 0; ch < numChannel; ch++) {
 			for (int r = 0; r < rows; r++) {
 				int or = r / poolRow;
 				for (int c = 0; c < cols; c++) {
 					int oc = c / poolCol;
+
 					value = input.getDouble(ch, r, c);
 					outValue = output.getDouble(ch, or, oc);
 					if (value > outValue) {
 						output.putScalar(new int[]{ch, or, oc}, value);
-						maskArray.putScalar(new int[]{ch, or, oc}, input.slice(ch).index(r, c));
+						weight.w.putScalar(new int[]{ch, or, oc}, input.slice(ch).index(r, c));
 					}
 				}
 			}
@@ -86,7 +92,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		for (int ch = 0; ch < numChannel; ch++) {
 			for (int or = 0; or < rows; or++) {
 				for (int oc = 0; oc < cols; oc++) {
-					propDelta.putScalar(maskArray.getInt(ch, or, oc),
+					propDelta.putScalar(weight.w.getInt(ch, or, oc),
 										error.getDouble(ch, or, oc));
 				}
 			}

@@ -26,7 +26,6 @@ public class PoolingLayerTest {
 
 		PoolingLayer poolingLayer = new PoolingLayer(dimIn, layerConf);
 		Weight weight = poolingLayer.createWeight(layerConf, dimIn);
-		int[] dimOut = poolingLayer.calculateOutputDimension(layerConf, dimIn);
 		INDArray output = poolingLayer.generateOutput(weight, input);
 
 		int channelIdx = 2;

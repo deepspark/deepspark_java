@@ -38,7 +38,7 @@ public class NeuralNetRunner {
         	System.out.println(String.format("%d(th) iteration...", i + 1));
 
             for (int j = 0; j < batchSize; j++) {
-                weightAccum.accumulate(net.train(data[Random.nextInt(50)]));
+                weightAccum.accumulate(net.train(data[Random.nextInt(dataSize)]));
             }
             net.updateWeight(weightAccum.getAverage());
             weightAccum.clear();

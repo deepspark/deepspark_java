@@ -2,7 +2,12 @@ package org.acl.deepspark.utils;
 
 import org.jblas.util.Random;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.NDArrayFactory;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.NDArrayIndex;
+import org.nd4j.linalg.jblas.NDArray;
+import org.nd4j.linalg.util.NDArrayMath;
+import org.nd4j.linalg.util.NDArrayUtil;
 
 /**
  * Created by Jaehong on 2015-07-29.
@@ -49,5 +54,11 @@ public class ArrayUtilsTest {
         System.out.println("full: " + full2);
 
         /** convolution test complete **/
+
+        double[] ii = new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+        INDArray aa = Nd4j.create(ii, new int[]{4, 4});
+        //System.out.println(ArrayUtils.subMatrix(aa, new int[]{1, 0}, new int[]{2, 2}));
+
+
     }
 }

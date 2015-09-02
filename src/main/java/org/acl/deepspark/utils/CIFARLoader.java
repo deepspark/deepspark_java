@@ -49,11 +49,11 @@ public class CIFARLoader implements Serializable {
 					for (int j = 0; j < featureVec[i].length; j++) {
 						value = (int) data[j]&0xff;
 						if (normalize)
-							featureVec[i][j] = (double) value / 256.0;
+							featureVec[i][j] = (double) (value - 127) / 128.0;
 						else
 							featureVec[i][j] = (double) value;
 					}
-					INDArray channelData = Nd4j.create(featureVec[i]).reshape(dimRows, dimRows).transpose();
+					INDArray channelData = Nd4j.create(featureVec[i]).reshape(dimRows, dimRows);
 					s.data.putSlice(i, channelData);
 				}
 				samples.add(s);
@@ -103,9 +103,9 @@ public class CIFARLoader implements Serializable {
 					in.read(data);
 					featureVec[i] = new double[dimRows * dimRows];
 					for (int j = 0; j < featureVec[i].length; j++) {
-						value = (int) data[j]&0xff;
+						value = (int) data[j] & 0xff;
 						if (normalize)
-							featureVec[i][j] = (double) value / 256.0;
+							featureVec[i][j] = (double) (value - 127) / 128.0;
 						else
 							featureVec[i][j] = (double) value;
 					}

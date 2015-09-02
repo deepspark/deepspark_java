@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.utils.ArrayUtils;
+import org.jblas.JavaBlas;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 

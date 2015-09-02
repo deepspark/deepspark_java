@@ -1,6 +1,7 @@
 package org.acl.deepspark.data;
 
 import org.jblas.DoubleMatrix;
+import org.jblas.exceptions.SizeException;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -14,7 +15,7 @@ public class Tensor implements Serializable {
     private DoubleMatrix[][] data;  // data = DoubleMatrix[kernels][channels]
 
     public enum init {
-        ZEROS, UNIFORM, GAUSSIAN
+        ZEROS, ONES, UNIFORM, GAUSSIAN
     }
 
     private Tensor() {
@@ -41,6 +42,10 @@ public class Tensor implements Serializable {
                         data[i][j] = DoubleMatrix.zeros(dimShape[2], dimShape[3]);
                         break;
 
+                    case ONES:
+                        data[i][j] = DoubleMatrix.ones(dimShape[2], dimShape[3]);
+                        break;
+
                     case UNIFORM:
                         data[i][j] = DoubleMatrix.rand(dimShape[2], dimShape[3]);
                         break;
@@ -57,9 +62,10 @@ public class Tensor implements Serializable {
         this(newDim);
         // TODO: assert sizeOf(newData) == sizeOf(newDim)
 
-        double[] subArr = new double[dimShape[2] * dimShape[3]];
+
         for (int i = 0; i < dimShape[0]; i++) {
             for (int j = 0; j < dimShape[1]; j++) {
+                double[] subArr = new double[dimShape[2] * dimShape[3]];
                 int startPos = i * dimShape[1] * subArr.length + j * subArr.length;
                 System.arraycopy(newData, startPos, subArr, 0, subArr.length);
                 data[i][j] = new DoubleMatrix(dimShape[2], dimShape[3], subArr);
@@ -75,6 +81,10 @@ public class Tensor implements Serializable {
         return new Tensor(init.ZEROS, shape);
     }
 
+    public static Tensor ones(int[] shape) {
+        return new Tensor(init.ONES, shape);
+    }
+
     public static Tensor rand(int[] shape) {
         return new Tensor(init.UNIFORM, shape);
     }
@@ -84,7 +94,7 @@ public class Tensor implements Serializable {
     }
 
     public Tensor add(Tensor t) {
-        assert Arrays.equals(dimShape, t.getShape());
+        assertSameLength(t);
 
         Tensor tensor = new Tensor(dimShape);
         for (int i = 0 ; i < dimShape[0]; i++) {
@@ -96,7 +106,7 @@ public class Tensor implements Serializable {
     }
 
     public Tensor addi(Tensor t) {
-        assert Arrays.equals(dimShape, t.getShape());
+        assertSameLength(t);
         for (int i = 0 ; i < dimShape[0]; i++) {
             for (int j = 0; j < dimShape[1]; j++) {
                 data[i][j].addi(t.data[i][j]);
@@ -106,7 +116,7 @@ public class Tensor implements Serializable {
     }
 
     public Tensor sub(Tensor t) {
-        assert Arrays.equals(dimShape, t.getShape());
+        assertSameLength(t);
 
         Tensor tensor = new Tensor(dimShape);
         for (int i = 0 ; i < dimShape[0]; i++) {
@@ -118,7 +128,7 @@ public class Tensor implements Serializable {
     }
 
     public Tensor subi(Tensor t) {
-        assert Arrays.equals(dimShape, t.getShape());
+        assertSameLength(t);
         for (int i = 0 ; i < dimShape[0]; i++) {
             for (int j = 0; j < dimShape[1]; j++) {
                 data[i][j].subi(t.data[i][j]);
@@ -175,8 +185,31 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
-    public int[] getShape() {
+    public int[] shape() {
         return dimShape;
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            builder.append(String.format("%d th kernels", i)).append("\n");
+            for (int j = 0; j < dimShape[1]; j++) {
+                builder.append(String.format("%d th channels", j)).append("\n");
+                builder.append(data[i][j].toString()).append("\n");
+            }
+        }
+        return builder.toString();
+    }
+
+    public boolean sameLength(Tensor t) {
+        return Arrays.equals(dimShape, t.shape());
+    }
+
+    public void assertSameLength(Tensor a) {
+        if (!sameLength(a)) {
+            throw new SizeException(String.format("Tensor must have same length (is: {%d,%d,%d,%d} and + {%d,%d,%d,%d})",
+                                                    dimShape[0], dimShape[1], dimShape[2], dimShape[3],
+                                                    a.dimShape[0], a.dimShape[1], a.dimShape[2], a.dimShape[3]));
+        }
+    }
 }

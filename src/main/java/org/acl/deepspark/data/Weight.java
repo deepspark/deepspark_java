@@ -93,26 +93,8 @@ public class Weight implements Serializable {
 		return new Weight(w.dup(), b.dup());
 	}
 
-	public void clear() {
-		if (w != null && b != null) {
-
-		}
-	}
-
-	// Matrix multiplication for weight x input
-	public static INDArray mmul(Weight weight, INDArray input) {
-		INDArray result = weight.w.mmul(input);
-		return result.addi(weight.b);
-	}
-
-	// Matrix multiplication for input x weight
-	public static INDArray mmul(INDArray input, Weight weight) {
-		INDArray result = input.mmul(weight.w);
-		return result.addi(weight.b);
-	}
-
 	public String toString() {
-		return String.format("weight: %s, bias: %s", w.toString(), b.toString());
+		return String.format("weight:\n%s\nbias:\n%s", w.toString(), b.toString());
 	}
 
 }

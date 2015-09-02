@@ -11,7 +11,7 @@ public class Sample implements Serializable {
 	 */
 	private static final long serialVersionUID = 258491956070013844L;
 	
-	public DoubleMatrix[] data;
-	public DoubleMatrix label;
+	public INDArray data;
+	public INDArray label;
 
 }

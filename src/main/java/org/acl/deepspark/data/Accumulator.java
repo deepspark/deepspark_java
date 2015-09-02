@@ -3,13 +3,11 @@ package org.acl.deepspark.data;
 import java.io.Serializable;
 
 public class Accumulator implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -948972344668801995L;
-	
-	public Weight[] gradWList;
+
 	private int count;
+	public Weight[] gradWList;
+
+	private static final long serialVersionUID = -948972344668801995L;
 	
 	public Accumulator(int numLayer) {
 		gradWList = new Weight[numLayer];

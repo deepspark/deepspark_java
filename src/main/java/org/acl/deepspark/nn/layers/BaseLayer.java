@@ -14,12 +14,11 @@ public abstract class BaseLayer implements Layer,Serializable {
 	 */
 	private static final long serialVersionUID = 2727430537685176806L;
 	protected int[] inputShape;
-	protected Activator activator;
+
 	
-	public BaseLayer(int[] shapes, LayerConf conf) {
+	public BaseLayer(int[] shapes) {
 		inputShape = new int[shapes.length];
 		inputShape = shapes.clone();
-		activator = ActivatorFactory.getActivator((ActivatorType) conf.get("activator"));
 	}
 	
 	public int[] getInputShape() {

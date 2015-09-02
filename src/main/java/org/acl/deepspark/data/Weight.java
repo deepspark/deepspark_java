@@ -11,8 +11,8 @@ public class Weight implements Serializable {
 	 */
 	private static final long serialVersionUID = -2016361466768395491L;
 	
-	public INDArray w;
-	public INDArray b;
+	public Tensor w;
+	public Tensor b;
 
 	public Weight() {
 
@@ -20,11 +20,11 @@ public class Weight implements Serializable {
 
 	public Weight(int weight[], int bias[]) {
 		// Weight initialization, weight: gaussian, bias: zero
-		w = Nd4j.zeros(weight);
-		b = Nd4j.zeros(bias);
+		w = Tensor.zeros(weight);
+		b = Tensor.zeros(bias);
 	}
 
-	public Weight(INDArray w, INDArray b) {
+	public Weight(Tensor w, Tensor b) {
 		this.w = w;
 		this.b = b;
 	}

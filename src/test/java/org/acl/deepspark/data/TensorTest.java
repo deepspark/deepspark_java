@@ -97,5 +97,6 @@ public class TensorTest {
         tensor.divi(2.0);
         System.out.println(tensor);
         // test complete
+
     }
 }

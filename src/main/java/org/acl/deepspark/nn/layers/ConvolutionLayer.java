@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
+import org.acl.deepspark.nn.functions.Activator;
+import org.acl.deepspark.nn.functions.ActivatorFactory;
+import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.utils.ArrayUtils;
 import org.jblas.JavaBlas;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -13,12 +16,14 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	private static final long serialVersionUID = 140807767171115076L;
 	private int numFilter;
 	private int dimRow,dimCol;
+	private Activator activator;
 
 	public ConvolutionLayer(int[] shape, LayerConf conf) {
-		super(shape, conf);
-		this.numFilter = (Integer) conf.get("numFilters");
-		this.dimRow = (Integer) conf.get("filterRow");
-		this.dimCol= (Integer) conf.get("filterCol");
+		super(shape);
+		numFilter = (Integer) conf.get("numFilters");
+		dimRow = (Integer) conf.get("filterRow");
+		dimCol= (Integer) conf.get("filterCol");
+		activator = ActivatorFactory.getActivator((ActivatorType) conf.get("activator"));
 	}
 
 		@Override

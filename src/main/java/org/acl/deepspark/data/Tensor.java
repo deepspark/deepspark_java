@@ -1,8 +1,6 @@
 package org.acl.deepspark.data;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.jblas.DoubleMatrix;
-import org.jblas.JavaBlas;
 import org.jblas.exceptions.SizeException;
 
 import java.io.Serializable;
@@ -62,8 +60,7 @@ public class Tensor implements Serializable {
 
     private Tensor(double[] newData, int[] newDim) {
         this(newDim);
-        // TODO: assert sizeOf(newData) == sizeOf(newDim)
-
+        assertMatchSize(newData, newDim);
 
         for (int i = 0; i < dimShape[0]; i++) {
             for (int j = 0; j < dimShape[1]; j++) {
@@ -73,6 +70,25 @@ public class Tensor implements Serializable {
                 data[i][j] = new DoubleMatrix(dimShape[2], dimShape[3], subArr);
             }
         }
+    }
+
+    public int[] shape() {
+        return dimShape;
+    }
+
+    public int length() {
+        int length = 1;
+        for (int dim : dimShape)
+            length *= dim;
+        return length;
+    }
+
+    public DoubleMatrix[] slice(int kernelIdx) {
+        return data[kernelIdx];
+    }
+
+    public DoubleMatrix slice(int kernelIdx, int channelIdx) {
+        return data[kernelIdx][channelIdx];
     }
 
     public static Tensor create(double[] newData, int[] newDim) {
@@ -187,8 +203,23 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
-    public int[] shape() {
-        return dimShape;
+    private void assertSameLength(Tensor a) {
+        if (!Arrays.equals(dimShape, a.shape())) {
+            throw new SizeException(String.format("Tensor must have same length (is: {%d,%d,%d,%d} and + {%d,%d,%d,%d})",
+                                                    dimShape[0], dimShape[1], dimShape[2], dimShape[3],
+                                                    a.dimShape[0], a.dimShape[1], a.dimShape[2], a.dimShape[3]));
+        }
+    }
+
+    private void assertMatchSize(double[] data, int[] shape) {
+        int length = 1;
+        for (int i = 0 ; i < shape.length; i++)
+            length *= shape[i];
+
+        if (data != null && data.length != length) {
+            throw new IllegalArgumentException(
+                    "Passed data must match matrix dimensions.");
+        }
     }
 
     public String toString() {
@@ -201,17 +232,5 @@ public class Tensor implements Serializable {
             }
         }
         return builder.toString();
-    }
-
-    public boolean sameLength(Tensor t) {
-        return Arrays.equals(dimShape, t.shape());
-    }
-
-    public void assertSameLength(Tensor a) {
-        if (!sameLength(a)) {
-            throw new SizeException(String.format("Tensor must have same length (is: {%d,%d,%d,%d} and + {%d,%d,%d,%d})",
-                                                    dimShape[0], dimShape[1], dimShape[2], dimShape[3],
-                                                    a.dimShape[0], a.dimShape[1], a.dimShape[2], a.dimShape[3]));
-        }
     }
 }

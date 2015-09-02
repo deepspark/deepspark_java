@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
+import org.acl.deepspark.nn.functions.Activator;
+import org.acl.deepspark.nn.functions.ActivatorFactory;
+import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.utils.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -13,14 +16,13 @@ import org.nd4j.linalg.factory.Nd4j;
 // Fully Connected HiddenLayer
 public class FullyConnectedLayer extends BaseLayer implements Serializable {
 
-	public FullyConnectedLayer(int[] inputShape, LayerConf conf) {
-		super(inputShape, conf);
-	}
-
-	/**
-	 * 
-	 */
+	private Activator activator;
 	private static final long serialVersionUID = 2662945560065918864L;
+
+	public FullyConnectedLayer(int[] inputShape, LayerConf conf) {
+		super(inputShape);
+		activator = ActivatorFactory.getActivator((ActivatorType) conf.get("activator"));
+	}
 
 	@Override
 	public INDArray generateOutput(Weight weight, INDArray input) {

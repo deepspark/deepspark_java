@@ -81,7 +81,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	public Weight gradient(INDArray input, INDArray error) {
 		return null;
 	}
-
+/*
 	@Override
 	public INDArray calculateBackprop(Weight weight, INDArray error) {
 		INDArray propDelta = Nd4j.create(getInputShape());
@@ -135,4 +135,5 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 			
 		return propDelta;
 	}
+*/
 }

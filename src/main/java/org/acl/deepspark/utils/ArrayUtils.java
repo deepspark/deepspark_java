@@ -1,5 +1,6 @@
 package org.acl.deepspark.utils;
 
+import org.acl.deepspark.data.Tensor;
 import org.jblas.DoubleMatrix;
 import org.jblas.SimpleBlas;
 import org.jblas.ranges.RangeUtils;
@@ -21,6 +22,10 @@ public class ArrayUtils {
     public static INDArray makeColumnVector(INDArray data) {
 		INDArray d = data.dup();
 		return d.reshape(data.length(), 1);
+	}
+
+	public static Tensor makeRowVector(Tensor data) {
+		return data.reshape(data.length());
 	}
     
     public static INDArray rot90(INDArray toRotate) {
@@ -98,10 +103,11 @@ public class ArrayUtils {
 	}
 
 	public static DoubleMatrix flip(DoubleMatrix d) {
-		for(int k = 0; k < d.getRows() / 2 ; k++)
-			d.swapRows(k, d.getRows() - 1 -k);
-		for(int k = 0; k < d.getColumns() / 2 ; k++)
-			d.swapColumns(k, d.getColumns() - 1 -k);
-		return d;
+		DoubleMatrix output = d.dup();
+		for(int k = 0; k < output.getRows() / 2 ; k++)
+			output.swapRows(k, output.getRows() - 1 -k);
+		for(int k = 0; k < output.getColumns() / 2 ; k++)
+			output.swapColumns(k, output.getColumns() - 1 -k);
+		return output;
 	}
 }

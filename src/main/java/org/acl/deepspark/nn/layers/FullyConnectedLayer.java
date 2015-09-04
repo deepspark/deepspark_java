@@ -2,15 +2,13 @@ package org.acl.deepspark.nn.layers;
 
 import java.io.Serializable;
 
+import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.functions.ActivatorFactory;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.utils.ArrayUtils;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-
 
 
 // Fully Connected HiddenLayer
@@ -21,25 +19,24 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 
 	public FullyConnectedLayer(int[] inputShape, LayerConf conf) {
 		super(inputShape);
-		activator = ActivatorFactory.getActivator((ActivatorType) conf.get("activator"));
+		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
 	}
 
 	@Override
-	public INDArray generateOutput(Weight weight, INDArray input) {
-		INDArray data = ArrayUtils.makeColumnVector(input);
-//		System.out.println("fullyconn output");
-//		System.out.println(weight.w.mmul(data));
+	public Tensor generateOutput(Weight weight, Tensor input) {
+
+		Tensor data = ArrayUtils.makeRowVector(input);
 		return weight.w.mmul(data).addi(weight.b);
 	}
 
 	@Override
-	public INDArray deriveDelta(INDArray output, INDArray error) {
-		return error.mul(activator.derivative(output,true));
+	public Tensor deriveDelta(Tensor activated, Tensor error) {
+		return error.mul(activator.derivative(activated));
 	}
 
 	@Override
-	public Weight gradient(INDArray input,INDArray error) {
-		INDArray data = ArrayUtils.makeColumnVector(input);
+	public Weight gradient(Tensor input,Tensor error) {
+		Tensor data = ArrayUtils.makeRowVector(input);
 		Weight w = new Weight();
 		w.w = error.mmul(data.transpose());
 		w.b = error;
@@ -54,13 +51,13 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 			dimIn *= input[i];
 
 		Weight w= new Weight();
-		w.w = Nd4j.randn(dimOut, dimIn).mul(Math.sqrt(2.0/dimIn));
-		w.b = Nd4j.zeros(dimOut, 1);
+		w.w = Tensor.randn(dimOut, dimIn).mul(Math.sqrt(2.0/dimIn));
+		w.b = Tensor.zeros(dimOut);
 		return w;
 	}
 
 	@Override
-	public INDArray activate(INDArray output) {
+	public Tensor activate(Tensor output) {
 		return activator.output(output);
 	}
 
@@ -73,11 +70,11 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	}
 
 	@Override
-	public INDArray calculateBackprop(Weight weight, INDArray delta) {
-		INDArray data = weight.w.transpose().mmul(delta);
+	public Tensor calculateBackprop(Weight weight, Tensor delta) {
+		Tensor data = weight.w.transpose().mmul(delta);
 		return data.reshape(getInputShape());
 	}
-
+/*
 	@Override
 	public INDArray generateOutputBatch(Weight weight, INDArray input) {
 		int numSample = input.shape()[0];
@@ -107,7 +104,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 		/*
 		 * delta = sample x output
 		 * data = sample x feature
-		 */
+		 *
 		for(int i = 0; i < numSample; i++) {
 			data.putSlice(i, input.slice(i).reshape(inputLength));
 			delta.putSlice(i, error.slice(i).reshape(errorLength));
@@ -117,7 +114,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 		/*
 		 * data = feature x sample
 		 * w = output x feature
-		 */
+		 *
  		
 		Weight w = new Weight();
 		w.w = data.mul(delta).transposei().div(numSample);  // output x feature
@@ -146,4 +143,5 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 		// data = sample x (input dim)
 		return data.reshape(dim);
 	}
+*/
 }

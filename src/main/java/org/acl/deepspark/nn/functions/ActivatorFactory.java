@@ -7,7 +7,7 @@ import org.jblas.MatrixFunctions;
 import java.io.Serializable;
 
 public class ActivatorFactory implements Serializable {
-	public static Activator getActivator(ActivatorType t) {
+	public static Activator get(ActivatorType t) {
 		switch(t) {
 			case SIGMOID:
 				return new Activator() {

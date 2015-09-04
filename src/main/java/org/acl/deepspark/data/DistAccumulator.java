@@ -9,7 +9,7 @@ public class DistAccumulator implements AccumulatorParam<Weight[]> {
 
     @Override
     public Weight[] addAccumulator(Weight[] current, Weight[] param) {
-        if (current.length != param.length)
+        if (param != null && current.length != param.length)
             throw new IllegalArgumentException(String.format
                     ("Number of layers mismatch; current %d, param %d", current.length, param.length));
 
@@ -24,7 +24,7 @@ public class DistAccumulator implements AccumulatorParam<Weight[]> {
 
     @Override
     public Weight[] addInPlace(Weight[] current, Weight[] param) {
-        if (current.length != param.length)
+        if (param != null && current.length != param.length)
             throw new IllegalArgumentException(String.format
                     ("Number of layers mismatch; current %d, param %d", current.length, param.length));
 

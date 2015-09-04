@@ -169,10 +169,33 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
+    public Tensor mul(Tensor t) {
+        assertSameLength(t);
+
+        Tensor tensor = new Tensor(dimShape);
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                tensor.data[i][j] = data[i][j].mul(t.data[i][j]);
+            }
+        }
+        return tensor;
+    }
+
     public Tensor muli(double d) {
         for (int i = 0 ; i < dimShape[0]; i++) {
             for (int j = 0; j < dimShape[1]; j++) {
                 data[i][j].muli(d);
+            }
+        }
+        return this;
+    }
+
+    public Tensor muli(Tensor t) {
+        assertSameLength(t);
+
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                data[i][j].muli(t.data[i][j]);
             }
         }
         return this;
@@ -188,10 +211,32 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
+    public Tensor div(Tensor t) {
+        assertSameLength(t);
+
+        Tensor tensor = new Tensor(dimShape);
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                tensor.data[i][j] = data[i][j].div(t.data[i][j]);
+            }
+        }
+        return tensor;
+    }
+
     public Tensor divi(double d) {
         for (int i = 0 ; i < dimShape[0]; i++) {
             for (int j = 0; j < dimShape[1]; j++) {
                 data[i][j].divi(d);
+            }
+        }
+        return this;
+    }
+
+    public Tensor divi(Tensor t) {
+        assertSameLength(t);
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                data[i][j].divi(t.data[i][j]);
             }
         }
         return this;
@@ -205,6 +250,34 @@ public class Tensor implements Serializable {
             }
         }
         return tensor;
+    }
+
+    public Tensor transpose() {
+        Tensor t = new Tensor(dimShape);
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                t.data[i][j] = data[i][j].transpose();
+            }
+        }
+        return t;
+    }
+
+    public double[] toArray() {
+        double[] arr = new double[length()];
+        int channels = dimShape[1];
+        int matSize = dimShape[2]*dimShape[3];       // row x col
+
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                int startPos = i*channels*matSize + j*matSize;
+                System.arraycopy(data[i][j].data, 0, arr, startPos, matSize);
+            }
+        }
+        return arr;
+    }
+
+    public Tensor reshape(int... shape) {
+        return Tensor.create(toArray(), shape);
     }
 
     private void assertSameLength(Tensor a) {
@@ -224,6 +297,10 @@ public class Tensor implements Serializable {
             throw new IllegalArgumentException(
                     "Passed data must match shape dimensions.");
         }
+    }
+
+    private void assertMultipliable(Tensor t) {
+
     }
 
     public String toString() {

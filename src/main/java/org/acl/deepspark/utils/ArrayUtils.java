@@ -1,5 +1,8 @@
 package org.acl.deepspark.utils;
 
+import org.jblas.DoubleMatrix;
+import org.jblas.SimpleBlas;
+import org.jblas.ranges.RangeUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.NDArrayFactory;
 import org.nd4j.linalg.factory.Nd4j;
@@ -54,66 +57,51 @@ public class ArrayUtils {
     	return maxIdx;
     }
 
-	// 2D
-	public static INDArray subMatrix(INDArray arr, int[] offset, int[] shape) {
-		assert offset.length == shape.length;
-		INDArrayIndex[] sub = new INDArrayIndex[shape.length];
-		for(int i = 0; i < sub.length; i++) {
-			sub[i] = NDArrayIndex.interval(offset[i], shape[i], false);
-		}
-
-		//arr.get(NDArrayIndex.createCoveringShape())
-		return null;
-	}
-
-
-    
-    public static INDArray convolution(INDArray data, INDArray filter, int option) {
-		INDArray result;
-		INDArray input;
-
+    public static DoubleMatrix convolution(DoubleMatrix data, DoubleMatrix filter, int option) {
+		DoubleMatrix result;
+		DoubleMatrix input;
 
 		int nCols, nRows;
 		switch(option) {
 			case FULL_CONV:
-				nRows = data.rows() + filter.rows() -1;
-				nCols = data.columns() + filter.columns() -1;
-				input = Nd4j.zeros(nRows+ filter.rows() -1, nCols + filter.columns() - 1);
-				for (int i = 0; i < data.rows(); i++) {
-					for (int j = 0; j < data.columns(); j++) {
-						input.put(filter.rows() - 1 + i, filter.columns() -1 + j, data.getDouble(i, j));
-					}
-				}
+				nRows = data.rows + filter.rows -1;
+				nCols = data.columns + filter.columns -1;
+				input = DoubleMatrix.zeros(nRows+ filter.rows - 1, nCols + filter.columns - 1);
+				input.put(RangeUtils.interval(filter.rows - 1, filter.rows + data.rows - 1),
+						  RangeUtils.interval(filter.columns - 1, filter.columns + data.columns - 1), data);
+
 				break;
 			case SAME_CONV:
-				nRows = data.rows();
-				nCols = data.columns();
-				input = Nd4j.zeros(nRows+ filter.rows() - 1, nCols + filter.columns() - 1);
-				input.put(new INDArrayIndex[] {NDArrayIndex.interval(filter.rows() / 2, filter.rows() / 2 + data.rows()),
-						NDArrayIndex.interval(filter.columns() / 2, filter.columns() /2  + data.columns())},
-						data);
+				nRows = data.getRows();
+				nCols = data.getColumns();
+				input = DoubleMatrix.zeros(nRows+ filter.rows - 1 , nCols + filter.columns - 1);
+				input.put(RangeUtils.interval(filter.rows / 2, filter.rows / 2 + data.rows),
+						RangeUtils.interval(filter.columns / 2, filter.columns /2  + data.columns), data);
 				break;
 			case VALID_CONV:
-				nRows = data.rows() - filter.rows() + 1;
-				nCols = data.columns() - filter.columns() + 1;
+				nRows = data.rows - filter.rows + 1;
+				nCols = data.columns - filter.columns + 1;
 				input = data;
 				break;
 			default:
 				return null;
 		}
-
-		result = Nd4j.zeros(nRows, nCols);
+		result = DoubleMatrix.zeros(nRows, nCols);
 		for(int r = 0; r < nRows ; r++) {
 			for(int c = 0 ; c < nCols ; c++) {
-				double sum = 0;
-				for(int i = 0; i < filter.rows(); i++) {
-					for(int j = 0; j < filter.columns();j++) {
-						sum += input.getDouble(r+i, c+j) * filter.getDouble(i,j);
-					}
-				}
-				result.put(r,c, sum);
+				result.put(r,c,
+						SimpleBlas.dot(input.get(RangeUtils.interval(r, r + filter.getRows()),
+								RangeUtils.interval(c, c + filter.getColumns())), filter));
 			}
 		}
 		return result;
+	}
+
+	public static DoubleMatrix flip(DoubleMatrix d) {
+		for(int k = 0; k < d.getRows() / 2 ; k++)
+			d.swapRows(k, d.getRows() - 1 -k);
+		for(int k = 0; k < d.getColumns() / 2 ; k++)
+			d.swapColumns(k, d.getColumns() - 1 -k);
+		return d;
 	}
 }

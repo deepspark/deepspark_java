@@ -65,11 +65,15 @@ public class Tensor implements Serializable {
         for (int i = 0; i < dimShape[0]; i++) {
             for (int j = 0; j < dimShape[1]; j++) {
                 double[] subArr = new double[dimShape[2] * dimShape[3]];
-                int startPos = i * dimShape[1] * subArr.length + j * subArr.length;
+                int startPos = i*dimShape[1]*subArr.length + j*subArr.length;
                 System.arraycopy(newData, startPos, subArr, 0, subArr.length);
                 data[i][j] = new DoubleMatrix(dimShape[2], dimShape[3], subArr);
             }
         }
+    }
+
+    public DoubleMatrix[][] data() {
+        return data;
     }
 
     public int[] shape() {
@@ -95,19 +99,19 @@ public class Tensor implements Serializable {
         return new Tensor(newData, newDim);
     }
 
-    public static Tensor zeros(int[] shape) {
+    public static Tensor zeros(int... shape) {
         return new Tensor(init.ZEROS, shape);
     }
 
-    public static Tensor ones(int[] shape) {
+    public static Tensor ones(int... shape) {
         return new Tensor(init.ONES, shape);
     }
 
-    public static Tensor rand(int[] shape) {
+    public static Tensor rand(int... shape) {
         return new Tensor(init.UNIFORM, shape);
     }
 
-    public static Tensor randn(int[] shape) {
+    public static Tensor randn(int... shape) {
         return new Tensor(init.GAUSSIAN, shape);
     }
 
@@ -218,7 +222,7 @@ public class Tensor implements Serializable {
 
         if (data != null && data.length != length) {
             throw new IllegalArgumentException(
-                    "Passed data must match matrix dimensions.");
+                    "Passed data must match shape dimensions.");
         }
     }
 

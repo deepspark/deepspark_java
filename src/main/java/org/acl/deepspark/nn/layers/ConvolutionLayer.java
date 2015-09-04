@@ -2,6 +2,7 @@ package org.acl.deepspark.nn.layers;
 
 import java.io.Serializable;
 
+import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.Activator;
@@ -13,10 +14,10 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 public class ConvolutionLayer extends BaseLayer implements Serializable {
-	private static final long serialVersionUID = 140807767171115076L;
 	private int numFilter;
 	private int dimRow,dimCol;
 	private Activator activator;
+	private static final long serialVersionUID = 140807767171115076L;
 
 	public ConvolutionLayer(int[] shape, LayerConf conf) {
 		super(shape);
@@ -28,84 +29,80 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 		@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
-		// weight - 4D ( channel, filter, x, y )
-		// bias - 2D ( channel, filter )
+		// weight - 4D ( kernels, channels, x, y )
+		// bias - 1D ( filter )
 		// input - 3D ( channel, x, y)
 		Weight w = new Weight();
 		int[] dimW = new int[4];
-		dimW[0] = input[0];
-		dimW[1] = (Integer) conf.get("numFilters");
-		dimW[2] = (Integer) conf.get("filterRow"); // x
-		dimW[3] = (Integer) conf.get("filterCol"); // y
+		dimW[0] = numFilter;
+		dimW[1] = input[0];
+		dimW[2] = dimRow; // x
+		dimW[3] = dimCol; // y
 
 		double f_in = 1.0;
 		for (int i = 0 ; i < dimW.length; i++) {
 			f_in *= dimW[i];
 		}
-		w.w = Nd4j.randn(dimW).muli(Math.sqrt(2.0/f_in));
-		w.b = Nd4j.zeros(1, dimW[1]);//.muli(0.01);
+
+		w.w = Tensor.randn(dimW).muli(0.1);//.muli(Math.sqrt(2.0/f_in));
+		w.b = Tensor.zeros(dimW[0]);
 
 		return w;
 	}
 
 	@Override
-	public INDArray generateOutput(Weight weight, INDArray input) {
+	public Tensor generateOutput(Weight weight, Tensor input) {
 
-		int[] dim = new int[3];
-		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
-		int[] kernelDim = weight.getWeightShape(); // 0: # of channel, 1: # of filter, 2: x, 3: y;
-		
-		int numChannels = kernelDim[0];
-		int numFilters = kernelDim[1];
-		
-		dim[0] = numFilters;
-		dim[1] = inputDim[1] - kernelDim[2] + 1;
-		dim[2] = inputDim[2] - kernelDim[3] + 1;
-		
-		INDArray output = Nd4j.zeros(dim);
+		int[] inputDim = getInputShape(); // 0: # of kernels(1), 1: # of channel, 2: x, 3: y;
+		int[] kernelDim = weight.getWeightShape(); // 0: # of kernels, 1: # of channel, 2: x, 3: y;
+
+		int outputX = inputDim[2] - kernelDim[2] + 1;
+		int outputY = inputDim[3] - kernelDim[3] + 1;
+		Tensor output = Tensor.zeros(kernelDim[0], outputX, outputY);
 		
 		// TODO: check dims(image) > dims(filter)
-		for(int i = 0; i < numFilters; i++) {
-			for(int j = 0; j < numChannels; j++)
-				output.slice(i).addi(ArrayUtils.convolution(input.slice(j), weight.w.slice(j).slice(i), ArrayUtils.VALID_CONV)); // valid conv
-			output.slice(i).addi(weight.b.getScalar(i));
+		for (int i = 0; i < kernelDim[0]; i++) {
+			for (int j = 0; j < kernelDim[1]; j++) {
+				output.slice(0, i).addi(ArrayUtils.convolution(input.slice(0, j), weight.w.slice(i, j), ArrayUtils.VALID_CONV)); // valid conv
+			}
+			output.slice(0, i).addi(weight.b.slice(0, 0).get(i));
 		}
 		return output;
 	}
 
 	@Override
-	public Weight gradient(INDArray input, INDArray error) {
+	public Weight gradient(Tensor input, Tensor error) {
 		int[] dim = new int[4];
 		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
 		
-		// 0: # of channel, 1: # of filter, 2: x, 3: y;
-		dim[0] = inputDim[0];
-		dim[1] = numFilter; 
+		// 0: # of filters, 1: # of channels, 2: x, 3: y;
+		dim[0] = numFilter;
+		dim[1] = inputDim[0];
 		dim[2] = dimRow;
 		dim[3] = dimCol;
 
-		error = error.reshape(numFilter, inputDim[1] - dimRow + 1, inputDim[2] - dimCol + 1);
+		//error = error.reshape(numFilter, inputDim[1] - dimRow + 1, inputDim[2] - dimCol + 1);
 		
 		Weight w = new Weight();
-		w.w = Nd4j.zeros(dim);
-		w.b = Nd4j.zeros(1, numFilter);
+		w.w = Tensor.zeros(dim);
+		w.b = Tensor.zeros(numFilter);
 		
 		//bias
 		for(int j = 0; j < numFilter; j++) {
-			w.b.put(j, Nd4j.sum(error.slice(j)));
+			w.b.slice(0, 0).put(j, error.slice(0, j).sum());
 		}
 		
 		//weight
-		for(int i = 0; i < inputDim[0]; i++) {
-			for (int j = 0; j < numFilter; j++) {
-				w.w.slice(i).slice(j).addi(ArrayUtils.convolution(input.slice(i), error.slice(j), ArrayUtils.VALID_CONV)); // valid conv
+		for(int i = 0; i < numFilter; i++) {
+			for (int j = 0; j < inputDim[0]; j++) {
+				w.w.slice(i,j).addi(ArrayUtils.convolution(input.slice(0, j), error.slice(0, i), ArrayUtils.VALID_CONV)); // valid conv
 			}
 		}
 		return w;
 	}
 
 	@Override
-	public INDArray activate(INDArray output) {
+	public Tensor activate(Tensor output) {
 		return activator.output(output);
 	}
 

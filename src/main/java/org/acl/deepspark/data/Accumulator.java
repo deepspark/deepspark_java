@@ -15,7 +15,7 @@ public class Accumulator implements Serializable {
 	}
 
 	public void accumulate(Weight[] weights) {
-		if (gradWList.length != weights.length)
+		if (weights != null && weights.length != gradWList.length)
 			throw new IllegalArgumentException(String.format
 					("Number of layers mismatch; current %d, param %d", gradWList.length, weights.length));
 

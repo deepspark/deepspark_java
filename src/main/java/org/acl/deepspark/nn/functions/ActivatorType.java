@@ -1,5 +1,5 @@
 package org.acl.deepspark.nn.functions;
 
 public enum ActivatorType {
-	SIGMOID, RECTIFIED_LINEAR, SOFTMAX, NONE
+	SIGMOID, RECTIFIED_LINEAR, SOFTMAX, TANH, NONE
 }

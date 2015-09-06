@@ -2,10 +2,12 @@ package org.acl.deepspark.nn.layers;
 
 import java.io.Serializable;
 
+import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.utils.ArrayUtils;
 import org.jblas.DoubleMatrix;
+import org.jblas.SimpleBlas;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.factory.Nd4jBackend;
@@ -21,45 +23,47 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	private int strides;
 
 	public PoolingLayer(int[] inputShape, LayerConf conf) {
-		super(inputShape, conf);
+		super(inputShape);
 		this.poolRow = (Integer) conf.get("poolRow");
 		this.poolCol = (Integer) conf.get("poolCol");
+
 	}
 
 	@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
 		Weight weight = new Weight();
-		weight.w = Nd4j.zeros(calculateOutputDimension(conf, input));
-		weight.b = Nd4j.zeros(1);
+		weight.w = Tensor.zeros(calculateOutputDimension());
+		weight.b = Tensor.zeros(1);
 		return weight;
 	}
 
 	@Override
-	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
-		return new int[] {input[0], (input[1]-poolRow)/strides + 1, (input[2]-poolCol)/strides + 1};
+	public int[] calculateOutputDimension() {
+		int[] dimIn = getInputShape();
+		return new int[] {dimIn[0], (dimIn[1]-poolRow)/strides + 1, (dimIn[2]-poolCol)/strides + 1};
 	}
 
 	@Override
-	public INDArray generateOutput(Weight weight, INDArray input) {
-		int numChannel = input.size(0);
-		int rows = input.size(1);
-		int cols = input.size(2);
+	public Tensor generateOutput(Weight weight, Tensor input) {
+		int[] dimIn = input.shape();
 
 		double value;
 		double outValue;
 
-		INDArray output = Nd4j.create(weight.getWeightShape());
-		for (int ch = 0; ch < numChannel; ch++) {
-			for (int r = 0; r < rows; r++) {
-				int or = r / poolRow;
-				for (int c = 0; c < cols; c++) {
-					int oc = c / poolCol;
+		Tensor output = Tensor.ones(calculateOutputDimension()).mul(Double.MAX_VALUE * -1);
+		for (int k = 0; k < dimIn[0]; k++) {
+			for (int ch = 0; ch < dimIn[1]; ch++) {
+				for (int r = 0; r < dimIn[2]; r++) {
+					int or = r / poolRow;
+					for (int c = 0; c < dimIn[3]; c++) {
+						int oc = c / poolCol;
 
-					value = input.getDouble(ch, r, c);
-					outValue = output.getDouble(ch, or, oc);
-					if (value > outValue) {
-						output.putScalar(new int[]{ch, or, oc}, value);
-						weight.w.putScalar(new int[]{ch, or, oc}, input.slice(ch).index(r, c));
+						value = input.slice(k, ch).get(r, c);
+						outValue = output.slice(k, ch).get(or, oc);
+						if (value > outValue) {
+							output.slice(k, ch).put(new int[]{or, oc}, value);
+							weight.w.slice(k, ch).put(new int[]{or, oc}, input.slice(k,ch).index(r,c));
+						}
 					}
 				}
 			}
@@ -68,38 +72,36 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	}
 
 	@Override
-	public INDArray activate(INDArray output) {
+	public Tensor activate(Tensor output) {
 		return output;
 	}
 
 	@Override
-	public INDArray deriveDelta(INDArray output, INDArray error) {
+	public Tensor deriveDelta(Tensor output, Tensor error) {
 		return error;
 	}
 
 	@Override
-	public Weight gradient(INDArray input, INDArray error) {
+	public Weight gradient(Tensor input, Tensor error) {
 		return null;
 	}
-/*
-	@Override
-	public INDArray calculateBackprop(Weight weight, INDArray error) {
-		INDArray propDelta = Nd4j.create(getInputShape());
-		int numChannel = propDelta.size(0);
-		int rows = error.size(1);
-		int cols = error.size(2);
 
-		for (int ch = 0; ch < numChannel; ch++) {
-			for (int or = 0; or < rows; or++) {
-				for (int oc = 0; oc < cols; oc++) {
-					propDelta.putScalar(weight.w.getInt(ch, or, oc),
-										error.getDouble(ch, or, oc));
+	@Override
+	public Tensor calculateBackprop(Weight weight, Tensor error) {
+		Tensor propDelta = Tensor.zeros(getInputShape());
+		int[] dimOut = calculateOutputDimension();
+
+		for (int ch = 0; ch < dimOut[0]; ch++) {
+			for (int or = 0; or < dimOut[1]; or++) {
+				for (int oc = 0; oc < dimOut[2]; oc++) {
+					propDelta.slice(0, ch).put((int) weight.w.slice(0, ch).get(or, oc),
+											   	error.slice(0, ch).get(or, oc));
 				}
 			}
 		}
 		return propDelta;
 	}
-
+/*
 	@Override
 	public INDArray generateOutputBatch(Weight weight, INDArray input) {
 		// TODO Auto-generated method stub

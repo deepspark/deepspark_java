@@ -13,12 +13,13 @@ import org.acl.deepspark.utils.ArrayUtils;
 
 // Fully Connected HiddenLayer
 public class FullyConnectedLayer extends BaseLayer implements Serializable {
-
-	private Activator activator;
+	private int 		numOut;
+	private Activator 	activator;
 	private static final long serialVersionUID = 2662945560065918864L;
 
 	public FullyConnectedLayer(int[] inputShape, LayerConf conf) {
 		super(inputShape);
+		numOut = (Integer) conf.get("numNodes");
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
 	}
 
@@ -26,7 +27,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	public Tensor generateOutput(Weight weight, Tensor input) {
 
 		Tensor data = ArrayUtils.makeRowVector(input);
-		return weight.w.mmul(data).addi(weight.b);
+		return data.mmul(weight.w).addi(weight.b);
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	public Weight gradient(Tensor input,Tensor error) {
 		Tensor data = ArrayUtils.makeRowVector(input);
 		Weight w = new Weight();
-		w.w = error.mmul(data.transpose());
+		w.w = data.transpose().mmul(error);
 		w.b = error;
 		return w;
 	}
@@ -51,7 +52,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 			dimIn *= input[i];
 
 		Weight w= new Weight();
-		w.w = Tensor.randn(dimOut, dimIn).mul(Math.sqrt(2.0/dimIn));
+		w.w = Tensor.randn(dimIn, dimOut).mul(Math.sqrt(2.0/dimIn));
 		w.b = Tensor.zeros(dimOut);
 		return w;
 	}
@@ -62,16 +63,13 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	}
 
 	@Override
-	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
-		int[] ret = new int[2];
-		ret[0] = (Integer) conf.get("numNodes");
-		ret[1] = 1;
-		return ret;
+	public int[] calculateOutputDimension() {
+		return new int[] { numOut };
 	}
 
 	@Override
 	public Tensor calculateBackprop(Weight weight, Tensor delta) {
-		Tensor data = weight.w.transpose().mmul(delta);
+		Tensor data = weight.w.mmul(delta.transpose());
 		return data.reshape(getInputShape());
 	}
 /*

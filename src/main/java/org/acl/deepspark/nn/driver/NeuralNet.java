@@ -1,6 +1,7 @@
 package org.acl.deepspark.nn.driver;
 
 import org.acl.deepspark.data.Sample;
+import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
@@ -60,7 +61,7 @@ public class NeuralNet implements Serializable {
                     break;
             }
             weights[i] = layers[i].createWeight(layerConf, dimIn);
-            dimIn = layers[i].calculateOutputDimension(layerConf, dimIn);
+            dimIn = layers[i].calculateOutputDimension();
             if (weights[i] != null)
                 weightUpdates[i] = new Weight(weights[i].getWeightShape(), weights[i].getBiasShape());
         }
@@ -80,8 +81,8 @@ public class NeuralNet implements Serializable {
 
     public Weight[] train(Sample in) throws Exception {
         Weight[] gradient = new Weight[layers.length];
-        INDArray[] output = new INDArray[layers.length];
-        INDArray[] activated = new INDArray[layers.length + 1];
+        Tensor[] output = new Tensor[layers.length];
+        Tensor[] activated = new Tensor[layers.length + 1];
         activated[0] = in.data;
 
         for (int i = 0; i < layers.length; i++) {
@@ -89,8 +90,8 @@ public class NeuralNet implements Serializable {
             activated[i+1] = layers[i].activate(output[i]);
         }
 
-        INDArray delta = activated[layers.length].sub(in.label);
-        System.out.println(Nd4j.sum(delta.mul(delta)));
+        Tensor delta = activated[layers.length].sub(in.label);
+        System.out.println(delta.mul(delta).sum());
         
         for (int i = layers.length-1; i >= 0; i--) {
             delta = layers[i].deriveDelta(activated[i+1], delta);
@@ -102,10 +103,10 @@ public class NeuralNet implements Serializable {
         return gradient;
     }
 
-    public INDArray predict(Sample in) {
-        INDArray activatedOut = in.data;
+    public Tensor predict(Sample in) {
+        Tensor activatedOut = in.data;
         for (int i = 0; i < layers.length; i++) {
-            INDArray output = layers[i].generateOutput(weights[i], activatedOut);
+            Tensor output = layers[i].generateOutput(weights[i], activatedOut);
             activatedOut = layers[i].activate(output);
         }
         return activatedOut;

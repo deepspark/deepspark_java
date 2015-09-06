@@ -1,5 +1,7 @@
 package org.acl.deepspark.utils;
 
+import org.acl.deepspark.data.Tensor;
+import org.jblas.DoubleMatrix;
 import org.jblas.util.Random;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.NDArrayFactory;
@@ -15,24 +17,25 @@ import org.nd4j.linalg.util.NDArrayUtil;
 public class ArrayUtilsTest {
     public static void main(String[] args) {
         double[] input_a = new double[]{1, 2, -2, 4, -2, 6, 3, -1, 11};
-        INDArray a = Nd4j.create(input_a, new int[]{3, 3});
+        Tensor a = Tensor.create(input_a, new int[]{3, 3});
         double[] input_b = new double[]{-1, 6, 2, 8, 1, 1, 1, 2, 0};
-        INDArray b = Nd4j.create(input_b, new int[]{3, 3});
+        Tensor b = Tensor.create(input_b, new int[]{3, 3});
         double[] input_c = new double[]{1, 0, -2, 3};
-        INDArray c = Nd4j.create(input_c, new int[]{2, 2});
+        Tensor c = Tensor.create(input_c, new int[]{2, 2});
 
-        INDArray valid1 = ArrayUtils.convolution(a, b, ArrayUtils.VALID_CONV);
-        INDArray full1 = ArrayUtils.convolution(a, b, ArrayUtils.FULL_CONV);
+        DoubleMatrix valid1 = ArrayUtils.convolution(a.slice(0,0), b.slice(0,0), ArrayUtils.VALID_CONV);
+        DoubleMatrix full1 = ArrayUtils.convolution(a.slice(0,0), b.slice(0,0), ArrayUtils.FULL_CONV);
 
-        INDArray valid2 = ArrayUtils.convolution(a, c, ArrayUtils.VALID_CONV);
-        INDArray full2 = ArrayUtils.convolution(a, c, ArrayUtils.FULL_CONV);
+        DoubleMatrix valid2 = ArrayUtils.convolution(a.slice(0,0), c.slice(0,0), ArrayUtils.VALID_CONV);
+        DoubleMatrix full2 = ArrayUtils.convolution(a.slice(0,0), c.slice(0,0), ArrayUtils.FULL_CONV);
 
         /*
          * valid: 44.0
-			full: [[0.0, 1.0, 6.0, 11.0, 6.0]
-			 [2.0, 11.0, 18.0, 22.0, 16.0]
-			  ,[5.0, 8.0, 44.0, 30.0, 13.0]
-			 ]
+			full: [0.0, 1.0, 6.0, 11.0, 6.0]
+			      [2.0, 11.0, 18.0, 22.0, 16.0]
+			      [5.0, 8.0, 44.0, 30.0, 13.0]
+			      [-2.0, 24.0, -3.0, 41.0, 67.0]
+			      [-2.0, -10.0, 61.0, 82.0, -11.0]
          */
         
         System.out.println("input_a: " + a);
@@ -41,12 +44,12 @@ public class ArrayUtilsTest {
         System.out.println("full: " + full1);
 
         /*
-          	valid: [[-13.0, -5.0]
- 					[24.0, 33.0]]
-        	full: [[3.0, 12.0, 9.0, 0.0]
-        		 [4.0, -13.0, -5.0, 3.0]
-        		  ,[-10.0, 24.0, 33.0, -1.0]
-        		 ]
+          	valid:  [-13.0, -5.0]
+ 				    [24.0, 33.0]]
+        	full:   [3.0, 12.0, 9.0, 0.0]
+        		    [4.0, -13.0, -5.0, 3.0]
+        		    [-10.0, 24.0, 33.0, -1.0]
+        		    [4.0, -14.0, -16.0, 11.0]
 		 */
         System.out.println("input_a: " + a);
         System.out.println("input_c: " + c);
@@ -54,10 +57,6 @@ public class ArrayUtilsTest {
         System.out.println("full: " + full2);
 
         /** convolution test complete **/
-
-        double[] ii = new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-        INDArray aa = Nd4j.create(ii, new int[]{4, 4});
-        //System.out.println(ArrayUtils.subMatrix(aa, new int[]{1, 0}, new int[]{2, 2}));
 
 
     }

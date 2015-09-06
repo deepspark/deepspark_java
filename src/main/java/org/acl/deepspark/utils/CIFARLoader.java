@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 import org.acl.deepspark.data.Sample;
+import org.acl.deepspark.data.Tensor;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -39,8 +40,8 @@ public class CIFARLoader implements Serializable {
 				}
 
 				Sample s = new Sample();
-				s.data = Nd4j.create(sampleDim);
-				s.label = Nd4j.create(labelVec);
+				s.data = Tensor.zeros(sampleDim);
+				s.label = Tensor.zeros(labelVec);
 
 				int value;
 				for (int i = 0; i < channel; i++) {
@@ -95,8 +96,8 @@ public class CIFARLoader implements Serializable {
 				}
 
 				Sample s = new Sample();
-				s.data = Nd4j.create(sampleDim);
-				s.label = Nd4j.create(labelVec);
+				s.data = Tensor.create(sampleDim);
+				s.label = Tensor.create(labelVec);
 
 				int value;
 				for (int i = 0; i < channel; i++) {

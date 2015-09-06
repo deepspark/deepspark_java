@@ -49,13 +49,8 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public Tensor generateOutput(Weight weight, Tensor input) {
-
-		int[] inputDim = getInputShape(); // 0: # of kernels(1), 1: # of channel, 2: x, 3: y;
 		int[] kernelDim = weight.getWeightShape(); // 0: # of kernels, 1: # of channel, 2: x, 3: y;
-
-		int outputX = inputDim[2] - kernelDim[2] + 1;
-		int outputY = inputDim[3] - kernelDim[3] + 1;
-		Tensor output = Tensor.zeros(kernelDim[0], outputX, outputY);
+		Tensor output = Tensor.zeros(calculateOutputDimension());
 		
 		// TODO: check dims(image) > dims(filter)
 		for (int i = 0; i < kernelDim[0]; i++) {
@@ -104,12 +99,11 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	}
 
 	@Override
-	public int[] calculateOutputDimension(LayerConf conf, int[] input) {
-		int[] dimW = new int[3];
-		dimW[0] = numFilter;
-		dimW[1] = getInputShape()[1] - dimRow + 1; // x
-		dimW[2] = getInputShape()[2] - dimCol + 1; // y
-		return dimW;
+	public int[] calculateOutputDimension() {
+		int[] dimOut = new int[] { numFilter,
+								 getInputShape()[1] - dimRow + 1,  // x
+								 getInputShape()[2] - dimCol + 1}; // y
+		return dimOut;
 	}
 
 

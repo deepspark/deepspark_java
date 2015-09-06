@@ -22,7 +22,7 @@ public class Tensor implements Serializable {
         dimShape = new int[] {1, 1, 1, 1};
     }
 
-    private Tensor(int[] newDim) {
+    private Tensor(int... newDim) {
         this();
         if (newDim != null) {
             if (newDim.length > 4)
@@ -201,6 +201,17 @@ public class Tensor implements Serializable {
         return this;
     }
 
+    public Tensor mmul(Tensor t) {
+        assertMultipliesWith(t);
+        Tensor tensor = new Tensor(dimShape[0], dimShape[1], dimShape[2], t.dimShape[3]);
+        for (int i = 0 ; i < tensor.dimShape[0]; i++) {
+            for (int j = 0; j < tensor.dimShape[1]; j++) {
+                tensor.data[i][j] = data[i][j].mmul(t.data[i][j]);
+            }
+        }
+        return tensor;
+    }
+
     public Tensor div(double d) {
         Tensor tensor = new Tensor(dimShape);
         for (int i = 0 ; i < dimShape[0]; i++) {
@@ -242,6 +253,16 @@ public class Tensor implements Serializable {
         return this;
     }
 
+    public double sum() {
+        double sum = 0;
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                sum += data[i][j].sum();
+            }
+        }
+        return sum;
+    }
+
     public Tensor dup() {
         Tensor tensor = new Tensor(dimShape.clone());
         for (int i = 0 ; i < dimShape[0]; i++) {
@@ -253,7 +274,7 @@ public class Tensor implements Serializable {
     }
 
     public Tensor transpose() {
-        Tensor t = new Tensor(dimShape);
+        Tensor t = new Tensor(dimShape[0], dimShape[1], dimShape[3], dimShape[2]);
         for (int i = 0 ; i < dimShape[0]; i++) {
             for (int j = 0; j < dimShape[1]; j++) {
                 t.data[i][j] = data[i][j].transpose();
@@ -282,7 +303,7 @@ public class Tensor implements Serializable {
 
     private void assertSameLength(Tensor a) {
         if (!Arrays.equals(dimShape, a.shape())) {
-            throw new SizeException(String.format("Tensor must have same length (is: {%d,%d,%d,%d} and + {%d,%d,%d,%d})",
+            throw new SizeException(String.format("Tensors must have same length (is: {%d,%d,%d,%d} and {%d,%d,%d,%d})",
                                                     dimShape[0], dimShape[1], dimShape[2], dimShape[3],
                                                     a.dimShape[0], a.dimShape[1], a.dimShape[2], a.dimShape[3]));
         }
@@ -294,13 +315,19 @@ public class Tensor implements Serializable {
             length *= shape[i];
 
         if (data != null && data.length != length) {
-            throw new IllegalArgumentException(
+            throw new SizeException(
                     "Passed data must match shape dimensions.");
         }
     }
 
-    private void assertMultipliable(Tensor t) {
-
+    private void assertMultipliesWith(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        } else {
+            if (dimShape[3] != t.dimShape[2])
+                throw new SizeException("Number of columns of left matrix must be equal to number of rows of right matrix.");
+        }
     }
 
     public String toString() {

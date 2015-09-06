@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.acl.deepspark.data.Accumulator;
 import org.acl.deepspark.data.Sample;
+import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.async.ParameterClient;
 import org.acl.deepspark.utils.ArrayUtils;
@@ -102,21 +103,21 @@ public class DistAsyncNeuralNetRunner implements Serializable {
         }
     }
 
-    public INDArray[] predict(Sample[] data) {
-        INDArray[] output = new INDArray[data.length];
+    public Tensor[] predict(Sample[] data) {
+        Tensor[] output = new Tensor[data.length];
         for (int i = 0 ; i < data.length ; i++)
             output[i] = predict(data[i]);
         return output;
     }
 
-    public INDArray predict(Sample data) {
+    public Tensor predict(Sample data) {
         return net.predict(data);
     }
 
     public double printAccuracy(Sample[] data) {
         int count = 0;
         for (Sample sample : data) {
-            INDArray output = net.predict(sample);
+            Tensor output = net.predict(sample);
             if (ArrayUtils.argmax(sample.label) == ArrayUtils.argmax(output))
                 count++;
         }

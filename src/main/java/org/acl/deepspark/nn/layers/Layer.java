@@ -8,7 +8,7 @@ public interface Layer {
 
 	// initialization
 	public abstract Weight createWeight(LayerConf conf, int[] input);
-	public abstract int[] calculateOutputDimension(LayerConf conf, int[] input);
+	public abstract int[] calculateOutputDimension();
 	
 	// generate output	
 	public abstract Tensor generateOutput(Weight weight, Tensor input);

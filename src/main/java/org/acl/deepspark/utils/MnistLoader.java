@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.acl.deepspark.data.Sample;
+import org.acl.deepspark.data.Tensor;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -50,11 +51,11 @@ public class MnistLoader implements Serializable {
 				Sample s = new Sample();
 				int[] dimData = {1, dimRows, dimRows};
 
-				s.data = Nd4j.create(featureVec, dimData);
+				s.data = Tensor.create(featureVec, dimData);
 				s.data.transposei();
 				if (normalize)
 					s.data.divi(256.0);
-				s.label = Nd4j.create(labelVec, new int[] {dimLabel, 1});
+				s.label = Tensor.create(labelVec, new int[] {dimLabel});
 
 				samples.add(s);
 			}
@@ -100,11 +101,11 @@ public class MnistLoader implements Serializable {
 				Sample s = new Sample();
 				int[] dimData = {1, dimRows, dimRows};
 
-				s.data = Nd4j.create(featureVec, dimData);
+				s.data = Tensor.create(featureVec, dimData);
 				s.data.transposei();
 				if (normalize)
 					s.data.divi(256.0);
-				s.label = Nd4j.create(labelVec, new int[] {dimLabel, 1});
+				s.label = Tensor.create(labelVec, new int[] {dimLabel});
 
 				return s;
 			}
@@ -138,11 +139,11 @@ public class MnistLoader implements Serializable {
 				Sample s = new Sample();
 				int[] dimData = {1, dimRows, dimRows};
 
-				s.data = Nd4j.create(featureVec, dimData);
+				s.data = Tensor.create(featureVec, dimData);
 				s.data.transposei();
 				if (normalize)
 					s.data.divi(256.0);
-				s.label = Nd4j.create(labelVec, new int[] {dimLabel, 1});
+				s.label = Tensor.create(labelVec, new int[] {dimLabel});
 
 				samples.add(s);
 			}

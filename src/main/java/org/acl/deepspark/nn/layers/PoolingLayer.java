@@ -2,6 +2,7 @@ package org.acl.deepspark.nn.layers;
 
 import java.io.Serializable;
 
+import com.sun.xml.bind.v2.TODO;
 import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
@@ -20,13 +21,13 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 
 	private int poolRow;
 	private int poolCol;
-	private int strides;
+	private int strides = 1;
 
 	public PoolingLayer(int[] inputShape, LayerConf conf) {
 		super(inputShape);
 		this.poolRow = (Integer) conf.get("poolRow");
 		this.poolCol = (Integer) conf.get("poolCol");
-
+		this.strides = poolRow;
 	}
 
 	@Override
@@ -61,8 +62,8 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 						value = input.slice(k, ch).get(r, c);
 						outValue = output.slice(k, ch).get(or, oc);
 						if (value > outValue) {
-							output.slice(k, ch).put(new int[]{or, oc}, value);
-							weight.w.slice(k, ch).put(new int[]{or, oc}, input.slice(k,ch).index(r,c));
+							output.slice(k, ch).put(output.slice(k, ch).index(or, oc), value);
+							weight.w.slice(k, ch).put(weight.w.slice(k, ch).index(or, oc), input.slice(k, ch).index(r, c));
 						}
 					}
 				}
@@ -95,7 +96,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 			for (int or = 0; or < dimOut[1]; or++) {
 				for (int oc = 0; oc < dimOut[2]; oc++) {
 					propDelta.slice(0, ch).put((int) weight.w.slice(0, ch).get(or, oc),
-											   	error.slice(0, ch).get(or, oc));
+							error.slice(0, ch).get(or, oc));
 				}
 			}
 		}

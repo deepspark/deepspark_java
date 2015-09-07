@@ -20,13 +20,13 @@ public class AccumulatorTest {
         double[] bias1 = new double[] {1, 3};
         double[] bias2 = new double[] {2, 4};
 
-        INDArray input1 = Nd4j.create(data1, dimIn);
-        INDArray input2 = Nd4j.create(data2, dimIn);
+        Tensor input1 = Tensor.create(data1, dimIn);
+        Tensor input2 = Tensor.create(data2, dimIn);
 
         Accumulator accumulator = new Accumulator(1);
 
-        Weight weight1 = new Weight(input1, Nd4j.create(bias1));
-        Weight weight2 = new Weight(input2, Nd4j.create(bias2));
+        Weight weight1 = new Weight(input1, Tensor.create(bias1, new int[] {2}));
+        Weight weight2 = new Weight(input2, Tensor.create(bias2, new int[] {2}));
 
         System.out.println("weight1:" + weight1.toString());
         System.out.println("weight2:" + weight2.toString());

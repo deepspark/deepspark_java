@@ -1,4 +1,5 @@
 package org.acl.deepspark.nn.layers;
+import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
@@ -17,38 +18,31 @@ public class ConvolutionLayerTest {
 									 4, 5, 23, 2, 1, 5, 7, 23, 1, 2, 4, 7};
 
 		int[] dimIn = new int[] {4, 3, 3};
-		INDArray input = Nd4j.create(data, dimIn);
+		Tensor input = Tensor.create(data, dimIn);
+		System.out.println("input");
+		System.out.println(input);
+
 		LayerConf layerConf = new LayerConf(LayerType.CONVOLUTION);
 		layerConf.set("numFilters", 5);
 		layerConf.set("filterRow", 2);
 		layerConf.set("filterCol", 2);
-		layerConf.set("activator", ActivatorType.SIGMOID);
+		layerConf.set("activator", ActivatorType.NONE);
 
 		ConvolutionLayer convLayer = new ConvolutionLayer(dimIn, layerConf);
 		Weight weight = convLayer.createWeight(layerConf, dimIn);
-		int[] dimOut = convLayer.calculateOutputDimension(layerConf, dimIn);
 
-		INDArray output = convLayer.generateOutput(weight, input);
+		Tensor output = convLayer.generateOutput(weight, input);
+		System.out.println("output");
+		System.out.println(output);
 
-		System.out.println(String.format("input dim: (%d, %d, %d)", input.size(0), input.size(1), input.size(2)));
-		System.out.println(String.format("weight dim: (%d, %d, %d, %d)", weight.w.size(0), weight.w.size(1), weight.w.size(2), weight.w.size(3)));
-		System.out.println(String.format("bias dim: (%d, %d)", weight.b.size(0), weight.b.size(1)));
-		System.out.println(String.format("output dim: (%d, %d, %d)", output.size(0), output.size(1), output.size(2)));
+		System.out.println(String.format("input dim: (%d, %d, %d, %d)", input.shape()[0], input.shape()[1], input.shape()[2], input.shape()[3]));
+		System.out.println(String.format("weight dim: (%d, %d, %d, %d)", weight.w.shape()[0], weight.w.shape()[1], weight.w.shape()[2], weight.w.shape()[3]));
+		System.out.println(String.format("bias dim: (%d, %d, %d, %d)", weight.b.shape()[0], weight.b.shape()[1], weight.b.shape()[2], weight.b.shape()[3]));
+		System.out.println(String.format("output dim: (%d, %d, %d, %d)", output.shape()[0], output.shape()[1], output.shape()[2], output.shape()[3]));
 
-		INDArray propDelta = convLayer.calculateBackprop(weight, output);
-		System.out.println(String.format("delta dim: (%d, %d, %d)", propDelta.size(0), propDelta.size(1), propDelta.size(2)));
-
-
-
-		System.out.println(input);
-		INDArray ret = ArrayUtils.makeColumnVector(input);
-
-		System.out.println(ret.reshape(dimIn));
-
-
-	}
+		Tensor propDelta = convLayer.calculateBackprop(weight, output);
+		System.out.println(String.format("delta dim: (%d, %d, %d, %d)", propDelta.shape()[0], propDelta.shape()[1], propDelta.shape()[2], propDelta.shape()[3]));
 
 		/** feedforward test complete **/
-
-
+	}
 }

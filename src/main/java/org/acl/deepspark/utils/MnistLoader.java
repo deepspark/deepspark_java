@@ -52,7 +52,7 @@ public class MnistLoader implements Serializable {
 				int[] dimData = {1, dimRows, dimRows};
 
 				s.data = Tensor.create(featureVec, dimData);
-				s.data.transposei();
+				//s.data.transposei();
 				if (normalize)
 					s.data.divi(256.0);
 				s.label = Tensor.create(labelVec, new int[] {dimLabel});
@@ -102,7 +102,7 @@ public class MnistLoader implements Serializable {
 				int[] dimData = {1, dimRows, dimRows};
 
 				s.data = Tensor.create(featureVec, dimData);
-				s.data.transposei();
+				//s.data.transposei();
 				if (normalize)
 					s.data.divi(256.0);
 				s.label = Tensor.create(labelVec, new int[] {dimLabel});
@@ -140,7 +140,7 @@ public class MnistLoader implements Serializable {
 				int[] dimData = {1, dimRows, dimRows};
 
 				s.data = Tensor.create(featureVec, dimData);
-				s.data.transposei();
+				//s.data.transposei();
 				if (normalize)
 					s.data.divi(256.0);
 				s.label = Tensor.create(labelVec, new int[] {dimLabel});

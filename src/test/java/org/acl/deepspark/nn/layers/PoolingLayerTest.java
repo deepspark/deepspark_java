@@ -1,12 +1,9 @@
 package org.acl.deepspark.nn.layers;
 
+import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
-import org.acl.deepspark.nn.layers.LayerType;
-import org.acl.deepspark.nn.layers.PoolingLayer;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 public class PoolingLayerTest {
 	public static void main(String[] args) {
@@ -17,7 +14,7 @@ public class PoolingLayerTest {
 									0, 21, 39, 2, 1, 3, 33, 44, 26, 0, 3, 14};
 
 		int[] dimIn = new int[] {3, 4, 4};
-		INDArray input = Nd4j.create(data, dimIn);
+		Tensor input = Tensor.create(data, dimIn);
 
 		LayerConf layerConf = new LayerConf(LayerType.POOLING);
 		layerConf.set("poolRow", 2);
@@ -26,21 +23,21 @@ public class PoolingLayerTest {
 
 		PoolingLayer poolingLayer = new PoolingLayer(dimIn, layerConf);
 		Weight weight = poolingLayer.createWeight(layerConf, dimIn);
-		INDArray output = poolingLayer.generateOutput(weight, input);
+		Tensor output = poolingLayer.generateOutput(weight, input);
 
 		int channelIdx = 2;
 
-		System.out.println(String.format("input dim : (%d, %d, %d)", input.size(0), input.size(1), input.size(2)));
-		System.out.println(input.slice(channelIdx));
+		System.out.println(String.format("input dim : (%d, %d, %d, %d)", input.shape()[0], input.shape()[1], input.shape()[2], input.shape()[3]));
+		System.out.println(input.slice(0, channelIdx));
 
-		System.out.println(String.format("output dim : (%d, %d, %d)", output.size(0), output.size(1), output.size(2)));
-		System.out.println(output.slice(channelIdx));
+		System.out.println(String.format("output dim : (%d, %d, %d, %d)", output.shape()[0], output.shape()[1], output.shape()[2], output.shape()[3]));
+		System.out.println(output.slice(0, channelIdx));
 
-		INDArray delta = Nd4j.ones(output.shape());
-		INDArray propDelta = poolingLayer.calculateBackprop(null, delta);
+		Tensor delta = output.dup();
+		Tensor propDelta = poolingLayer.calculateBackprop(weight, delta);
 
-		System.out.println(String.format("delta dim : (%d, %d, %d)", propDelta.size(0), propDelta.size(1), propDelta.size(2)));
-		System.out.println(propDelta.slice(channelIdx));
+		System.out.println(String.format("delta dim : (%d, %d, %d, %d)", propDelta.shape()[0], propDelta.shape()[1], propDelta.shape()[2], propDelta.shape()[3]));
+		System.out.println(propDelta.slice(0, channelIdx));
 
 
 		/** feedforward test complete **/

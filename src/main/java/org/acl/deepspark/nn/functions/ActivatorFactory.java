@@ -37,7 +37,7 @@ public class ActivatorFactory implements Serializable {
 							Tensor ret = Tensor.zeros(dim);
 							for (int i = 0 ; i < dim[0]; i++) {
 								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j] = output(ret.data()[i][j]);
+									ret.data()[i][j].addi(output(input.data()[i][j]));
 								}
 							}
 							return ret;
@@ -52,7 +52,7 @@ public class ActivatorFactory implements Serializable {
 							Tensor ret = Tensor.zeros(dim);
 							for (int i = 0 ; i < dim[0]; i++) {
 								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j] = derivative(ret.data()[i][j]);
+									ret.data()[i][j].addi(derivative(activated.data()[i][j]));
 								}
 							}
 							return ret;
@@ -86,7 +86,7 @@ public class ActivatorFactory implements Serializable {
 							Tensor ret = Tensor.zeros(dim);
 							for (int i = 0 ; i < dim[0]; i++) {
 								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j] = output(ret.data()[i][j]);
+									ret.data()[i][j].addi(output(input.data()[i][j]));
 								}
 							}
 							return ret;
@@ -101,7 +101,7 @@ public class ActivatorFactory implements Serializable {
 							Tensor ret = Tensor.zeros(dim);
 							for (int i = 0 ; i < dim[0]; i++) {
 								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j] = derivative(ret.data()[i][j]);
+									ret.data()[i][j].addi(derivative(activated.data()[i][j]));
 								}
 							}
 							return ret;
@@ -138,7 +138,7 @@ public class ActivatorFactory implements Serializable {
 							Tensor ret = Tensor.zeros(dim);
 							for (int i = 0 ; i < dim[0]; i++) {
 								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j] = output(ret.data()[i][j]);
+									ret.data()[i][j].addi(output(input.data()[i][j]));
 								}
 							}
 							return ret;
@@ -153,7 +153,7 @@ public class ActivatorFactory implements Serializable {
 							Tensor ret = Tensor.zeros(dim);
 							for (int i = 0 ; i < dim[0]; i++) {
 								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j] = derivative(ret.data()[i][j]);
+									ret.data()[i][j].addi(derivative(activated.data()[i][j]));
 								}
 							}
 							return ret;
@@ -190,7 +190,7 @@ public class ActivatorFactory implements Serializable {
 							Tensor ret = Tensor.zeros(dim);
 							for (int i = 0 ; i < dim[0]; i++) {
 								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j] = derivative(ret.data()[i][j]);
+									ret.data()[i][j].addi(derivative(ret.data()[i][j]));
 								}
 							}
 							return ret;
@@ -222,7 +222,7 @@ public class ActivatorFactory implements Serializable {
 							Tensor ret = Tensor.zeros(dim);
 							for (int i = 0 ; i < dim[0]; i++) {
 								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j] = output(ret.data()[i][j]);
+									ret.data()[i][j].addi(output(input.data()[i][j]));
 								}
 							}
 							return ret;
@@ -237,7 +237,7 @@ public class ActivatorFactory implements Serializable {
 							Tensor ret = Tensor.zeros(dim);
 							for (int i = 0 ; i < dim[0]; i++) {
 								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j] = derivative(ret.data()[i][j]);
+									ret.data()[i][j].addi(derivative(activated.data()[i][j]));
 								}
 							}
 							return ret;

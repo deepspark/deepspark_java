@@ -46,7 +46,7 @@ public class DistNeuralNetRunnerTest {
         layer1.set("numFilters", 20);
         layer1.set("filterRow", 5);
         layer1.set("filterCol", 5);
-        layer1.set("activator", ActivatorType.SIGMOID);
+        layer1.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
         LayerConf layer2 = new LayerConf(LayerType.POOLING);
         layer2.set("poolRow", 2);
@@ -57,7 +57,7 @@ public class DistNeuralNetRunnerTest {
         layer3.set("numFilters", 50);
         layer3.set("filterRow", 5);
         layer3.set("filterCol", 5);
-        layer3.set("activator", ActivatorType.SIGMOID);
+        layer3.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
         LayerConf layer4 = new LayerConf(LayerType.POOLING);
         layer4.set("poolRow", 2);
@@ -66,7 +66,7 @@ public class DistNeuralNetRunnerTest {
 
         LayerConf layer5 = new LayerConf(LayerType.FULLYCONN);
         layer5.set("numNodes", 200);
-        layer5.set("activator", ActivatorType.SIGMOID);
+        layer5.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
         LayerConf layer6 = new LayerConf(LayerType.FULLYCONN);
         layer6.set("numNodes", 10);
@@ -88,7 +88,7 @@ public class DistNeuralNetRunnerTest {
                 .build();
 
         DistNeuralNetRunner driver = new DistNeuralNetRunner(net).setIterations(numIteration)
-                                                         .setMiniBatchSize(minibatch);
+                                                                 .setMiniBatchSize(minibatch);
 
         System.out.println("Start Learning...");
         Date startTime = new Date();

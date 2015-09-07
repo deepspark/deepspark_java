@@ -47,6 +47,7 @@ public class ArrayUtils {
         }
         return ret.reshape(reverse.shape());
     }
+
     
     public static int argmax(INDArray arr) {
     	double[] data = arr.data().asDouble();

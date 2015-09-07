@@ -166,6 +166,7 @@ public class TensorTest {
         // Sum
         System.out.println("sum");
         System.out.println(t3.sum());
+        // test complete
 
         // Duplicate
         System.out.println("dup");

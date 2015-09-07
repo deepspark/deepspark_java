@@ -253,6 +253,16 @@ public class Tensor implements Serializable {
         return this;
     }
 
+    public Tensor transpose() {
+        Tensor t = new Tensor(dimShape[0], dimShape[1], dimShape[3], dimShape[2]);
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                t.data[i][j] = data[i][j].transpose();
+            }
+        }
+        return t;
+    }
+
     public double sum() {
         double sum = 0;
         for (int i = 0 ; i < dimShape[0]; i++) {
@@ -273,15 +283,7 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
-    public Tensor transpose() {
-        Tensor t = new Tensor(dimShape[0], dimShape[1], dimShape[3], dimShape[2]);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                t.data[i][j] = data[i][j].transpose();
-            }
-        }
-        return t;
-    }
+
 
     public double[] toArray() {
         double[] arr = new double[length()];

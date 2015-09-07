@@ -118,7 +118,7 @@ public class DistAsyncNeuralNetRunner implements Serializable {
         int count = 0;
         for (Sample sample : data) {
             Tensor output = net.predict(sample);
-            if (ArrayUtils.argmax(sample.label) == ArrayUtils.argmax(output))
+            if (sample.label.slice(0,0).argmax() == output.slice(0,0).argmax())
                 count++;
         }
         return (double) count / data.length * 100;

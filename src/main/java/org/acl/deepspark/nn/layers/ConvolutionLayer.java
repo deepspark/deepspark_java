@@ -114,15 +114,16 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public Tensor calculateBackprop(Weight weight, Tensor error) {
-		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
-		Tensor backProp = Tensor.zeros(inputDim);
+		Tensor backProp = Tensor.zeros(getInputShape());
+		int[] deltaShape = backProp.shape();
 
-		int numChannel = inputDim[0];
 		// TODO: check dims(image) > dims(filter)
-		for(int i = 0; i < numChannel; i++) {
-			for(int j = 0; j < numFilter; j++) {
-				backProp.slice(0, i).addi(ArrayUtils.convolution(error.slice(0, j), ArrayUtils.flip(weight.w.slice(j,i)),		// flip weight
-				ArrayUtils.FULL_CONV));				// full convolution
+		for (int k = 0; k < deltaShape[0]; k++) {
+			for (int ch = 0; ch < deltaShape[1]; ch++) {
+				for (int i = 0; i < numFilter; i++) {
+					backProp.slice(k, ch).addi(ArrayUtils.convolution(error.slice(k, i), ArrayUtils.flip(weight.w.slice(i, ch)),        // flip weight
+							ArrayUtils.FULL_CONV));                // full convolution
+				}
 			}
 		}
 		return backProp;

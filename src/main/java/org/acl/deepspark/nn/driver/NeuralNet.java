@@ -121,10 +121,12 @@ public class NeuralNet implements Serializable {
             if (weights[i] != null) {
                 weightUpdates[i].w.muli(momentum);
                 weightUpdates[i].w.subi(weights[i].w.mul(learningRate * decayLambda));
-                weightUpdates[i].w.subi(deltaWeight[i].w.mul(learningRate));
+                if (deltaWeight[i] != null)
+                    weightUpdates[i].w.subi(deltaWeight[i].w.mul(learningRate));
                 
                 weightUpdates[i].b.muli(momentum);
-                weightUpdates[i].b.subi(deltaWeight[i].b.mul(learningRate));
+                if (deltaWeight[i] != null)
+                    weightUpdates[i].b.subi(deltaWeight[i].b.mul(learningRate));
 
                 weights[i].w.addi(weightUpdates[i].w);
                 weights[i].b.addi(weightUpdates[i].b);

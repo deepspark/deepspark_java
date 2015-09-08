@@ -1,14 +1,19 @@
 package org.acl.deepspark.nn.driver;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.acl.deepspark.data.Accumulator;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.async.ParameterClient;
+import org.acl.deepspark.nn.async.ParameterServer;
 import org.acl.deepspark.utils.ArrayUtils;
+import org.apache.spark.Partition;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.VoidFunction;
@@ -29,9 +34,9 @@ public class DistAsyncNeuralNetRunner implements Serializable {
     private int iteration;
     private int batchSize;
     private String host;
-    private int port;
+    private int[] port;
 
-    public DistAsyncNeuralNetRunner(NeuralNet net, String host, int port) {
+    public DistAsyncNeuralNetRunner(NeuralNet net, String host, int[] port) {
         this.net = net;
         this.host = host;
         this.port = port;
@@ -47,7 +52,7 @@ public class DistAsyncNeuralNetRunner implements Serializable {
         return this;
     }
 
-    public void train(JavaRDD<Sample> data) {
+    public void train(JavaRDD<Sample> data) throws IOException {
         System.out.println("Start async learning...");
         System.out.println(String.format("batchSize: %d", batchSize));
         System.out.println(String.format("iterations: %d", iteration));
@@ -55,52 +60,45 @@ public class DistAsyncNeuralNetRunner implements Serializable {
         System.out.println(String.format("momentum: %4f", net.momentum));
         System.out.println(String.format("decayLambda: %4f", net.decayLambda));
         System.out.println(String.format("dropOutRate: %4f", net.dropOutRate));
-        
-        Weight[] init = new Weight[net.getWeights().length];
-        for (int i = 0 ; i < net.getWeights().length; i++) {
-            if (net.getWeights()[i] != null)
-                init[i] = new Weight(net.getWeights()[i].getWeightShape(), net.getWeights()[i].getBiasShape());
-        }
-        
-        data.cache();
-        
-        for (int i = 0 ; i < iteration; i++) {
-            data.foreachPartition(new VoidFunction<Iterator<Sample>>() {
-                /**
-				 * 
-				 */
-				private static final long serialVersionUID = -7223288722205378737L;
 
-				@Override
-                public void call(Iterator<Sample> samples) throws Exception {
-					//initialize
-					Accumulator w = new Accumulator(net.getNumLayers());
-					
-					while(samples.hasNext()) {
-						if(w.getCount() == 0) {
-							w.clear();
-						}
-						
-						Sample sample = samples.next();
-						w.accumulate(net.train(sample));
+        long count = data.cache().count();
 
-	                    if(w.getCount() == batchSize) {
-	                    	ParameterClient.sendDelta(host, port, w.getAverage());
-	                    	net.setWeights(ParameterClient.getWeights(host, port));
-	                    	
-	                    	w.clear();
-	                    }
-					}
-					
-					if(w.getCount() != 0) {
-						ParameterClient.sendDelta(host, port, w.getAverage());
-                    	net.setWeights(ParameterClient.getWeights(host, port));
-                    	
-                    	w.clear();
-					}
+        ParameterServer server = new ParameterServer(net, batchSize, port);
+        server.startServer();
+
+        data.cache().foreachPartition(new VoidFunction<Iterator<Sample>>() {
+            private static final long serialVersionUID = -7223288722205378737L;
+
+            @Override
+            public void call(Iterator<Sample> samples) throws Exception {
+                Accumulator w = new Accumulator(net.getNumLayers());
+                List<Sample> sampleList = new ArrayList<Sample>();
+                while (samples.hasNext()) {
+                    sampleList.add(samples.next());
                 }
-            });
-        }
+
+                for (int i = 0; i < iteration; i++) {
+                    System.out.println(String.format("%d th iteration", i));
+                    Iterator<Sample> iter = sampleList.iterator();
+                    net.setWeights(ParameterClient.getWeights(host, port[1]));
+                    while (iter.hasNext()) {
+                        w.accumulate(net.train(iter.next()));
+
+                        if (w.getCount() == batchSize) {
+                            ParameterClient.sendDelta(host, port[0], w.getAverage());
+                            net.setWeights(ParameterClient.getWeights(host, port[1]));
+                            w.clear();
+                        }
+                    }
+                    if (w.getCount() != 0) {
+                        ParameterClient.sendDelta(host, port[0], w.getAverage());
+                        w.clear();
+                    }
+                }
+            }
+        });
+
+        server.stopServer();
     }
 
     public Tensor[] predict(Sample[] data) {

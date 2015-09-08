@@ -11,13 +11,14 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Date;
 
 /**
- * Created by Jaehong on 2015-08-02.
+ * Created by Jaehong on 2015-09-08.
  */
-public class DistNeuralNetRunnerTest {
+public class DistAsyncNeuralNetRunnerTest {
     public static final int minibatch = 100;
     public static final int numIteration = 1200;
 
@@ -28,8 +29,8 @@ public class DistNeuralNetRunnerTest {
 
     public static void main(String[] args) throws Exception {
 
-        SparkConf conf = new SparkConf().setAppName("DistNeuralNetRunnerTest")
-                                        .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        SparkConf conf = new SparkConf().setAppName("DistAsyncNeuralNetRunnerTest")
+                .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         Class[] reg_classes = {Weight.class, Sample.class, NeuralNet.class, BaseLayer.class,
                 ConvolutionLayer.class, FullyConnectedLayer.class, PoolingLayer.class};
         conf.registerKryoClasses(reg_classes);
@@ -87,12 +88,16 @@ public class DistNeuralNetRunnerTest {
                 .addLayer(layer6)
                 .build();
 
-        DistNeuralNetRunner driver = new DistNeuralNetRunner(net).setIterations(numIteration)
-                                                                 .setMiniBatchSize(minibatch);
+        String serverHost = InetAddress.getLocalHost().getHostAddress();
+        final int[] port = new int[] {10020, 10021};
+        System.out.println("ParameterServer host: " + serverHost);
+        DistAsyncNeuralNetRunner driver = new DistAsyncNeuralNetRunner(net, serverHost, port)
+                .setIterations(numIteration)
+                .setMiniBatchSize(minibatch);
 
         System.out.println("Start Learning...");
         Date startTime = new Date();
-        driver.train(sc, train_data);
+        driver.train(train_data);
         Date endTime = new Date();
 
         System.out.println(String.format("Accuracy: %f %%", driver.printAccuracy(test_sample)));
@@ -100,6 +105,4 @@ public class DistNeuralNetRunnerTest {
         long time = endTime.getTime() - startTime.getTime();
         System.out.println(String.format("Training time: %f secs", (double) time / 1000));
     }
-
-
 }

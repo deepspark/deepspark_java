@@ -1,11 +1,11 @@
 package org.acl.deepspark.nn.async;
 
+import org.acl.deepspark.data.Weight;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-
-import org.acl.deepspark.data.Weight;
 
 public class ParameterClient {
 	public static void sendDelta(String host, int port, Weight[] d) throws IOException, ClassNotFoundException {

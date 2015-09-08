@@ -1,8 +1,8 @@
 package org.acl.deepspark.nn.conf;
 
-import java.util.HashMap;
-
 import org.acl.deepspark.nn.layers.LayerType;
+
+import java.util.HashMap;
 
 /**
  * Created by Jaehong on 2015-07-16.

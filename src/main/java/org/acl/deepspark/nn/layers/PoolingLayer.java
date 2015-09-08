@@ -1,17 +1,10 @@
 package org.acl.deepspark.nn.layers;
 
-import java.io.Serializable;
-
-import com.sun.xml.bind.v2.TODO;
 import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
-import org.acl.deepspark.utils.ArrayUtils;
-import org.jblas.DoubleMatrix;
-import org.jblas.SimpleBlas;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.factory.Nd4jBackend;
+
+import java.io.Serializable;
 
 public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	/**

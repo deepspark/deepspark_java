@@ -5,14 +5,7 @@ import org.jblas.DoubleMatrix;
 import org.jblas.SimpleBlas;
 import org.jblas.ranges.RangeUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.NDArrayFactory;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.factory.Nd4jBackend;
-import org.nd4j.linalg.indexing.INDArrayIndex;
-import org.nd4j.linalg.indexing.NDArrayIndex;
-import org.nd4j.linalg.indexing.NDArrayIndexAll;
-import org.nd4j.linalg.indexing.NDArrayIndexEmpty;
-import org.nd4j.linalg.util.NDArrayUtil;
 
 public class ArrayUtils {
 	public static final int FULL_CONV = 0;

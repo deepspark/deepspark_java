@@ -1,9 +1,10 @@
 package org.acl.deepspark.nn.conf;
 
-import java.io.Serializable;
-import java.util.*;
-
 import org.acl.deepspark.nn.driver.NeuralNet;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class NeuralNetConf implements Serializable {

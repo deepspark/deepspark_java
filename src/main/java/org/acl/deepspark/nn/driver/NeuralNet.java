@@ -9,13 +9,9 @@ import org.acl.deepspark.nn.layers.ConvolutionLayer;
 import org.acl.deepspark.nn.layers.FullyConnectedLayer;
 import org.acl.deepspark.nn.layers.Layer;
 import org.acl.deepspark.nn.layers.PoolingLayer;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.IllegalFormatException;
 
 /**
  * Created by Jaehong on 2015-07-16.

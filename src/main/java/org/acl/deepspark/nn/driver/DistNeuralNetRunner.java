@@ -1,16 +1,14 @@
 package org.acl.deepspark.nn.driver;
 
+import org.acl.deepspark.data.DistAccumulator;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
-import org.acl.deepspark.data.DistAccumulator;
-import org.acl.deepspark.utils.ArrayUtils;
 import org.apache.spark.Accumulator;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.jblas.util.Random;
-import org.nd4j.linalg.api.ndarray.INDArray;
 
 import java.io.Serializable;
 

@@ -1,10 +1,5 @@
 package org.acl.deepspark.nn.layers;
 
-import org.acl.deepspark.nn.conf.LayerConf;
-import org.acl.deepspark.nn.functions.Activator;
-import org.acl.deepspark.nn.functions.ActivatorFactory;
-import org.acl.deepspark.nn.functions.ActivatorType;
-
 import java.io.Serializable;
 
 

@@ -3,10 +3,7 @@ package org.acl.deepspark.nn.driver;
 import org.acl.deepspark.data.Accumulator;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.data.Tensor;
-import org.acl.deepspark.data.Weight;
-import org.acl.deepspark.utils.ArrayUtils;
 import org.jblas.util.Random;
-import org.nd4j.linalg.api.ndarray.INDArray;
 
 /**
  * Created by Jaehong on 2015-07-16.

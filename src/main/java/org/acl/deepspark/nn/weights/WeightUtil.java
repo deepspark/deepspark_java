@@ -1,9 +1,9 @@
 
 package org.acl.deepspark.nn.weights;
 
-import java.io.Serializable;
-
 import org.jblas.DoubleMatrix;
+
+import java.io.Serializable;
 
 
 public class WeightUtil implements Serializable {

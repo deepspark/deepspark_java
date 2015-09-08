@@ -1,23 +1,18 @@
 package org.acl.deepspark.nn.driver;
 
+import org.acl.deepspark.data.Accumulator;
+import org.acl.deepspark.data.Sample;
+import org.acl.deepspark.data.Tensor;
+import org.acl.deepspark.nn.async.ParameterClient;
+import org.acl.deepspark.nn.async.ParameterServer;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.VoidFunction;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.acl.deepspark.data.Accumulator;
-import org.acl.deepspark.data.Sample;
-import org.acl.deepspark.data.Tensor;
-import org.acl.deepspark.data.Weight;
-import org.acl.deepspark.nn.async.ParameterClient;
-import org.acl.deepspark.nn.async.ParameterServer;
-import org.acl.deepspark.utils.ArrayUtils;
-import org.apache.spark.Partition;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.VoidFunction;
-import org.nd4j.linalg.api.ndarray.INDArray;
 
 /**
  * Created by Jaehong on 2015-07-31.

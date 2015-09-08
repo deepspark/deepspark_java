@@ -2,7 +2,6 @@ package org.acl.deepspark.nn.functions;
 
 import org.acl.deepspark.data.Tensor;
 import org.jblas.DoubleMatrix;
-import org.nd4j.linalg.api.ndarray.INDArray;
 
 import java.io.Serializable;
 

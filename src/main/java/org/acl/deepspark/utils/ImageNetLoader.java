@@ -1,17 +1,5 @@
 package org.acl.deepspark.utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-
-import org.acl.deepspark.data.Sample;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.jblas.DoubleMatrix;
-
 public class ImageNetLoader {
 	private static final long serialVersionUID = 4845357475294611873L;
 	

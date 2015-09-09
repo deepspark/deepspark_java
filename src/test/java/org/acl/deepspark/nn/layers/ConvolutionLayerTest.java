@@ -1,11 +1,9 @@
 package org.acl.deepspark.nn.layers;
+
 import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
-import org.acl.deepspark.utils.ArrayUtils;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 
 public class ConvolutionLayerTest {

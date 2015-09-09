@@ -12,7 +12,6 @@ public class ParameterClient {
 		Socket s = new Socket(host, port);
 		ObjectOutputStream os = new ObjectOutputStream(s.getOutputStream());
 		os.writeObject(d);
-		os.flush();
 		s.close();
 	}
 	

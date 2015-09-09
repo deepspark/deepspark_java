@@ -1,7 +1,5 @@
 package org.acl.deepspark.utils;
 
-import org.jblas.DoubleMatrix;
-
 public class MnistLoaderTest {
 	public static void main(String[] args) {
 /*		DoubleMatrix[] mnist_train = MnistLoader.loadData("C:\\Users\\Jaehong\\Downloads\\mnist\\mnist_train.txt");

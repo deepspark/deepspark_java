@@ -56,12 +56,12 @@ public class DistAsyncNeuralNetRunner implements Serializable {
         System.out.println(String.format("decayLambda: %4f", net.decayLambda));
         System.out.println(String.format("dropOutRate: %4f", net.dropOutRate));
 
-        long count = data.cache().count();
+        int numPartition = (int) data.cache().count() / batchSize;
 
         ParameterServer server = new ParameterServer(net, batchSize, port);
         server.startServer();
 
-        data.cache().foreachPartition(new VoidFunction<Iterator<Sample>>() {
+        data.foreachPartition(new VoidFunction<Iterator<Sample>>() {
             private static final long serialVersionUID = -7223288722205378737L;
 
             @Override

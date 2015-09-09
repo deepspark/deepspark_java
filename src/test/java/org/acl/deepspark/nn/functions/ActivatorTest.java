@@ -1,7 +1,6 @@
 package org.acl.deepspark.nn.functions;
 
 import org.acl.deepspark.data.Tensor;
-import org.jblas.DoubleMatrix;
 
 /**
  * Created by Jaehong on 2015-09-07.

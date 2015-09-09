@@ -23,8 +23,9 @@ public class MnistLoader implements Serializable {
 
 	public static Sample[] loadIntoSamples(String path, boolean normalize) {
 		System.out.println("Data Loading...");
-		BufferedReader reader = null;
 		double label;
+		int[] dimData = {1, dimRows, dimRows};
+		BufferedReader reader = null;
 		ArrayList<Sample> samples = new ArrayList<Sample>();
 		
 		double[] featureVec = new double[dimRows * dimRows];
@@ -34,21 +35,18 @@ public class MnistLoader implements Serializable {
 			String[] feature = null;
 			while((line = reader.readLine()) != null) {
 				feature = line.split("\t");
+				double[] labelVec = new double[dimLabel];
 				label = Double.parseDouble(feature[dimRows * dimRows]);
-				double[] labelVec = new double[dimLabel];		
 				for(int i = 0; i < dimLabel; i++) {
 					labelVec[i] = (label == i) ?  1.0 : 0.0;
 				}
-				for(int i = 0; i < feature.length -1;i++)
+				for(int i = 0; i < feature.length - 1;i++)
 					featureVec[i] = Double.parseDouble(feature[i]);
 				
 				Sample s = new Sample();
-				int[] dimData = {1, dimRows, dimRows};
-
-				s.data = Tensor.create(featureVec, dimData);
-				//s.data.transposei();
+				s.data = Tensor.create(featureVec, dimData).transpose();
 				if (normalize)
-					s.data.divi(256.0);
+					s.data.subi(128.0).divi(128.0);
 				s.label = Tensor.create(labelVec, new int[] {dimLabel});
 
 				samples.add(s);
@@ -96,9 +94,8 @@ public class MnistLoader implements Serializable {
 				int[] dimData = {1, dimRows, dimRows};
 
 				s.data = Tensor.create(featureVec, dimData);
-				//s.data.transposei();
 				if (normalize)
-					s.data.divi(256.0);
+					s.data.subi(128.0).divi(128.0);
 				s.label = Tensor.create(labelVec, new int[] {dimLabel});
 
 				return s;
@@ -108,11 +105,13 @@ public class MnistLoader implements Serializable {
 	}
 
 	public static Sample[] loadFromHDFS(String path, boolean normalize) {
-		BufferedReader reader = null;
+		System.out.println("Data Loading...");
 		double label;
+		int[] dimData = {1, dimRows, dimRows};
+		BufferedReader reader = null;
 		ArrayList<Sample> samples = new ArrayList<Sample>();
-
 		double[] featureVec = new double[dimRows * dimRows];
+
 		try {
 			Path p = new Path(path);
 			FileSystem fs = FileSystem.get(new Configuration());
@@ -122,21 +121,19 @@ public class MnistLoader implements Serializable {
 
 			while ((line = reader.readLine()) != null) {
 				feature = line.split("\t");
-				label = Double.parseDouble(feature[dimRows * dimRows]);
 				double[] labelVec = new double[dimLabel];
+				label = Double.parseDouble(feature[dimRows * dimRows]);
 				for (int i = 0; i < dimLabel; i++) {
 					labelVec[i] = (label == i) ? 1.0 : 0.0;
 				}
 
 				for (int i = 0; i < feature.length -1; i++)
 					featureVec[i] = Double.parseDouble(feature[i]);
-				Sample s = new Sample();
-				int[] dimData = {1, dimRows, dimRows};
 
-				s.data = Tensor.create(featureVec, dimData);
-				//s.data.transposei();
+				Sample s = new Sample();
+				s.data = Tensor.create(featureVec, dimData).transpose();
 				if (normalize)
-					s.data.divi(256.0);
+					s.data.subi(128.0).divi(128.0);
 				s.label = Tensor.create(labelVec, new int[] {dimLabel});
 
 				samples.add(s);

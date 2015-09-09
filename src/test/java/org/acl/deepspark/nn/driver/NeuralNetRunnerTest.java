@@ -1,14 +1,14 @@
 package org.acl.deepspark.nn.driver;
 
-import java.util.Date;
-
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
-import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.LayerType;
+import org.acl.deepspark.utils.CIFARLoader;
 import org.acl.deepspark.utils.MnistLoader;
+
+import java.util.Date;
 
 
 public class NeuralNetRunnerTest {
@@ -23,8 +23,8 @@ public class NeuralNetRunnerTest {
 	
 	public static void main(String[] args) throws Exception {
 
-		Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_train.txt", true);
-		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);
+		Sample[] training_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/train_batch.bin", true);
+		Sample[] test_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/test_batch.bin", true);
 		System.out.println(new Date());
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
 		layer1.set("numFilters", 20);
@@ -47,7 +47,7 @@ public class NeuralNetRunnerTest {
 		layer4.set("poolRow", 2);
 		layer4.set("poolCol", 2);
 		layer4.set("activator", ActivatorType.NONE);
-/*
+
 		LayerConf layer5 = new LayerConf(LayerType.CONVOLUTION);
 		layer5.set("numFilters", 64);
 		layer5.set("filterRow", 2);
@@ -58,11 +58,11 @@ public class NeuralNetRunnerTest {
 		layer6.set("poolRow", 2);
 		layer6.set("poolCol", 2);
 		layer6.set("activator", ActivatorType.NONE);
-*/
+/*
 		LayerConf layer5 = new LayerConf(LayerType.FULLYCONN);
-		layer5.set("numNodes", 500);
+		layer5.set("numNodes", 200);
 		layer5.set("activator", ActivatorType.RECTIFIED_LINEAR);
-
+*/
 		LayerConf layer7 = new LayerConf(LayerType.FULLYCONN);
 		layer7.set("numNodes", 10);
 		layer7.set("activator", ActivatorType.SOFTMAX);
@@ -72,14 +72,14 @@ public class NeuralNetRunnerTest {
 							.setDecayLambda(decayLambda)
 							.setMomentum(momentum)
 							.setDropOutRate(dropOut)
-							.setInputDim(new int[]{1, 28, 28})
+							.setInputDim(new int[]{3, 32, 32})
 							.setOutputDim(new int[]{10})
 							.addLayer(layer1)
 							.addLayer(layer2)
 							.addLayer(layer3)
 							.addLayer(layer4)
 							.addLayer(layer5)
-							//.addLayer(layer6)
+//							.addLayer(layer6)
 							.addLayer(layer7)
 							.build();
 

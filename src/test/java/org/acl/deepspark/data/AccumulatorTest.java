@@ -1,8 +1,5 @@
 package org.acl.deepspark.data;
 
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-
 /**
  * Created by Jaehong on 2015-07-30.
  */

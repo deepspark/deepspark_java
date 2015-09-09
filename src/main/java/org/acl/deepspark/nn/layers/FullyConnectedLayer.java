@@ -52,7 +52,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 			dimIn *= input[i];
 
 		Weight w= new Weight();
-		w.w = Tensor.randn(dimIn, dimOut).mul(0.1);//.mul(Math.sqrt(2.0/dimIn));
+		w.w = Tensor.randn(dimIn, dimOut).mul(Math.sqrt(2.0/dimIn));
 		w.b = Tensor.zeros(dimOut);
 		return w;
 	}

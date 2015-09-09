@@ -115,6 +115,16 @@ public class Tensor implements Serializable {
         return new Tensor(init.GAUSSIAN, shape);
     }
 
+    public Tensor add(double d) {
+        Tensor tensor = new Tensor(dimShape);
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                tensor.data[i][j] = data[i][j].add(d);
+            }
+        }
+        return tensor;
+    }
+
     public Tensor add(Tensor t) {
         assertSameLength(t);
 
@@ -127,6 +137,15 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
+    public Tensor addi(double d) {
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                data[i][j].addi(d);
+            }
+        }
+        return this;
+    }
+
     public Tensor addi(Tensor t) {
         assertSameLength(t);
         for (int i = 0 ; i < dimShape[0]; i++) {
@@ -135,6 +154,16 @@ public class Tensor implements Serializable {
             }
         }
         return this;
+    }
+
+    public Tensor sub(double d) {
+        Tensor tensor = new Tensor(dimShape);
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                tensor.data[i][j] = data[i][j].sub(d);
+            }
+        }
+        return tensor;
     }
 
     public Tensor sub(Tensor t) {
@@ -147,6 +176,15 @@ public class Tensor implements Serializable {
             }
         }
         return tensor;
+    }
+
+    public Tensor subi(double d) {
+        for (int i = 0 ; i < dimShape[0]; i++) {
+            for (int j = 0; j < dimShape[1]; j++) {
+                data[i][j].subi(d);
+            }
+        }
+        return this;
     }
 
     public Tensor subi(Tensor t) {

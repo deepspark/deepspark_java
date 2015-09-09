@@ -2,14 +2,6 @@ package org.acl.deepspark.utils;
 
 import org.acl.deepspark.data.Tensor;
 import org.jblas.DoubleMatrix;
-import org.jblas.util.Random;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.NDArrayFactory;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.NDArrayIndex;
-import org.nd4j.linalg.jblas.NDArray;
-import org.nd4j.linalg.util.NDArrayMath;
-import org.nd4j.linalg.util.NDArrayUtil;
 
 /**
  * Created by Jaehong on 2015-07-29.

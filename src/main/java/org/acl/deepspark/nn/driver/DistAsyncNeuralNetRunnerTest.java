@@ -6,7 +6,7 @@ import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.*;
-import org.acl.deepspark.utils.MnistLoader;
+import org.acl.deepspark.utils.CIFARLoader;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -22,9 +22,9 @@ public class DistAsyncNeuralNetRunnerTest {
     public static final int minibatch = 100;
     public static final int numIteration = 1200;
 
-    public static final double learningRate = 0.1;
+    public static final double learningRate = 0.01;
     public static final double decayLambda = 0.0005;
-    public static final double momentum = 0.9;
+    public static final double momentum = 0.0;
     public static final double dropOut = 0.0;
 
     public static void main(String[] args) throws Exception {
@@ -38,8 +38,8 @@ public class DistAsyncNeuralNetRunnerTest {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         System.out.println("Data Loading...");
-        Sample[] train_sample = MnistLoader.loadFromHDFS("data/mnist/mnist_train.txt", true);
-        Sample[] test_sample = MnistLoader.loadFromHDFS("data/mnist/mnist_test.txt", true);
+        Sample[] train_sample = CIFARLoader.loadFromHDFS("data/cifar-10/train_batch.bin", true);
+        Sample[] test_sample = CIFARLoader.loadFromHDFS("data/cifar-10/test_batch.bin", true);
 
         JavaRDD<Sample> train_data = sc.parallelize(Arrays.asList(train_sample)).cache();
 

@@ -42,7 +42,9 @@ public class ParameterServer {
 	
 	public void startServer() throws IOException {
 		updateSocket = new ServerSocket(listenPort);
+		updateSocket.setSoTimeout(15000);
 		castSocket = new ServerSocket(castPort);
+		castSocket.setSoTimeout(15000);
 		
 		// update socket
 		threads[0] = new Thread(new Runnable() {

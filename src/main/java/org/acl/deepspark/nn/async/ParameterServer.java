@@ -1,13 +1,15 @@
 package org.acl.deepspark.nn.async;
 
-import org.acl.deepspark.data.Weight;
-import org.acl.deepspark.nn.driver.NeuralNet;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+import org.acl.deepspark.data.Weight;
+import org.acl.deepspark.nn.driver.NeuralNet;
 
 public class ParameterServer {
 	private NeuralNet p;
@@ -55,7 +57,7 @@ public class ParameterServer {
 					try {
 						Socket a = castSocket.accept();
 						synchronized (lock) {
-							ObjectOutputStream os = new ObjectOutputStream(a.getOutputStream());
+							ObjectOutputStream os = new ObjectOutputStream(new GZIPOutputStream(a.getOutputStream()));
 							os.writeObject(p.getWeights());
 						}
 						a.close();
@@ -76,7 +78,7 @@ public class ParameterServer {
 					try {
 						Socket a = updateSocket.accept();
 						synchronized (lock) {
-							ObjectInputStream is = new ObjectInputStream(a.getInputStream());
+							ObjectInputStream is = new ObjectInputStream(new GZIPInputStream(a.getInputStream()));
 							p.updateWeight((Weight[]) is.readObject());
 						}
 						a.close();

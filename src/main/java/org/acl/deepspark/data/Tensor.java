@@ -61,7 +61,7 @@ public class Tensor implements Serializable {
         this(newDim);
         assertMatchSize(newData, newDim);
 
-        int length = newDim[0]*newDim[1];
+        int length = dimShape[0]*dimShape[1];
         int matSize = dimShape[2]*dimShape[3];
         for (int i = 0 ; i < length; i++) {
             double[] subArr = new double[matSize];

@@ -189,5 +189,17 @@ public class TensorTest {
         tensor1 = tensor1.reshape(48);
         System.out.println(tensor1);
         // test complete
+
+        t3 = Tensor.create(data3, dim3);
+        t33 = Tensor.create(data33, dim33);
+
+        // Merge
+        System.out.println("merge");
+//        ret = Tensor.merge(t3, t2);
+        ret = Tensor.merge(t3, t33);
+        System.out.println(ret);
+        System.out.println(ret.equals(t3));
+        System.out.println(ret.equals(t33));
+        // test complete
     }
 }

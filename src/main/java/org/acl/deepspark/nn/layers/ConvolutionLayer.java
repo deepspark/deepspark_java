@@ -165,7 +165,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		
 		// 0: # of channel, 1: # of filter, 2: x, 3: y;
 		dim[0] = inputDim[0];
-		dim[1] = numFilter; 
+		dim[1] = numFilter;
 		dim[2] = dimRow;
 		dim[3] = dimCol;
 

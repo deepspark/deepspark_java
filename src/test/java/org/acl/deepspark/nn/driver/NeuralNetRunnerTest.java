@@ -14,11 +14,11 @@ import java.util.Date;
 public class NeuralNetRunnerTest {
 
 	public static final int minibatch = 100;
-	public static final int numIteration = 1200;
+	public static final int numIteration = 600;
 
 	public static final double learningRate = 0.1;
 	public static final double decayLambda = 0.0005;
-	public static final double momentum = 0.9;
+	public static final double momentum = 0.5;
 	public static final double dropOut = 0.0;
 	
 	public static void main(String[] args) throws Exception {
@@ -27,7 +27,7 @@ public class NeuralNetRunnerTest {
 		Sample[] test_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/test_batch.bin", true);
 		System.out.println(new Date());
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
-		layer1.set("numFilters", 20);
+		layer1.set("numFilters", 64);
 		layer1.set("filterRow", 5);
 		layer1.set("filterCol", 5);
 		layer1.set("activator", ActivatorType.RECTIFIED_LINEAR);
@@ -38,7 +38,7 @@ public class NeuralNetRunnerTest {
 		layer2.set("activator", ActivatorType.NONE);
 
 		LayerConf layer3 = new LayerConf(LayerType.CONVOLUTION);
-		layer3.set("numFilters", 50);
+		layer3.set("numFilters", 64);
 		layer3.set("filterRow", 5);
 		layer3.set("filterCol", 5);
 		layer3.set("activator", ActivatorType.RECTIFIED_LINEAR);
@@ -50,19 +50,19 @@ public class NeuralNetRunnerTest {
 
 		LayerConf layer5 = new LayerConf(LayerType.CONVOLUTION);
 		layer5.set("numFilters", 64);
-		layer5.set("filterRow", 2);
-		layer5.set("filterCol", 2);
+		layer5.set("filterRow", 5);
+		layer5.set("filterCol", 5);
 		layer5.set("activator", ActivatorType.RECTIFIED_LINEAR);
-
+/*
 		LayerConf layer6 = new LayerConf(LayerType.POOLING);
 		layer6.set("poolRow", 2);
 		layer6.set("poolCol", 2);
 		layer6.set("activator", ActivatorType.NONE);
-/*
-		LayerConf layer5 = new LayerConf(LayerType.FULLYCONN);
-		layer5.set("numNodes", 200);
-		layer5.set("activator", ActivatorType.RECTIFIED_LINEAR);
 */
+		LayerConf layer6 = new LayerConf(LayerType.FULLYCONN);
+		layer6.set("numNodes", 200);
+		layer6.set("activator", ActivatorType.RECTIFIED_LINEAR);
+
 		LayerConf layer7 = new LayerConf(LayerType.FULLYCONN);
 		layer7.set("numNodes", 10);
 		layer7.set("activator", ActivatorType.SOFTMAX);
@@ -79,7 +79,7 @@ public class NeuralNetRunnerTest {
 							.addLayer(layer3)
 							.addLayer(layer4)
 							.addLayer(layer5)
-//							.addLayer(layer6)
+							.addLayer(layer6)
 							.addLayer(layer7)
 							.build();
 

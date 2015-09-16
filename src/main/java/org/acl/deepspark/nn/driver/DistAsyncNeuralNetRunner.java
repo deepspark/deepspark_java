@@ -74,6 +74,7 @@ public class DistAsyncNeuralNetRunner implements Serializable {
 
                 for (int i = 0; i < iteration; i++) {
                     System.out.println(String.format("%d th iteration", i));
+
                     Iterator<Sample> iter = sampleList.iterator();
                     net.setWeights(ParameterClient.getWeights(host, port[1]));
                     while (iter.hasNext()) {

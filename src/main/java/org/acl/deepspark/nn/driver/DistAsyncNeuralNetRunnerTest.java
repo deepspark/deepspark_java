@@ -20,7 +20,7 @@ import java.util.Date;
  */
 public class DistAsyncNeuralNetRunnerTest {
     public static final int minibatch = 100;
-    public static final int numIteration = 1200;
+    public static final int numIteration = 10;
 
     public static final double learningRate = 0.01;
     public static final double decayLambda = 0.0005;

@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Tensor implements Serializable {
 
     private int[] dimShape;         // dimShape = {kernels, channels, rows, cols}
-    private DoubleMatrix[][] data;  // data = DoubleMatrix[kernels][channels]
+    private DoubleMatrix[] data;  // data = DoubleMatrix[kernels * channels]
 
     public enum init {
         ZEROS, ONES, UNIFORM, GAUSSIAN
@@ -29,31 +29,30 @@ public class Tensor implements Serializable {
                 throw new IllegalStateException(String.format("Only support (n <= 4) dimensional tensor, current: %d", newDim.length));
             /* dimShape = {kernels, channels, rows, cols} */
             System.arraycopy(newDim, 0, dimShape, 4-newDim.length, newDim.length);
-            data = new DoubleMatrix[dimShape[0]][dimShape[1]];
+            data = new DoubleMatrix[dimShape[0]*dimShape[1]];
         }
     }
 
     private Tensor(Tensor.init init, int[] newDim) {
         this(newDim);
-        for (int i = 0; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                switch (init) {
-                    case ZEROS:
-                        data[i][j] = DoubleMatrix.zeros(dimShape[2], dimShape[3]);
-                        break;
+        int length = dimShape[0]*dimShape[1];
+        for (int i = 0; i < length; i++) {
+            switch (init) {
+                case ZEROS:
+                    data[i] = DoubleMatrix.zeros(dimShape[2], dimShape[3]);
+                    break;
 
-                    case ONES:
-                        data[i][j] = DoubleMatrix.ones(dimShape[2], dimShape[3]);
-                        break;
+                case ONES:
+                    data[i] = DoubleMatrix.ones(dimShape[2], dimShape[3]);
+                    break;
 
-                    case UNIFORM:
-                        data[i][j] = DoubleMatrix.rand(dimShape[2], dimShape[3]);
-                        break;
+                case UNIFORM:
+                    data[i] = DoubleMatrix.rand(dimShape[2], dimShape[3]);
+                    break;
 
-                    case GAUSSIAN:
-                        data[i][j] = DoubleMatrix.randn(dimShape[2], dimShape[3]);
-                        break;
-                }
+                case GAUSSIAN:
+                    data[i] = DoubleMatrix.randn(dimShape[2], dimShape[3]);
+                    break;
             }
         }
     }
@@ -62,17 +61,21 @@ public class Tensor implements Serializable {
         this(newDim);
         assertMatchSize(newData, newDim);
 
-        for (int i = 0; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                double[] subArr = new double[dimShape[2] * dimShape[3]];
-                int startPos = i*dimShape[1]*subArr.length + j*subArr.length;
-                System.arraycopy(newData, startPos, subArr, 0, subArr.length);
-                data[i][j] = new DoubleMatrix(dimShape[2], dimShape[3], subArr);
-            }
+        int length = newDim[0]*newDim[1];
+        int matSize = dimShape[2]*dimShape[3];
+        for (int i = 0 ; i < length; i++) {
+            double[] subArr = new double[matSize];
+            System.arraycopy(newData, i*matSize, subArr, 0, subArr.length);
+            data[i] = new DoubleMatrix(dimShape[2], dimShape[3], subArr);
         }
     }
 
-    public DoubleMatrix[][] data() {
+    private Tensor(DoubleMatrix[] newData, int[] newDim) {
+        data = newData;
+        dimShape = newDim;
+    }
+
+    public DoubleMatrix[] data() {
         return data;
     }
 
@@ -87,12 +90,12 @@ public class Tensor implements Serializable {
         return length;
     }
 
-    public DoubleMatrix[] slice(int kernelIdx) {
-        return data[kernelIdx];
+    public DoubleMatrix slice(int kernelIdx) {
+        return slice(kernelIdx, 0);
     }
 
     public DoubleMatrix slice(int kernelIdx, int channelIdx) {
-        return data[kernelIdx][channelIdx];
+        return data[kernelIdx*dimShape[1] + channelIdx];
     }
 
     public static Tensor create(double[] newData, int[] newDim) {
@@ -117,10 +120,9 @@ public class Tensor implements Serializable {
 
     public Tensor add(double d) {
         Tensor tensor = new Tensor(dimShape);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                tensor.data[i][j] = data[i][j].add(d);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            tensor.data[i] = data[i].add(d);
         }
         return tensor;
     }
@@ -129,39 +131,35 @@ public class Tensor implements Serializable {
         assertSameLength(t);
 
         Tensor tensor = new Tensor(dimShape);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                tensor.data[i][j] = data[i][j].add(t.data[i][j]);
-            }
+        int length = data.length;
+        for (int i = 0; i < length; i++) {
+            tensor.data[i] = data[i].add(t.data[i]);
         }
         return tensor;
     }
 
     public Tensor addi(double d) {
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                data[i][j].addi(d);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            data[i].addi(d);
         }
         return this;
     }
 
     public Tensor addi(Tensor t) {
         assertSameLength(t);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                data[i][j].addi(t.data[i][j]);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            data[i].addi(t.data[i]);
         }
         return this;
     }
 
     public Tensor sub(double d) {
         Tensor tensor = new Tensor(dimShape);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                tensor.data[i][j] = data[i][j].sub(d);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            tensor.data[i] = data[i].sub(d);
         }
         return tensor;
     }
@@ -170,39 +168,35 @@ public class Tensor implements Serializable {
         assertSameLength(t);
 
         Tensor tensor = new Tensor(dimShape);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                tensor.data[i][j] = data[i][j].sub(t.data[i][j]);
-            }
+        int length = data.length;
+        for (int i = 0; i < length; i++) {
+            tensor.data[i] = data[i].sub(t.data[i]);
         }
         return tensor;
     }
 
     public Tensor subi(double d) {
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                data[i][j].subi(d);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            data[i].subi(d);
         }
         return this;
     }
 
     public Tensor subi(Tensor t) {
         assertSameLength(t);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                data[i][j].subi(t.data[i][j]);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            data[i].subi(t.data[i]);
         }
         return this;
     }
 
     public Tensor mul(double d) {
         Tensor tensor = new Tensor(dimShape);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                tensor.data[i][j] = data[i][j].mul(d);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            tensor.data[i] = data[i].mul(d);
         }
         return tensor;
     }
@@ -211,30 +205,26 @@ public class Tensor implements Serializable {
         assertSameLength(t);
 
         Tensor tensor = new Tensor(dimShape);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                tensor.data[i][j] = data[i][j].mul(t.data[i][j]);
-            }
+        int length = data.length;
+        for (int i = 0; i < length; i++) {
+            tensor.data[i] = data[i].mul(t.data[i]);
         }
         return tensor;
     }
 
     public Tensor muli(double d) {
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                data[i][j].muli(d);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            data[i].muli(d);
         }
         return this;
     }
 
     public Tensor muli(Tensor t) {
         assertSameLength(t);
-
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                data[i][j].muli(t.data[i][j]);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            data[i].muli(t.data[i]);
         }
         return this;
     }
@@ -242,20 +232,18 @@ public class Tensor implements Serializable {
     public Tensor mmul(Tensor t) {
         assertMultipliesWith(t);
         Tensor tensor = new Tensor(dimShape[0], dimShape[1], dimShape[2], t.dimShape[3]);
-        for (int i = 0 ; i < tensor.dimShape[0]; i++) {
-            for (int j = 0; j < tensor.dimShape[1]; j++) {
-                tensor.data[i][j] = data[i][j].mmul(t.data[i][j]);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            tensor.data[i] = data[i].mmul(t.data[i]);
         }
         return tensor;
     }
 
     public Tensor div(double d) {
         Tensor tensor = new Tensor(dimShape);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                tensor.data[i][j] = data[i][j].div(d);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            tensor.data[i] = data[i].div(d);
         }
         return tensor;
     }
@@ -264,75 +252,79 @@ public class Tensor implements Serializable {
         assertSameLength(t);
 
         Tensor tensor = new Tensor(dimShape);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                tensor.data[i][j] = data[i][j].div(t.data[i][j]);
-            }
+        int length = data.length;
+        for (int i = 0; i < length; i++) {
+            tensor.data[i] = data[i].div(t.data[i]);
         }
         return tensor;
     }
 
     public Tensor divi(double d) {
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                data[i][j].divi(d);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            data[i].divi(d);
         }
         return this;
     }
 
     public Tensor divi(Tensor t) {
         assertSameLength(t);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                data[i][j].divi(t.data[i][j]);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            data[i].divi(t.data[i]);
         }
         return this;
     }
 
     public Tensor transpose() {
         Tensor t = new Tensor(dimShape[0], dimShape[1], dimShape[3], dimShape[2]);
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                t.data[i][j] = data[i][j].transpose();
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            t.data[i] = data[i].transpose();
         }
         return t;
     }
 
     public double sum() {
         double sum = 0;
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                sum += data[i][j].sum();
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            sum += data[i].sum();
         }
         return sum;
     }
 
     public Tensor dup() {
         Tensor tensor = new Tensor(dimShape.clone());
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                tensor.data[i][j] = data[i][j].dup();
-            }
-        }
+        int length = data.length;
+        System.arraycopy(data, 0, tensor.data, 0, length);
         return tensor;
     }
 
+    public static Tensor merge(Tensor... tensors) {
+        // merged Tensors must have same lengths
+        for (Tensor t : tensors) {
+            tensors[0].assertSameLength(t);
+        }
+        int kernels = tensors[0].shape()[0];
+        int channel = tensors[0].shape()[1];
+        Tensor ret = new Tensor(kernels*tensors.length, channel,
+                                tensors[0].shape()[2], tensors[0].shape()[3]);
 
+        int dataSize = kernels*channel;
+        for (int i = 0 ; i < tensors.length; i++) {
+            System.arraycopy(tensors[i].data, 0, ret.data, i*dataSize, dataSize);
+        }
+        return ret;
+    }
 
     public double[] toArray() {
         double[] arr = new double[length()];
-        int channels = dimShape[1];
         int matSize = dimShape[2]*dimShape[3];       // row x col
 
-        for (int i = 0 ; i < dimShape[0]; i++) {
-            for (int j = 0; j < dimShape[1]; j++) {
-                int startPos = i*channels*matSize + j*matSize;
-                System.arraycopy(data[i][j].data, 0, arr, startPos, matSize);
-            }
+        int length = data.length;
+        for (int i = 0 ; i < length; i++) {
+            System.arraycopy(data[i].data, 0, arr, i*matSize, matSize);
         }
         return arr;
     }
@@ -376,7 +368,7 @@ public class Tensor implements Serializable {
             builder.append(String.format("%d th kernels", i)).append("\n");
             for (int j = 0; j < dimShape[1]; j++) {
                 builder.append(String.format("%d th channels", j)).append("\n");
-                builder.append(data[i][j].toString()).append("\n");
+                builder.append(data[i*dimShape[1] + j].toString()).append("\n");
             }
         }
         return builder.toString();

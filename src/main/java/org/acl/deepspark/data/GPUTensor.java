@@ -8,9 +8,8 @@ import org.jblas.DoubleMatrix;
 /**
  * Created by Jaehee on 2015-09-15.
  */
-public class GPUAccelerator {
+public class GPUTensor extends Tensor {
     // TODO
-
 //    public Tensor mmul(Tensor t, char flag) {
 //        assertMultipliesWith(t);
 //        Tensor tensor = new Tensor(dimShape[0], dimShape[1], dimShape[2], t.dimShape[3]);

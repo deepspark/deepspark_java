@@ -11,18 +11,18 @@ import java.util.Arrays;
  */
 public class Tensor implements Serializable {
 
-    private int[] dimShape;         // dimShape = {kernels, channels, rows, cols}
-    private DoubleMatrix[] data;  // data = DoubleMatrix[kernels * channels]
+    protected int[] dimShape;         // dimShape = {kernels, channels, rows, cols}
+    protected DoubleMatrix[] data;  // data = DoubleMatrix[kernels * channels]
 
     public enum init {
         ZEROS, ONES, UNIFORM, GAUSSIAN
     }
 
-    private Tensor() {
+    protected Tensor() {
         dimShape = new int[] {1, 1, 1, 1};
     }
 
-    private Tensor(int... newDim) {
+    protected Tensor(int... newDim) {
         this();
         if (newDim != null) {
             if (newDim.length > 4)
@@ -33,7 +33,7 @@ public class Tensor implements Serializable {
         }
     }
 
-    private Tensor(Tensor.init init, int[] newDim) {
+    protected Tensor(Tensor.init init, int[] newDim) {
         this(newDim);
         int length = dimShape[0]*dimShape[1];
         for (int i = 0; i < length; i++) {
@@ -57,7 +57,7 @@ public class Tensor implements Serializable {
         }
     }
 
-    private Tensor(double[] newData, int[] newDim) {
+    protected Tensor(double[] newData, int[] newDim) {
         this(newDim);
         assertMatchSize(newData, newDim);
 
@@ -70,7 +70,7 @@ public class Tensor implements Serializable {
         }
     }
 
-    private Tensor(DoubleMatrix[] newData, int[] newDim) {
+    protected Tensor(DoubleMatrix[] newData, int[] newDim) {
         data = newData;
         dimShape = newDim;
     }
@@ -333,7 +333,7 @@ public class Tensor implements Serializable {
         return Tensor.create(toArray(), shape);
     }
 
-    private void assertSameLength(Tensor a) {
+    protected void assertSameLength(Tensor a) {
         if (!Arrays.equals(dimShape, a.shape())) {
             throw new SizeException(String.format("Tensors must have same length (is: {%d,%d,%d,%d} and {%d,%d,%d,%d})",
                                                     dimShape[0], dimShape[1], dimShape[2], dimShape[3],
@@ -341,7 +341,7 @@ public class Tensor implements Serializable {
         }
     }
 
-    private void assertMatchSize(double[] data, int[] shape) {
+    protected void assertMatchSize(double[] data, int[] shape) {
         int length = 1;
         for (int i = 0 ; i < shape.length; i++)
             length *= shape[i];
@@ -352,7 +352,7 @@ public class Tensor implements Serializable {
         }
     }
 
-    private void assertMultipliesWith(Tensor t) {
+    protected void assertMultipliesWith(Tensor t) {
         if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
             throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
                                     "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));

@@ -33,12 +33,10 @@ public class ActivatorFactory implements Serializable {
 					@Override
 					public Tensor output(Tensor input) {
 						if (input != null) {
-							int[] dim = input.shape();
-							Tensor ret = Tensor.zeros(dim);
-							for (int i = 0 ; i < dim[0]; i++) {
-								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j].addi(output(input.data()[i][j]));
-								}
+							int length = input.data().length;
+							Tensor ret = Tensor.zeros(input.shape());
+							for (int i = 0 ; i < length; i++) {
+								ret.data()[i].addi(output(input.data()[i]));
 							}
 							return ret;
 						}
@@ -48,12 +46,10 @@ public class ActivatorFactory implements Serializable {
 					@Override
 					public Tensor derivative(Tensor activated) {
 						if (activated != null) {
-							int[] dim = activated.shape();
-							Tensor ret = Tensor.zeros(dim);
-							for (int i = 0 ; i < dim[0]; i++) {
-								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j].addi(derivative(activated.data()[i][j]));
-								}
+							int length = activated.data().length;
+							Tensor ret = Tensor.zeros(activated.shape());
+							for (int i = 0 ; i <length; i++) {
+								ret.data()[i].addi(derivative(activated.data()[i]));
 							}
 							return ret;
 						}
@@ -82,12 +78,10 @@ public class ActivatorFactory implements Serializable {
 					@Override
 					public Tensor output(Tensor input) {
 						if (input != null) {
-							int[] dim = input.shape();
-							Tensor ret = Tensor.zeros(dim);
-							for (int i = 0 ; i < dim[0]; i++) {
-								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j].addi(output(input.data()[i][j]));
-								}
+							int length = input.data().length;
+							Tensor ret = Tensor.zeros(input.shape());
+							for (int i = 0 ; i < length; i++) {
+								ret.data()[i].addi(output(input.data()[i]));
 							}
 							return ret;
 						}
@@ -97,12 +91,10 @@ public class ActivatorFactory implements Serializable {
 					@Override
 					public Tensor derivative(Tensor activated) {
 						if (activated != null) {
-							int[] dim = activated.shape();
-							Tensor ret = Tensor.zeros(dim);
-							for (int i = 0 ; i < dim[0]; i++) {
-								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j].addi(derivative(activated.data()[i][j]));
-								}
+							int length = activated.data().length;
+							Tensor ret = Tensor.zeros(activated.shape());
+							for (int i = 0 ; i < length; i++) {
+								ret.data()[i].addi(derivative(activated.data()[i]));
 							}
 							return ret;
 						}
@@ -134,12 +126,10 @@ public class ActivatorFactory implements Serializable {
 					@Override
 					public Tensor output(Tensor input) {
 						if (input != null) {
-							int[] dim = input.shape();
-							Tensor ret = Tensor.zeros(dim);
-							for (int i = 0 ; i < dim[0]; i++) {
-								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j].addi(output(input.data()[i][j]));
-								}
+							int length = input.data().length;
+							Tensor ret = Tensor.zeros(input.shape());
+							for (int i = 0 ; i < length; i++) {
+								ret.data()[i].addi(output(input.data()[i]));
 							}
 							return ret;
 						}
@@ -149,12 +139,10 @@ public class ActivatorFactory implements Serializable {
 					@Override
 					public Tensor derivative(Tensor activated) {
 						if (activated != null) {
-							int[] dim = activated.shape();
-							Tensor ret = Tensor.zeros(dim);
-							for (int i = 0 ; i < dim[0]; i++) {
-								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j].addi(derivative(activated.data()[i][j]));
-								}
+							int length = activated.data().length;
+							Tensor ret = Tensor.zeros(activated.shape());
+							for (int i = 0 ; i < length; i++) {
+								ret.data()[i].addi(derivative(activated.data()[i]));
 							}
 							return ret;
 						}
@@ -185,16 +173,8 @@ public class ActivatorFactory implements Serializable {
 
 					@Override
 					public Tensor derivative(Tensor activated) {
-						if (activated != null) {
-							int[] dim = activated.shape();
-							Tensor ret = Tensor.zeros(dim);
-							for (int i = 0 ; i < dim[0]; i++) {
-								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j].addi(derivative(ret.data()[i][j]));
-								}
-							}
-							return ret;
-						}
+						if (activated != null)
+							return activated.dup();
 						return null;
 					}
 				};
@@ -218,12 +198,10 @@ public class ActivatorFactory implements Serializable {
 					@Override
 					public Tensor output(Tensor input) {
 						if (input != null) {
-							int[] dim = input.shape();
-							Tensor ret = Tensor.zeros(dim);
-							for (int i = 0 ; i < dim[0]; i++) {
-								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j].addi(output(input.data()[i][j]));
-								}
+							int length = input.data().length;
+							Tensor ret = Tensor.zeros(input.shape());
+							for (int i = 0 ; i < length; i++) {
+								ret.data()[i].addi(output(input.data()[i]));
 							}
 							return ret;
 						}
@@ -233,12 +211,10 @@ public class ActivatorFactory implements Serializable {
 					@Override
 					public Tensor derivative(Tensor activated) {
 						if (activated != null) {
-							int[] dim = activated.shape();
-							Tensor ret = Tensor.zeros(dim);
-							for (int i = 0 ; i < dim[0]; i++) {
-								for (int j = 0; j < dim[1]; j++) {
-									ret.data()[i][j].addi(derivative(activated.data()[i][j]));
-								}
+							int length = activated.data().length;
+							Tensor ret = Tensor.zeros(activated.shape());
+							for (int i = 0 ; i < length; i++) {
+								ret.data()[i].addi(derivative(activated.data()[i]));
 							}
 							return ret;
 						}

@@ -1,25 +1,25 @@
 package org.acl.deepspark.utils;
 
 import org.acl.deepspark.data.Tensor;
-import org.jblas.DoubleMatrix;
+import org.jblas.FloatMatrix;
 
 /**
  * Created by Jaehong on 2015-07-29.
  */
 public class ArrayUtilsTest {
     public static void main(String[] args) {
-        double[] input_a = new double[]{1, 2, -2, 4, -2, 6, 3, -1, 11};
+        float[] input_a = new float[]{1, 2, -2, 4, -2, 6, 3, -1, 11};
         Tensor a = Tensor.create(input_a, new int[]{3, 3});
-        double[] input_b = new double[]{-1, 6, 2, 8, 1, 1, 1, 2, 0};
+        float[] input_b = new float[]{-1, 6, 2, 8, 1, 1, 1, 2, 0};
         Tensor b = Tensor.create(input_b, new int[]{3, 3});
-        double[] input_c = new double[]{1, 0, -2, 3};
+        float[] input_c = new float[]{1, 0, -2, 3};
         Tensor c = Tensor.create(input_c, new int[]{2, 2});
 
-        DoubleMatrix valid1 = ArrayUtils.convolution(a.slice(0,0), b.slice(0,0), ArrayUtils.VALID_CONV);
-        DoubleMatrix full1 = ArrayUtils.convolution(a.slice(0,0), b.slice(0,0), ArrayUtils.FULL_CONV);
+        FloatMatrix valid1 = ArrayUtils.convolution(a.slice(0,0), b.slice(0,0), ArrayUtils.VALID_CONV);
+        FloatMatrix full1 = ArrayUtils.convolution(a.slice(0,0), b.slice(0,0), ArrayUtils.FULL_CONV);
 
-        DoubleMatrix valid2 = ArrayUtils.convolution(a.slice(0,0), c.slice(0,0), ArrayUtils.VALID_CONV);
-        DoubleMatrix full2 = ArrayUtils.convolution(a.slice(0,0), c.slice(0,0), ArrayUtils.FULL_CONV);
+        FloatMatrix valid2 = ArrayUtils.convolution(a.slice(0,0), c.slice(0,0), ArrayUtils.VALID_CONV);
+        FloatMatrix full2 = ArrayUtils.convolution(a.slice(0,0), c.slice(0,0), ArrayUtils.FULL_CONV);
 
         /*
          * valid: 44.0

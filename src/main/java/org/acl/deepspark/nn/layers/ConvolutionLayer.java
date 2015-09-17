@@ -41,7 +41,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 			f_in *= dimW[i];
 		}
 
-		w.w = Tensor.randn(dimW).muli(Math.sqrt(2.0/f_in));
+		w.w = Tensor.randn(dimW).muli((float) Math.sqrt(2.0/f_in));
 		w.b = Tensor.zeros(dimW[0]);
 
 		return w;

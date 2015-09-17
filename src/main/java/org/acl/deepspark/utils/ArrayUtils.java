@@ -1,7 +1,7 @@
 package org.acl.deepspark.utils;
 
 import org.acl.deepspark.data.Tensor;
-import org.jblas.DoubleMatrix;
+import org.jblas.FloatMatrix;
 import org.jblas.SimpleBlas;
 import org.jblas.ranges.RangeUtils;
 
@@ -14,16 +14,16 @@ public class ArrayUtils {
 		return data.reshape(data.length());
 	}
 
-    public static DoubleMatrix convolution(DoubleMatrix data, DoubleMatrix filter, int option) {
-		DoubleMatrix result;
-		DoubleMatrix input;
+    public static FloatMatrix convolution(FloatMatrix data, FloatMatrix filter, int option) {
+		FloatMatrix result;
+		FloatMatrix input;
 
 		int nCols, nRows;
 		switch(option) {
 			case FULL_CONV:
 				nRows = data.rows + filter.rows -1;
 				nCols = data.columns + filter.columns -1;
-				input = DoubleMatrix.zeros(nRows+ filter.rows - 1, nCols + filter.columns - 1);
+				input = FloatMatrix.zeros(nRows+ filter.rows - 1, nCols + filter.columns - 1);
 				input.put(RangeUtils.interval(filter.rows - 1, filter.rows + data.rows - 1),
 						  RangeUtils.interval(filter.columns - 1, filter.columns + data.columns - 1), data);
 
@@ -31,7 +31,7 @@ public class ArrayUtils {
 			case SAME_CONV:
 				nRows = data.getRows();
 				nCols = data.getColumns();
-				input = DoubleMatrix.zeros(nRows+ filter.rows - 1 , nCols + filter.columns - 1);
+				input = FloatMatrix.zeros(nRows+ filter.rows - 1 , nCols + filter.columns - 1);
 				input.put(RangeUtils.interval(filter.rows / 2, filter.rows / 2 + data.rows),
 						RangeUtils.interval(filter.columns / 2, filter.columns /2  + data.columns), data);
 				break;
@@ -43,7 +43,7 @@ public class ArrayUtils {
 			default:
 				return null;
 		}
-		result = DoubleMatrix.zeros(nRows, nCols);
+		result = FloatMatrix.zeros(nRows, nCols);
 		for(int r = 0; r < nRows ; r++) {
 			for(int c = 0 ; c < nCols ; c++) {
 				result.put(r,c,
@@ -54,8 +54,8 @@ public class ArrayUtils {
 		return result;
 	}
 
-	public static DoubleMatrix flip(DoubleMatrix d) {
-		DoubleMatrix output = d.dup();
+	public static FloatMatrix flip(FloatMatrix d) {
+		FloatMatrix output = d.dup();
 		for(int k = 0; k < output.getRows() / 2 ; k++)
 			output.swapRows(k, output.getRows() - 1 -k);
 		for(int k = 0; k < output.getColumns() / 2 ; k++)

@@ -41,10 +41,10 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 	public Tensor generateOutput(Weight weight, Tensor input) {
 		int[] dimIn = input.shape();
 
-		double value;
-		double outValue;
+		float value;
+		float outValue;
 
-		Tensor output = Tensor.ones(calculateOutputDimension()).mul(Double.MAX_VALUE * -1);
+		Tensor output = Tensor.ones(calculateOutputDimension()).mul(Float.MAX_VALUE * -1);
 		for (int k = 0; k < dimIn[0]; k++) {
 			for (int ch = 0; ch < dimIn[1]; ch++) {
 				for (int r = 0; r < dimIn[2]; r++) {

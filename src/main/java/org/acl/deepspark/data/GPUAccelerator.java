@@ -1,10 +1,10 @@
 package org.acl.deepspark.data;
-
+/*
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
 import org.jblas.DoubleMatrix;
-
+*/
 /**
  * Created by Jaehee on 2015-09-15.
  */
@@ -30,7 +30,7 @@ public class GPUAccelerator {
 //        }
 //        return tensor;
 //    }
-
+/*
     public static DoubleMatrix dgemmJCublas(DoubleMatrix A, DoubleMatrix B)
     {
         int m = A.rows;
@@ -68,5 +68,5 @@ public class GPUAccelerator {
 
         return C;
     } // TODO migrate to GPU
-
+*/
 }

@@ -60,27 +60,27 @@ public class Weight implements Serializable {
 		return this;
 	}
 
-	public Weight mul(double d) {
+	public Weight mul(float d) {
 		Weight result = new Weight();
 		result.w = this.w.mul(d);
 		result.b = this.b.mul(d);
 		return result;
 	}
 
-	public Weight muli(double d) {
+	public Weight muli(float d) {
 		w.muli(d);
 		b.muli(d);
 		return this;
 	}
 
-	public Weight div(double d) {
+	public Weight div(float d) {
 		Weight result = new Weight();
 		result.w = w.div(d);
 		result.b = b.div(d);
 		return result;
 	}
 
-	public Weight divi(double d) {
+	public Weight divi(float d) {
 		w.divi(d);
 		b.divi(d);
 		return this;

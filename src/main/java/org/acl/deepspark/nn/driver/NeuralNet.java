@@ -17,20 +17,20 @@ import java.util.ArrayList;
  * Created by Jaehong on 2015-07-16.
  */
 public class NeuralNet implements Serializable {
-    public double learningRate;
-    public double decayLambda;
-    public double momentum;
-    public double dropOutRate;
+    public float learningRate;
+    public float decayLambda;
+    public float momentum;
+    public float dropOutRate;
 
     private Layer[]     layers;
     private Weight[]    weights;
     private Weight[]    weightUpdates;
 
     public NeuralNet(final NeuralNetConf conf) {
-        learningRate = conf.getLearningRate();
-        decayLambda = conf.getDecayLambda();
-        momentum = conf.getMomentum();
-        dropOutRate = conf.getDropOutRate();
+        learningRate = (float) conf.getLearningRate();
+        decayLambda = (float) conf.getDecayLambda();
+        momentum = (float) conf.getMomentum();
+        dropOutRate = (float) conf.getDropOutRate();
         initNetwork(conf);
     }
 

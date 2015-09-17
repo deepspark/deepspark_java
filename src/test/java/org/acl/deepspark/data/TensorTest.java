@@ -6,40 +6,40 @@ package org.acl.deepspark.data;
 public class TensorTest {
     public static void main(String[] args) {
 
-        double[] data1 = new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        float[] data1 = new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         int[] dim1 = new int[] {3, 4};
 
-        double[] data11 = new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        float[] data11 = new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         int[] dim11 = new int[] {2, 5};
 
-        double[] data2 = new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+        float[] data2 = new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                        13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         int[] dim2 = new int[] {2, 3, 4};
 
-        double[] data22 = new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+        float[] data22 = new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
 
         int[] dim22 = new int[] {2, 3, 4};
 
-        double[] data3 = new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+        float[] data3 = new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                         13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
                                         25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
                                         37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48};
         int[] dim3 = new int[] {2, 2, 3, 4};
 
-        double[] data33 = new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+        float[] data33 = new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                         13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
                                         25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
                                         37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48};
         int[] dim33 = new int[] {2, 2, 3, 4};
 
-        double[] data4 = new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+        float[] data4 = new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
                 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
                 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48};
         int[] dim4 = new int[] {2, 2, 4, 3};
 
-        double[] data44 = new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+        float[] data44 = new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
                 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
                 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48};
@@ -103,7 +103,7 @@ public class TensorTest {
         System.out.println(ret);
 
         System.out.println("mul");
-        ret = t3.mul(2.0);
+        ret = t3.mul(2);
         System.out.println(ret);
 
         System.out.println("mul");
@@ -121,7 +121,7 @@ public class TensorTest {
         System.out.println(ret);
 
         System.out.println("div");
-        ret = t3.div(2.0);
+        ret = t3.div(2);
         System.out.println(ret);
 
         System.out.println("div");
@@ -143,7 +143,7 @@ public class TensorTest {
         System.out.println(tensor);
 
         System.out.println("muli");
-        tensor.muli(2.0);
+        tensor.muli(2);
         System.out.println(tensor);
 
         System.out.println("muli");
@@ -153,7 +153,7 @@ public class TensorTest {
         System.out.println(tensor);
 
         System.out.println("divi");
-        tensor.divi(2.0);
+        tensor.divi(2);
         System.out.println(tensor);
 
         System.out.println("divi");

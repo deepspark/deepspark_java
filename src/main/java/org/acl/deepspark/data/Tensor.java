@@ -1,6 +1,7 @@
 package org.acl.deepspark.data;
 
 import org.jblas.DoubleMatrix;
+import org.jblas.FloatMatrix;
 import org.jblas.exceptions.SizeException;
 
 import java.io.Serializable;
@@ -12,7 +13,7 @@ import java.util.Arrays;
 public class Tensor implements Serializable {
 
     private int[] dimShape;         // dimShape = {kernels, channels, rows, cols}
-    private DoubleMatrix[] data;  // data = DoubleMatrix[kernels * channels]
+    private FloatMatrix[] data;  // data = FloatMatrix[kernels * channels]
 
     public enum init {
         ZEROS, ONES, UNIFORM, GAUSSIAN
@@ -29,7 +30,7 @@ public class Tensor implements Serializable {
                 throw new IllegalStateException(String.format("Only support (n <= 4) dimensional tensor, current: %d", newDim.length));
             /* dimShape = {kernels, channels, rows, cols} */
             System.arraycopy(newDim, 0, dimShape, 4-newDim.length, newDim.length);
-            data = new DoubleMatrix[dimShape[0]*dimShape[1]];
+            data = new FloatMatrix[dimShape[0]*dimShape[1]];
         }
     }
 
@@ -39,43 +40,43 @@ public class Tensor implements Serializable {
         for (int i = 0; i < length; i++) {
             switch (init) {
                 case ZEROS:
-                    data[i] = DoubleMatrix.zeros(dimShape[2], dimShape[3]);
+                    data[i] = FloatMatrix.zeros(dimShape[2], dimShape[3]);
                     break;
 
                 case ONES:
-                    data[i] = DoubleMatrix.ones(dimShape[2], dimShape[3]);
+                    data[i] = FloatMatrix.ones(dimShape[2], dimShape[3]);
                     break;
 
                 case UNIFORM:
-                    data[i] = DoubleMatrix.rand(dimShape[2], dimShape[3]);
+                    data[i] = FloatMatrix.rand(dimShape[2], dimShape[3]);
                     break;
 
                 case GAUSSIAN:
-                    data[i] = DoubleMatrix.randn(dimShape[2], dimShape[3]);
+                    data[i] = FloatMatrix.randn(dimShape[2], dimShape[3]);
                     break;
             }
         }
     }
 
-    private Tensor(double[] newData, int[] newDim) {
+    private Tensor(float[] newData, int[] newDim) {
         this(newDim);
         assertMatchSize(newData, newDim);
 
         int length = dimShape[0]*dimShape[1];
         int matSize = dimShape[2]*dimShape[3];
         for (int i = 0 ; i < length; i++) {
-            double[] subArr = new double[matSize];
+            float[] subArr = new float[matSize];
             System.arraycopy(newData, i*matSize, subArr, 0, subArr.length);
-            data[i] = new DoubleMatrix(dimShape[2], dimShape[3], subArr);
+            data[i] = new FloatMatrix(dimShape[2], dimShape[3], subArr);
         }
     }
 
-    private Tensor(DoubleMatrix[] newData, int[] newDim) {
+    private Tensor(FloatMatrix[] newData, int[] newDim) {
         data = newData;
         dimShape = newDim;
     }
 
-    public DoubleMatrix[] data() {
+    public FloatMatrix[] data() {
         return data;
     }
 
@@ -90,15 +91,15 @@ public class Tensor implements Serializable {
         return length;
     }
 
-    public DoubleMatrix slice(int kernelIdx) {
+    public FloatMatrix slice(int kernelIdx) {
         return slice(kernelIdx, 0);
     }
 
-    public DoubleMatrix slice(int kernelIdx, int channelIdx) {
+    public FloatMatrix slice(int kernelIdx, int channelIdx) {
         return data[kernelIdx*dimShape[1] + channelIdx];
     }
 
-    public static Tensor create(double[] newData, int[] newDim) {
+    public static Tensor create(float[] newData, int[] newDim) {
         return new Tensor(newData, newDim);
     }
 
@@ -118,7 +119,7 @@ public class Tensor implements Serializable {
         return new Tensor(init.GAUSSIAN, shape);
     }
 
-    public Tensor add(double d) {
+    public Tensor add(float d) {
         Tensor tensor = new Tensor(dimShape);
         int length = data.length;
         for (int i = 0 ; i < length; i++) {
@@ -138,7 +139,31 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
-    public Tensor addi(double d) {
+    public Tensor addRowTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        Tensor ret = new Tensor(dimShape);
+        for (int i = 0 ; i < data.length; i++)
+            ret.data[i] = data[i].addRowVector(t.data[i]);
+        return ret;
+    }
+
+    public Tensor addColumnTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        Tensor ret = new Tensor(dimShape);
+        for (int i = 0 ; i < data.length; i++)
+            ret.data[i] = data[i].addColumnVector(t.data[i]);
+        return ret;
+    }
+
+    public Tensor addi(float d) {
         int length = data.length;
         for (int i = 0 ; i < length; i++) {
             data[i].addi(d);
@@ -155,7 +180,29 @@ public class Tensor implements Serializable {
         return this;
     }
 
-    public Tensor sub(double d) {
+    public Tensor addiRowTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        for (int i = 0 ; i < data.length; i++)
+            data[i].addiRowVector(t.data[i]);
+        return this;
+    }
+
+    public Tensor addiColumnTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        for (int i = 0 ; i < data.length; i++)
+            data[i].addiColumnVector(t.data[i]);
+        return this;
+    }
+
+    public Tensor sub(float d) {
         Tensor tensor = new Tensor(dimShape);
         int length = data.length;
         for (int i = 0 ; i < length; i++) {
@@ -175,7 +222,31 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
-    public Tensor subi(double d) {
+    public Tensor subRowTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        Tensor ret = new Tensor(dimShape);
+        for (int i = 0 ; i < data.length; i++)
+            ret.data[i] = data[i].subRowVector(t.data[i]);
+        return ret;
+    }
+
+    public Tensor subColumnTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        Tensor ret = new Tensor(dimShape);
+        for (int i = 0 ; i < data.length; i++)
+            ret.data[i] = data[i].subColumnVector(t.data[i]);
+        return ret;
+    }
+
+    public Tensor subi(float d) {
         int length = data.length;
         for (int i = 0 ; i < length; i++) {
             data[i].subi(d);
@@ -192,7 +263,29 @@ public class Tensor implements Serializable {
         return this;
     }
 
-    public Tensor mul(double d) {
+    public Tensor subiRowTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        for (int i = 0 ; i < data.length; i++)
+            data[i].subiRowVector(t.data[i]);
+        return this;
+    }
+
+    public Tensor subiColumnTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        for (int i = 0 ; i < data.length; i++)
+            data[i].subiColumnVector(t.data[i]);
+        return this;
+    }
+
+    public Tensor mul(float d) {
         Tensor tensor = new Tensor(dimShape);
         int length = data.length;
         for (int i = 0 ; i < length; i++) {
@@ -212,7 +305,31 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
-    public Tensor muli(double d) {
+    public Tensor mulRowTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        Tensor ret = new Tensor(dimShape);
+        for (int i = 0 ; i < data.length; i++)
+            ret.data[i] = data[i].mulRowVector(t.data[i]);
+        return ret;
+    }
+
+    public Tensor mulColumnTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        Tensor ret = new Tensor(dimShape);
+        for (int i = 0 ; i < data.length; i++)
+            ret.data[i] = data[i].mulColumnVector(t.data[i]);
+        return ret;
+    }
+
+    public Tensor muli(float d) {
         int length = data.length;
         for (int i = 0 ; i < length; i++) {
             data[i].muli(d);
@@ -229,6 +346,28 @@ public class Tensor implements Serializable {
         return this;
     }
 
+    public Tensor muliRowTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        for (int i = 0 ; i < data.length; i++)
+            data[i].muliRowVector(t.data[i]);
+        return this;
+    }
+
+    public Tensor muliColumnTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        for (int i = 0 ; i < data.length; i++)
+            data[i].muliColumnVector(t.data[i]);
+        return this;
+    }
+
     public Tensor mmul(Tensor t) {
         assertMultipliesWith(t);
         Tensor tensor = new Tensor(dimShape[0], dimShape[1], dimShape[2], t.dimShape[3]);
@@ -239,7 +378,7 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
-    public Tensor div(double d) {
+    public Tensor div(float d) {
         Tensor tensor = new Tensor(dimShape);
         int length = data.length;
         for (int i = 0 ; i < length; i++) {
@@ -259,7 +398,31 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
-    public Tensor divi(double d) {
+    public Tensor divRowTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        Tensor ret = new Tensor(dimShape);
+        for (int i = 0 ; i < data.length; i++)
+            ret.data[i] = data[i].divRowVector(t.data[i]);
+        return ret;
+    }
+
+    public Tensor divColumnTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        Tensor ret = new Tensor(dimShape);
+        for (int i = 0 ; i < data.length; i++)
+            ret.data[i] = data[i].divColumnVector(t.data[i]);
+        return ret;
+    }
+
+    public Tensor divi(float d) {
         int length = data.length;
         for (int i = 0 ; i < length; i++) {
             data[i].divi(d);
@@ -276,6 +439,28 @@ public class Tensor implements Serializable {
         return this;
     }
 
+    public Tensor diviRowTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        for (int i = 0 ; i < data.length; i++)
+            data[i].diviRowVector(t.data[i]);
+        return this;
+    }
+
+    public Tensor diviColumnTensor(Tensor t) {
+        if (t.dimShape[0] != dimShape[0] || t.dimShape[1] != dimShape[1]) {
+            throw new SizeException(String.format("Tensors must have same kernel and channel size (" +
+                    "is {%d,%d} and {%d,%d}", dimShape[0], dimShape[1], t.dimShape[0], t.dimShape[1]));
+        }
+
+        for (int i = 0 ; i < data.length; i++)
+            data[i].diviColumnVector(t.data[i]);
+        return this;
+    }
+
     public Tensor transpose() {
         Tensor t = new Tensor(dimShape[0], dimShape[1], dimShape[3], dimShape[2]);
         int length = data.length;
@@ -285,13 +470,31 @@ public class Tensor implements Serializable {
         return t;
     }
 
-    public double sum() {
-        double sum = 0;
+    public float sum() {
+        float sum = 0;
         int length = data.length;
         for (int i = 0 ; i < length; i++) {
             sum += data[i].sum();
         }
         return sum;
+    }
+
+    public Tensor rowSums() {
+        int length = data.length;
+        Tensor ret = new Tensor(dimShape[0], dimShape[1], dimShape[2], 1);
+        for (int i = 0 ; i < length; i++) {
+            ret.data[i] = data[i].rowSums();
+        }
+        return ret;
+    }
+
+    public Tensor columnSums() {
+        int length = data.length;
+        Tensor ret = new Tensor(dimShape[0], dimShape[1], 1, dimShape[3]);
+        for (int i = 0 ; i < length; i++) {
+            ret.data[i] = data[i].columnSums();
+        }
+        return ret;
     }
 
     public Tensor dup() {
@@ -318,8 +521,8 @@ public class Tensor implements Serializable {
         return ret;
     }
 
-    public double[] toArray() {
-        double[] arr = new double[length()];
+    public float[] toArray() {
+        float[] arr = new float[length()];
         int matSize = dimShape[2]*dimShape[3];       // row x col
 
         int length = data.length;
@@ -341,7 +544,7 @@ public class Tensor implements Serializable {
         }
     }
 
-    private void assertMatchSize(double[] data, int[] shape) {
+    private void assertMatchSize(float[] data, int[] shape) {
         int length = 1;
         for (int i = 0 ; i < shape.length; i++)
             length *= shape[i];

@@ -10,7 +10,6 @@ import org.jblas.FloatMatrix;
  */
 public class GPUTensor extends Tensor {
     // TODO
-
     public Tensor add(Tensor t) {
         assertSameLength(t);
 

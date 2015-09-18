@@ -1,7 +1,7 @@
 package org.acl.deepspark.nn.functions;
 
 import org.acl.deepspark.data.Tensor;
-import org.jblas.DoubleMatrix;
+import org.jblas.FloatMatrix;
 import org.jblas.MatrixFunctions;
 
 import java.io.Serializable;
@@ -13,18 +13,18 @@ public class ActivatorFactory implements Serializable {
 				return new Activator() {
 
 					@Override
-					public DoubleMatrix output(DoubleMatrix input) {
+					public FloatMatrix output(FloatMatrix input) {
 						if (input != null) {
-							DoubleMatrix denom = MatrixFunctions.exp(input.mul(-1.0)).add(1.0);
-							return DoubleMatrix.ones(input.rows, input.columns).divi(denom);
+							FloatMatrix denom = MatrixFunctions.exp(input.mul(-1)).add(1);
+							return FloatMatrix.ones(input.rows, input.columns).divi(denom);
 						}
 						return null;
 					}
 
 					@Override
-					public DoubleMatrix derivative(DoubleMatrix activated) {
+					public FloatMatrix derivative(FloatMatrix activated) {
 						if (activated != null) {
-							DoubleMatrix ret = DoubleMatrix.ones(activated.rows, activated.columns);
+							FloatMatrix ret = FloatMatrix.ones(activated.rows, activated.columns);
 							return ret.subi(activated).muli(activated);
 						}
 						return null;
@@ -60,16 +60,16 @@ public class ActivatorFactory implements Serializable {
 			case RECTIFIED_LINEAR:
 				return new Activator() {
 					@Override
-					public DoubleMatrix output(DoubleMatrix input) {
+					public FloatMatrix output(FloatMatrix input) {
 						if (input != null) {
-							DoubleMatrix idx = input.gt(0);
+							FloatMatrix idx = input.gt(0);
 							return input.mul(idx);
 						}
 						return null;
 					}
 
 					@Override
-					public DoubleMatrix derivative(DoubleMatrix activated) {
+					public FloatMatrix derivative(FloatMatrix activated) {
 						if (activated != null)
 							return activated.gt(0);
 						return null;
@@ -105,11 +105,11 @@ public class ActivatorFactory implements Serializable {
 			case SOFTMAX: // only for output
 				return new Activator() {
 					@Override
-					public DoubleMatrix output(DoubleMatrix input) {
+					public FloatMatrix output(FloatMatrix input) {
 						// exp(theta_j^T X) / sum(exp(theta_j^T X))
-						//DoubleMatrix movedInput = input.sub(input.max());
+						//FloatMatrix movedInput = input.sub(input.max());
 						if (input != null) {
-							DoubleMatrix output = MatrixFunctions.exp(input);
+							FloatMatrix output = MatrixFunctions.exp(input);
 							output.divi(output.sum());
 							return output;
 						}
@@ -117,9 +117,9 @@ public class ActivatorFactory implements Serializable {
 					}
 
 					@Override
-					public DoubleMatrix derivative(DoubleMatrix activated) {
+					public FloatMatrix derivative(FloatMatrix activated) {
 						if (activated != null)
-							return DoubleMatrix.ones(activated.rows, activated.columns);
+							return FloatMatrix.ones(activated.rows, activated.columns);
 						return null;
 					}
 
@@ -153,16 +153,16 @@ public class ActivatorFactory implements Serializable {
 				return new Activator() {
 
 					@Override
-					public DoubleMatrix output(DoubleMatrix input) {
+					public FloatMatrix output(FloatMatrix input) {
 						if (input != null)
 							return input.dup();
 						return null;
 					}
 
 					@Override
-					public DoubleMatrix derivative(DoubleMatrix activated) {
+					public FloatMatrix derivative(FloatMatrix activated) {
 						if (activated != null)
-							return DoubleMatrix.ones(activated.rows, activated.columns);
+							return FloatMatrix.ones(activated.rows, activated.columns);
 						return null;
 					}
 
@@ -182,16 +182,16 @@ public class ActivatorFactory implements Serializable {
 			case TANH:
 				return new Activator() {
 					@Override
-					public DoubleMatrix output(DoubleMatrix input) {
+					public FloatMatrix output(FloatMatrix input) {
 						if (input != null)
 							return MatrixFunctions.tanh(input);
 						return null;
 					}
 
 					@Override
-					public DoubleMatrix derivative(DoubleMatrix input) {
+					public FloatMatrix derivative(FloatMatrix input) {
 						if (input != null)
-							return DoubleMatrix.ones(input.rows, input.columns).subi(MatrixFunctions.pow(input, 2));
+							return FloatMatrix.ones(input.rows, input.columns).subi(MatrixFunctions.pow(input, 2));
 						return null;
 					}
 

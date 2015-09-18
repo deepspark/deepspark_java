@@ -8,7 +8,7 @@ import org.acl.deepspark.nn.functions.ActivatorType;
 
 public class FullyConnLayerTest {
 	public static void main(String[] args) {
-		double[] data = new double[] {1, 2, 1, 5, 1, 4, 8, 3, 2, 7, 9, 3,
+		float[] data = new float[] {1, 2, 1, 5, 1, 4, 8, 3, 2, 7, 9, 3,
 				5, 8, 3, 4, 1, 12, 23, 34, 1, 4, 2, 1,
 				4, 5, 23, 2, 1, 5, 7, 23, 1, 2, 4, 7};
 

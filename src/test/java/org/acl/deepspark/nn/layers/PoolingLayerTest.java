@@ -8,7 +8,7 @@ import org.acl.deepspark.nn.functions.ActivatorType;
 public class PoolingLayerTest {
 	public static void main(String[] args) {
 
-		double[] data = new double[] {1, 2, 3, 123, 2, 6 ,7, 8, 9, 10, 11, 12,
+		float[] data = new float[] {1, 2, 3, 123, 2, 6 ,7, 8, 9, 10, 11, 12,
 									13, 14, 15, 25, 17, 18, 19, 20, 21, 5, 23, 24,
 									25, 26, 15, 28, 39, 30, 31, 32, 14, 34, 35, 36,
 									0, 21, 39, 2, 1, 3, 33, 44, 26, 0, 3, 14};

@@ -27,9 +27,11 @@ public class NeuralNetRunnerTest {
 		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);
 		System.out.println(new Date());
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
-		layer1.set("numFilters", 10);
+		layer1.set("numFilters", 20);
 		layer1.set("filterRow", 5);
 		layer1.set("filterCol", 5);
+		layer1.set("stride", 1);
+		layer1.set("padding", 0);
 		layer1.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);
@@ -38,9 +40,11 @@ public class NeuralNetRunnerTest {
 		layer2.set("activator", ActivatorType.NONE);
 
 		LayerConf layer3 = new LayerConf(LayerType.CONVOLUTION);
-		layer3.set("numFilters", 20);
+		layer3.set("numFilters", 50);
 		layer3.set("filterRow", 5);
 		layer3.set("filterCol", 5);
+		layer3.set("stride", 1);
+		layer3.set("padding", 0);
 		layer3.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer4 = new LayerConf(LayerType.POOLING);
@@ -60,7 +64,7 @@ public class NeuralNetRunnerTest {
 		layer6.set("activator", ActivatorType.NONE);
 */
 		LayerConf layer6 = new LayerConf(LayerType.FULLYCONN);
-		layer6.set("numNodes", 200);
+		layer6.set("numNodes", 500);
 		layer6.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer7 = new LayerConf(LayerType.FULLYCONN);

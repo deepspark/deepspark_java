@@ -32,7 +32,7 @@ public class GPUTensor extends Tensor {
 
         return this;
     }
-
+/*
     public Tensor sub(Tensor t) {
         assertSameLength(t);
         Tensor tensor = new Tensor(t.data, dimShape);
@@ -61,7 +61,7 @@ public class GPUTensor extends Tensor {
         }
         return tensor;
     }
-
+*/
     // TODO implementing elementwise operation
 
     /**

@@ -7,12 +7,17 @@ import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.functions.ActivatorFactory;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.utils.ArrayUtils;
+import org.jblas.DoubleMatrix;
+import org.jblas.FloatMatrix;
+import org.jblas.ranges.RangeUtils;
 
 import java.io.Serializable;
 
 public class ConvolutionLayer extends BaseLayer implements Serializable {
 	private int numFilter;
 	private int dimRow,dimCol;
+	private int stride;
+	private int padding;
 	private Activator activator;
 	private static final long serialVersionUID = 140807767171115076L;
 
@@ -21,6 +26,8 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		numFilter = (Integer) conf.get("numFilters");
 		dimRow = (Integer) conf.get("filterRow");
 		dimCol= (Integer) conf.get("filterCol");
+		stride = (Integer) conf.get("stride");
+		padding = (Integer) conf.get("padding");
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
 	}
 
@@ -29,29 +36,69 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		// weight - 4D ( kernels, channels, x, y )
 		// bias - 1D ( filter )
 		// input - 3D ( channel, x, y)
-		Weight w = new Weight();
-		int[] dimW = new int[4];
-		dimW[0] = numFilter;
-		dimW[1] = input[0];
-		dimW[2] = dimRow; // x
-		dimW[3] = dimCol; // y
+		int[] dimW = new int[] {dimRow*dimCol*input[0], numFilter};
 
 		double f_in = 1.0;
 		for (int i = 0 ; i < dimW.length; i++) {
 			f_in *= dimW[i];
 		}
 
+		Weight w = new Weight();
 		w.w = Tensor.randn(dimW).muli((float) Math.sqrt(2.0/f_in));
-		w.b = Tensor.zeros(dimW[0]);
+		w.b = Tensor.zeros(numFilter);
 
 		return w;
 	}
 
 	@Override
 	public Tensor generateOutput(Weight weight, Tensor input) {
-		int[] kernelDim = weight.getWeightShape(); // 0: # of kernels, 1: # of channel, 2: x, 3: y;
-		Tensor output = Tensor.zeros(calculateOutputDimension());
-		
+		int[] dimIn = getInputShape();
+		int rowKernels = calculateOutputDimension()[1];
+		int colKernels = calculateOutputDimension()[2];
+
+		float[] reshapeArr = new float[dimRow*dimCol*dimIn[0]*rowKernels*colKernels];
+		int startPos = 0;
+
+		/* reshaping to matrix to simplify convolution to normal matrix multiplication */
+		for (int c = 0; c < colKernels; c++) {
+			for (int r = 0; r < rowKernels; r++) {
+				for (int ch = 0; ch < dimIn[0]; ch++) {
+					System.arraycopy(input.slice(0, ch).get(RangeUtils.interval(r*stride, r*stride+dimRow), RangeUtils.interval(c*stride, c*stride+dimCol)).toArray(),
+							0,
+							reshapeArr,
+							startPos,
+							dimRow*dimCol);
+					startPos += dimRow*dimCol;
+				}
+			}
+		}
+
+		Tensor reshaped = Tensor.create(reshapeArr, new int[]{dimRow*dimCol*dimIn[0], rowKernels*colKernels}).transpose();
+		return reshaped.mmul(weight.w).addiRowTensor(weight.b).reshape(numFilter, rowKernels, colKernels);
+
+/*
+		int[] dimIn = getInputShape();
+		int rowKernels = calculateOutputDimension()[1];
+		int colKernels = calculateOutputDimension()[2];
+
+		float[] reshapeArr = new float[dimow*dimCol*rowKernels*colKernels*dimIn[0]];
+		int startPos = 0;
+		for (int r = 0; r < rowKernels; r++) {
+			for (int c = 0; c < colKernels; c++) {
+				for (int ch = 0; ch < dimIn[0]; ch++) {
+					System.arraycopy(input.slice(0, ch).get(RangeUtils.interval(r*stride, r*stride+dimRow), RangeUtils.interval(c*stride, c*stride+dimCol)).toArray(),
+									0,
+									reshapeArr,
+									startPos,
+									dimRow*dimCol);
+					startPos += dimRow*dimCol;
+				}
+			}
+		}
+		Tensor reshaped = Tensor.create(reshapeArr, new int[]{dimRow * dimCol * dimIn[0], rowKernels * colKernels});
+		return weight.w.mmul(reshaped).addi(weight.b).transpose().reshape(calculateOutputDimension());
+*/
+/*
 		// TODO: check dims(image) > dims(filter)
 		for (int i = 0; i < kernelDim[0]; i++) {
 			for (int j = 0; j < kernelDim[1]; j++) {
@@ -59,11 +106,38 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 			}
 			output.slice(0, i).addi(weight.b.slice(0, 0).get(i));
 		}
-		return output;
+*/
 	}
 
 	@Override
 	public Weight gradient(Tensor input, Tensor error) {
+		int[] dimIn = getInputShape();
+		int rowKernels = calculateOutputDimension()[1];
+		int colKernels = calculateOutputDimension()[2];
+
+		float[] reshapeArr = new float[dimRow*dimCol*dimIn[0]*rowKernels*colKernels];
+		int startPos = 0;
+
+		/* reshaping to matrix to simplify convolution to normal matrix multiplication */
+		for (int c = 0; c < colKernels; c++) {
+			for (int r = 0; r < rowKernels; r++) {
+				for (int ch = 0; ch < dimIn[0]; ch++) {
+					System.arraycopy(input.slice(0, ch).get(RangeUtils.interval(r*stride, r*stride+dimRow), RangeUtils.interval(c*stride, c*stride+dimCol)).toArray(),
+							0,
+							reshapeArr,
+							startPos,
+							dimRow*dimCol);
+					startPos += dimRow*dimCol;
+				}
+			}
+		}
+
+		Tensor reshaped = Tensor.create(reshapeArr, new int[]{dimRow*dimCol*dimIn[0], rowKernels*colKernels});
+		error = error.reshape(rowKernels*colKernels, numFilter);
+
+		return new Weight(reshaped.mmul(error), error.columnSums());
+		/*
+
 		int[] dim = new int[4];
 		int[] inputDim = getInputShape(); // 0: # of channel, 1: x, 2: y;
 		
@@ -91,6 +165,10 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 			}
 		}
 		return w;
+
+		*/
+
+
 	}
 
 	@Override
@@ -100,9 +178,9 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public int[] calculateOutputDimension() {
-		int[] dimOut = new int[] { numFilter,
-								 getInputShape()[1] - dimRow + 1,  // x
-								 getInputShape()[2] - dimCol + 1}; // y
+		int[] dimOut = new int[] { numFilter,						// # of featureMaps
+				(getInputShape()[1]-dimRow+2*padding)/stride + 1,  	// featureMap width
+				(getInputShape()[2]-dimCol+2*padding)/stride + 1}; 	// featureMap height
 		return dimOut;
 	}
 
@@ -114,6 +192,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public Tensor calculateBackprop(Weight weight, Tensor error) {
+		/*
 		Tensor backProp = Tensor.zeros(getInputShape());
 		int[] deltaShape = backProp.shape();
 
@@ -123,6 +202,27 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 				for (int i = 0; i < numFilter; i++) {
 					backProp.slice(k, ch).addi(ArrayUtils.convolution(error.slice(k, i), ArrayUtils.flip(weight.w.slice(i, ch)),        // flip weight
 							ArrayUtils.FULL_CONV));                // full convolution
+				}
+			}
+		}
+		return backProp;
+		*/
+		int[] dimIn = getInputShape();
+		int rowKernels = calculateOutputDimension()[1];
+		int colKernels = calculateOutputDimension()[2];
+		error = error.reshape(rowKernels*colKernels, numFilter).transpose();
+
+		float[] backPropArr = weight.w.mmul(error).toArray();
+		float[] reshapeArr = new float[dimRow*dimCol];
+		int startPos = 0;
+
+		Tensor backProp = Tensor.zeros(getInputShape());
+		for (int c = 0; c < colKernels; c++) {
+			for (int r = 0; r < rowKernels; r++) {
+				for (int ch = 0; ch < dimIn[0]; ch++) {
+					System.arraycopy(backPropArr, startPos, reshapeArr, 0, dimRow*dimCol);
+					backProp.slice(0, ch).put(RangeUtils.interval(r*stride, r*stride+dimRow), RangeUtils.interval(c*stride, c*stride+dimCol), new FloatMatrix(dimRow, dimCol, reshapeArr));
+					startPos += dimRow*dimCol;
 				}
 			}
 		}

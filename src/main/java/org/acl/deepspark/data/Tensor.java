@@ -12,6 +12,7 @@ import java.util.Arrays;
 public class Tensor implements Serializable {
 
     protected int[] dimShape;         // dimShape = {kernels, channels, rows, cols}
+    protected int size;
     protected FloatMatrix[] data;  // data = DoubleMatrix[kernels * channels]
 
     public enum init {
@@ -29,14 +30,14 @@ public class Tensor implements Serializable {
                 throw new IllegalStateException(String.format("Only support (n <= 4) dimensional tensor, current: %d", newDim.length));
             /* dimShape = {kernels, channels, rows, cols} */
             System.arraycopy(newDim, 0, dimShape, 4-newDim.length, newDim.length);
-            data = new FloatMatrix[dimShape[0]*dimShape[1]];
+            size = dimShape[0]*dimShape[1];
+            data = new FloatMatrix[size];
         }
     }
 
     protected Tensor(Tensor.init init, int[] newDim) {
         this(newDim);
-        int length = dimShape[0]*dimShape[1];
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < size; i++) {
             switch (init) {
                 case ZEROS:
                     data[i] = FloatMatrix.zeros(dimShape[2], dimShape[3]);
@@ -61,9 +62,8 @@ public class Tensor implements Serializable {
         this(newDim);
         assertMatchSize(newData, newDim);
 
-        int length = dimShape[0]*dimShape[1];
         int matSize = dimShape[2]*dimShape[3];
-        for (int i = 0 ; i < length; i++) {
+        for (int i = 0 ; i < size; i++) {
             float[] subArr = new float[matSize];
             System.arraycopy(newData, i*matSize, subArr, 0, subArr.length);
             data[i] = new FloatMatrix(dimShape[2], dimShape[3], subArr);
@@ -71,6 +71,11 @@ public class Tensor implements Serializable {
     }
 
     protected Tensor(FloatMatrix[] newData, int[] newDim) {
+        this(newDim);
+        if (size != newData.length)
+            throw new SizeException(String.format("Input data length(%d) must match with Tensor size(%d)", newData.length, size));
+        for (FloatMatrix mat : newData)
+            mat.reshape(dimShape[2], dimShape[3]);
         data = newData;
         dimShape = newDim;
     }
@@ -99,6 +104,10 @@ public class Tensor implements Serializable {
     }
 
     public static Tensor create(float[] newData, int[] newDim) {
+        return new Tensor(newData, newDim);
+    }
+
+    public static Tensor create(FloatMatrix[] newData, int[] newDim) {
         return new Tensor(newData, newDim);
     }
 

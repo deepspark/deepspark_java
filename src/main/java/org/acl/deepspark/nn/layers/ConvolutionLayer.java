@@ -27,7 +27,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		dimRow = (Integer) conf.get("filterRow");
 		dimCol= (Integer) conf.get("filterCol");
 		stride = (Integer) conf.get("stride");
-		padding = (Integer) conf.get("padding");
+		padding = (Integer) conf.get("zeroPad");
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
 	}
 

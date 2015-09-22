@@ -31,7 +31,7 @@ public class NeuralNetRunnerTest {
 		layer1.set("filterRow", 5);
 		layer1.set("filterCol", 5);
 		layer1.set("stride", 1);
-		layer1.set("padding", 0);
+		layer1.set("zeroPad", 0);
 		layer1.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);
@@ -45,7 +45,7 @@ public class NeuralNetRunnerTest {
 		layer3.set("filterRow", 5);
 		layer3.set("filterCol", 5);
 		layer3.set("stride", 1);
-		layer3.set("padding", 0);
+		layer3.set("zeroPad", 0);
 		layer3.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer4 = new LayerConf(LayerType.POOLING);
@@ -59,7 +59,7 @@ public class NeuralNetRunnerTest {
 		layer5.set("filterRow", 5);
 		layer5.set("filterCol", 5);
 		layer5.set("stride", 1);
-		layer5.set("padding", 0);
+		layer5.set("zeroPad", 0);
 		layer5.set("activator", ActivatorType.RECTIFIED_LINEAR);
 /*
 		LayerConf layer6 = new LayerConf(LayerType.POOLING);

@@ -14,14 +14,25 @@ public class ArrayUtils {
 		return in.reshape(in.length());
 	}
 
-	public static Tensor padding(Tensor in, int zeroPadding) {
+	public static Tensor zeroPad(Tensor in, int padding) {
 		int length = in.data().length;
 		int[] shape = in.shape();
-		Tensor ret = Tensor.zeros(shape[0], shape[1], shape[2]+2*zeroPadding, shape[3]+2*zeroPadding);
+		Tensor ret = Tensor.zeros(shape[0], shape[1], shape[2]+2*padding, shape[3]+2*padding);
 
 		for (int i = 0 ; i < length; i++) {
-			ret.data()[i].put(RangeUtils.interval(zeroPadding, zeroPadding+shape[2]), RangeUtils.interval(zeroPadding, zeroPadding+shape[3]),
+			ret.data()[i].put(RangeUtils.interval(padding, padding+shape[2]), RangeUtils.interval(padding, padding+shape[3]),
 					in.data()[i]);
+		}
+		return ret;
+	}
+
+	public static Tensor centerCrop(Tensor in, int padding) {
+		int length = in.data().length;
+		int[] shape = in.shape();
+		Tensor ret = Tensor.zeros(shape[0], shape[1], shape[2]-2*padding, shape[3]-2*padding);
+
+		for (int i = 0 ; i < length; i++) {
+			ret.data()[i] = in.data()[i].get(RangeUtils.interval(padding, shape[2]-padding), RangeUtils.interval(padding, shape[3]-padding));
 		}
 		return ret;
 	}

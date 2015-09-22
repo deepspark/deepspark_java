@@ -25,7 +25,7 @@ public class ConvolutionLayerTest {
 		layerConf.set("filterRow", 2);
 		layerConf.set("filterCol", 2);
 		layerConf.set("stride", 1);
-		layerConf.set("padding", 0);
+		layerConf.set("zeroPad", 0);
 		layerConf.set("activator", ActivatorType.NONE);
 
 		ConvolutionLayer convLayer = new ConvolutionLayer(dimIn, layerConf);

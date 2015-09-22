@@ -60,8 +60,14 @@ public class ArrayUtilsTest {
         System.out.println("input");
         System.out.println(input);
 
-        Tensor padInput = ArrayUtils.padding(input, 2);
+        Tensor padInput = ArrayUtils.zeroPad(input, 2);
         System.out.println("padInput");
         System.out.println(padInput);
+
+        Tensor cropped = ArrayUtils.centerCrop(padInput, 1);
+        System.out.println("cropped");
+        System.out.println(cropped);
+
+
     }
 }

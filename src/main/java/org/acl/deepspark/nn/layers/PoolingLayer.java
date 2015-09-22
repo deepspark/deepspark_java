@@ -88,7 +88,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 				for (int oc = 0; oc < dimOut[2]; oc++) {
 					int subIdx = (int) weight.w.slice(0, ch).get(or, oc);
 					propDelta.slice(0, ch).put(or*stride+subIdx%poolRow, oc*stride+subIdx/poolCol,
-							error.slice(0, ch).get(or, oc));
+							propDelta.slice(0, ch).get(or*stride+subIdx%poolRow, oc*stride+subIdx/poolCol) + error.slice(0, ch).get(or, oc));
 				}
 			}
 		}

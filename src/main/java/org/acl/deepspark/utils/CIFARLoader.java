@@ -45,9 +45,9 @@ public class CIFARLoader implements Serializable {
 				for (int i = 0 ; i < length; i++) {
 					value = (int) data[i]&0xff;
 					if (normalize)
-						featureVec[i] = (value - 128) / 128;
+						featureVec[i] = ((float) value - 128) / 128;
 					else
-						featureVec[i] = value;
+						featureVec[i] = (float) value;
 				}
 
 				Sample s = new Sample();
@@ -85,6 +85,7 @@ public class CIFARLoader implements Serializable {
 			in = fs.open(p);
 
 			while ((label = in.read()) != -1) {
+
 				float[] labelVec = new float [dimLabel];
 				float[] featureVec = new float [channel * dimRows * dimCols];
 				for (int i = 0; i < dimLabel; i++) {
@@ -98,9 +99,9 @@ public class CIFARLoader implements Serializable {
 				for (int i = 0 ; i < length; i++) {
 					value = (int) data[i]&0xff;
 					if (normalize)
-						featureVec[i] = (value - 128) / 128;
+						featureVec[i] = ((float) value - 128) / 128;
 					else
-						featureVec[i] = value;
+						featureVec[i] = (float) value;
 				}
 
 				Sample s = new Sample();

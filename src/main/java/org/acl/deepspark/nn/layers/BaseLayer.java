@@ -12,7 +12,7 @@ public abstract class BaseLayer implements Layer,Serializable {
 
 	
 	public BaseLayer(int[] shapes) {
-		inputShape = shapes.clone();
+		inputShape = shapes;
 	}
 	
 	public int[] getInputShape() {

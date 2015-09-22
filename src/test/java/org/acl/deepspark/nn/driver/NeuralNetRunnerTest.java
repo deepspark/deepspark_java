@@ -23,11 +23,11 @@ public class NeuralNetRunnerTest {
 	
 	public static void main(String[] args) throws Exception {
 
-		Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_train.txt", true);
-		Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);
+		Sample[] training_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/train_batch.bin", true);
+		Sample[] test_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/test_batch.bin", true);
 		System.out.println(new Date());
 		LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
-		layer1.set("numFilters", 20);
+		layer1.set("numFilters", 64);
 		layer1.set("filterRow", 5);
 		layer1.set("filterCol", 5);
 		layer1.set("stride", 1);
@@ -37,10 +37,11 @@ public class NeuralNetRunnerTest {
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);
 		layer2.set("poolRow", 2);
 		layer2.set("poolCol", 2);
+		layer2.set("stride", 2);
 		layer2.set("activator", ActivatorType.NONE);
 
 		LayerConf layer3 = new LayerConf(LayerType.CONVOLUTION);
-		layer3.set("numFilters", 50);
+		layer3.set("numFilters", 64);
 		layer3.set("filterRow", 5);
 		layer3.set("filterCol", 5);
 		layer3.set("stride", 1);
@@ -50,21 +51,24 @@ public class NeuralNetRunnerTest {
 		LayerConf layer4 = new LayerConf(LayerType.POOLING);
 		layer4.set("poolRow", 2);
 		layer4.set("poolCol", 2);
+		layer4.set("stride", 2);
 		layer4.set("activator", ActivatorType.NONE);
-/*
+
 		LayerConf layer5 = new LayerConf(LayerType.CONVOLUTION);
-		layer5.set("numFilters", 64);
+		layer5.set("numFilters", 120);
 		layer5.set("filterRow", 5);
 		layer5.set("filterCol", 5);
+		layer5.set("stride", 1);
+		layer5.set("padding", 0);
 		layer5.set("activator", ActivatorType.RECTIFIED_LINEAR);
-
+/*
 		LayerConf layer6 = new LayerConf(LayerType.POOLING);
 		layer6.set("poolRow", 2);
 		layer6.set("poolCol", 2);
 		layer6.set("activator", ActivatorType.NONE);
 */
 		LayerConf layer6 = new LayerConf(LayerType.FULLYCONN);
-		layer6.set("numNodes", 500);
+		layer6.set("numNodes", 84);
 		layer6.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer7 = new LayerConf(LayerType.FULLYCONN);
@@ -76,13 +80,13 @@ public class NeuralNetRunnerTest {
 							.setDecayLambda(decayLambda)
 							.setMomentum(momentum)
 							.setDropOutRate(dropOut)
-							.setInputDim(new int[]{1, 28, 28})
+							.setInputDim(new int[]{3, 32, 32})
 							.setOutputDim(new int[]{10})
 							.addLayer(layer1)
 							.addLayer(layer2)
 							.addLayer(layer3)
 							.addLayer(layer4)
-//							.addLayer(layer5)
+							.addLayer(layer5)
 							.addLayer(layer6)
 							.addLayer(layer7)
 							.build();

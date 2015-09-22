@@ -10,8 +10,20 @@ public class ArrayUtils {
 	public static final int SAME_CONV = 1;
 	public static final int VALID_CONV = 2;
 
-	public static Tensor makeRowVector(Tensor data) {
-		return data.reshape(data.length());
+	public static Tensor makeRowVector(Tensor in) {
+		return in.reshape(in.length());
+	}
+
+	public static Tensor padding(Tensor in, int zeroPadding) {
+		int length = in.data().length;
+		int[] shape = in.shape();
+		Tensor ret = Tensor.zeros(shape[0], shape[1], shape[2]+2*zeroPadding, shape[3]+2*zeroPadding);
+
+		for (int i = 0 ; i < length; i++) {
+			ret.data()[i].put(RangeUtils.interval(zeroPadding, zeroPadding+shape[2]), RangeUtils.interval(zeroPadding, zeroPadding+shape[3]),
+					in.data()[i]);
+		}
+		return ret;
 	}
 
     public static FloatMatrix convolution(FloatMatrix data, FloatMatrix filter, int option) {

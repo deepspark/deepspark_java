@@ -14,7 +14,7 @@ import java.util.Date;
 public class NeuralNetRunnerTest {
 
 	public static final int minibatch = 100;
-	public static final int numIteration = 1200;
+	public static final int numIteration = 5000;
 
 	public static final double learningRate = 0.1;
 	public static final double decayLambda = 0.0005;
@@ -55,7 +55,7 @@ public class NeuralNetRunnerTest {
 		layer4.set("activator", ActivatorType.NONE);
 
 		LayerConf layer5 = new LayerConf(LayerType.CONVOLUTION);
-		layer5.set("numFilters", 120);
+		layer5.set("numFilters", 64);
 		layer5.set("filterRow", 5);
 		layer5.set("filterCol", 5);
 		layer5.set("stride", 1);
@@ -66,11 +66,11 @@ public class NeuralNetRunnerTest {
 		layer6.set("poolRow", 2);
 		layer6.set("poolCol", 2);
 		layer6.set("activator", ActivatorType.NONE);
-*/
+
 		LayerConf layer6 = new LayerConf(LayerType.FULLYCONN);
 		layer6.set("numNodes", 84);
 		layer6.set("activator", ActivatorType.RECTIFIED_LINEAR);
-
+*/
 		LayerConf layer7 = new LayerConf(LayerType.FULLYCONN);
 		layer7.set("numNodes", 10);
 		layer7.set("activator", ActivatorType.SOFTMAX);
@@ -87,7 +87,7 @@ public class NeuralNetRunnerTest {
 							.addLayer(layer3)
 							.addLayer(layer4)
 							.addLayer(layer5)
-							.addLayer(layer6)
+//							.addLayer(layer6)
 							.addLayer(layer7)
 							.build();
 

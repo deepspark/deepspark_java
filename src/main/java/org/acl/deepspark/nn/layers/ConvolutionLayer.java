@@ -60,6 +60,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		int startPos = 0;
 
 		/* reshaping to matrix to simplify convolution to normal matrix multiplication */
+		input = ArrayUtils.zeroPad(input, padding);
 		for (int c = 0; c < colKernels; c++) {
 			for (int r = 0; r < rowKernels; r++) {
 				for (int ch = 0; ch < dimIn[0]; ch++) {
@@ -87,6 +88,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		int startPos = 0;
 
 		/* reshaping to matrix to simplify convolution to normal matrix multiplication */
+		input = ArrayUtils.zeroPad(input, padding);
 		for (int c = 0; c < colKernels; c++) {
 			for (int r = 0; r < rowKernels; r++) {
 				for (int ch = 0; ch < dimIn[0]; ch++) {
@@ -137,7 +139,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		float[] reshapeArr = new float[dimRow*dimCol];
 		int startPos = 0;
 
-		Tensor backProp = Tensor.zeros(getInputShape());
+		Tensor backProp = Tensor.zeros(dimIn[0], dimIn[1]+2*padding, dimIn[2]+2*padding);
 		for (int c = 0; c < colKernels; c++) {
 			for (int r = 0; r < rowKernels; r++) {
 				for (int ch = 0; ch < dimIn[0]; ch++) {
@@ -147,6 +149,6 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 				}
 			}
 		}
-		return backProp;
+		return ArrayUtils.centerCrop(backProp, padding);
 	}
 }

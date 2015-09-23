@@ -31,12 +31,12 @@ public class NeuralNetRunnerTest {
 		layer1.set("filterRow", 5);
 		layer1.set("filterCol", 5);
 		layer1.set("stride", 1);
-		layer1.set("zeroPad", 0);
+		layer1.set("zeroPad", 1);
 		layer1.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer2 = new LayerConf(LayerType.POOLING);
-		layer2.set("poolRow", 2);
-		layer2.set("poolCol", 2);
+		layer2.set("poolRow", 3);
+		layer2.set("poolCol", 3);
 		layer2.set("stride", 2);
 		layer2.set("activator", ActivatorType.NONE);
 
@@ -45,12 +45,12 @@ public class NeuralNetRunnerTest {
 		layer3.set("filterRow", 5);
 		layer3.set("filterCol", 5);
 		layer3.set("stride", 1);
-		layer3.set("zeroPad", 0);
+		layer3.set("zeroPad", 1);
 		layer3.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
 		LayerConf layer4 = new LayerConf(LayerType.POOLING);
-		layer4.set("poolRow", 2);
-		layer4.set("poolCol", 2);
+		layer4.set("poolRow", 3);
+		layer4.set("poolCol", 3);
 		layer4.set("stride", 2);
 		layer4.set("activator", ActivatorType.NONE);
 
@@ -59,14 +59,15 @@ public class NeuralNetRunnerTest {
 		layer5.set("filterRow", 5);
 		layer5.set("filterCol", 5);
 		layer5.set("stride", 1);
-		layer5.set("zeroPad", 0);
+		layer5.set("zeroPad", 1);
 		layer5.set("activator", ActivatorType.RECTIFIED_LINEAR);
-/*
-		LayerConf layer6 = new LayerConf(LayerType.POOLING);
-		layer6.set("poolRow", 2);
-		layer6.set("poolCol", 2);
-		layer6.set("activator", ActivatorType.NONE);
 
+		LayerConf layer6 = new LayerConf(LayerType.POOLING);
+		layer6.set("poolRow", 3);
+		layer6.set("poolCol", 3);
+		layer6.set("stride", 2);
+		layer6.set("activator", ActivatorType.NONE);
+/*
 		LayerConf layer6 = new LayerConf(LayerType.FULLYCONN);
 		layer6.set("numNodes", 84);
 		layer6.set("activator", ActivatorType.RECTIFIED_LINEAR);

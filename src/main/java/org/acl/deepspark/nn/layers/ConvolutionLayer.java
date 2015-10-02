@@ -19,6 +19,9 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	private int stride;
 	private int padding;
 	private Activator activator;
+
+	private float std;
+
 	private static final long serialVersionUID = 140807767171115076L;
 
 	public ConvolutionLayer(int[] shape, LayerConf conf) {
@@ -28,6 +31,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		dimCol= (Integer) conf.get("filterCol");
 		stride = (Integer) conf.get("stride");
 		padding = (Integer) conf.get("zeroPad");
+
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
 	}
 
@@ -44,7 +48,8 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		}
 
 		Weight w = new Weight();
-		w.w = Tensor.randn(dimW).muli((float) Math.sqrt(2.0/f_in));
+		//w.w = Tensor.randn(dimW).muli((float) Math.sqrt(2.0/f_in));
+		w.w = Tensor.randn(dimW).muli(std);
 		w.b = Tensor.zeros(numFilter);
 
 		return w;
@@ -52,18 +57,18 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public Tensor generateOutput(Weight weight, Tensor input) {
-		int[] dimIn = getInputShape();
+		int channels = getInputShape()[0];
 		int rowKernels = calculateOutputDimension()[1];
 		int colKernels = calculateOutputDimension()[2];
 
-		float[] reshapeArr = new float[dimRow*dimCol*dimIn[0]*rowKernels*colKernels];
+		float[] reshapeArr = new float[dimRow*dimCol*channels*rowKernels*colKernels];
 		int startPos = 0;
 
 		/* reshaping to matrix to simplify convolution to normal matrix multiplication */
 		input = ArrayUtils.zeroPad(input, padding);
 		for (int c = 0; c < colKernels; c++) {
 			for (int r = 0; r < rowKernels; r++) {
-				for (int ch = 0; ch < dimIn[0]; ch++) {
+				for (int ch = 0; ch < channels; ch++) {
 					System.arraycopy(input.slice(0, ch).get(RangeUtils.interval(r*stride, r*stride+dimRow), RangeUtils.interval(c*stride, c*stride+dimCol)).toArray(),
 							0,
 							reshapeArr,
@@ -74,24 +79,24 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 			}
 		}
 
-		Tensor reshaped = Tensor.create(reshapeArr, new int[]{dimRow*dimCol*dimIn[0], rowKernels*colKernels}).transpose();
+		Tensor reshaped = Tensor.create(reshapeArr, new int[]{dimRow*dimCol*channels, rowKernels*colKernels}).transpose();
 		return reshaped.mmul(weight.w).addiRowTensor(weight.b).reshape(numFilter, rowKernels, colKernels);
 	}
 
 	@Override
 	public Weight gradient(Tensor input, Tensor error) {
-		int[] dimIn = getInputShape();
+		int channels = getInputShape()[0];
 		int rowKernels = calculateOutputDimension()[1];
 		int colKernels = calculateOutputDimension()[2];
 
-		float[] reshapeArr = new float[dimRow*dimCol*dimIn[0]*rowKernels*colKernels];
+		float[] reshapeArr = new float[dimRow*dimCol*channels*rowKernels*colKernels];
 		int startPos = 0;
 
 		/* reshaping to matrix to simplify convolution to normal matrix multiplication */
 		input = ArrayUtils.zeroPad(input, padding);
 		for (int c = 0; c < colKernels; c++) {
 			for (int r = 0; r < rowKernels; r++) {
-				for (int ch = 0; ch < dimIn[0]; ch++) {
+				for (int ch = 0; ch < channels; ch++) {
 					System.arraycopy(input.slice(0, ch).get(RangeUtils.interval(r*stride, r*stride+dimRow), RangeUtils.interval(c*stride, c*stride+dimCol)).toArray(),
 							0,
 							reshapeArr,
@@ -102,7 +107,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 			}
 		}
 
-		Tensor reshaped = Tensor.create(reshapeArr, new int[]{dimRow*dimCol*dimIn[0], rowKernels*colKernels});
+		Tensor reshaped = Tensor.create(reshapeArr, new int[]{dimRow*dimCol*channels, rowKernels*colKernels});
 		error = error.reshape(rowKernels*colKernels, numFilter);
 
 		return new Weight(reshaped.mmul(error), error.columnSums());

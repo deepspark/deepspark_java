@@ -64,7 +64,7 @@ public class ArrayUtilsTest {
         System.out.println("padInput");
         System.out.println(padInput);
 
-        Tensor cropped = ArrayUtils.centerCrop(padInput, 1);
+        Tensor cropped = ArrayUtils.centerCrop(padInput, 2);
         System.out.println("cropped");
         System.out.println(cropped);
 

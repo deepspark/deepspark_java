@@ -15,11 +15,14 @@ import java.io.Serializable;
 public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	private int 		numOut;
 	private Activator 	activator;
+
+	private float std;
 	private static final long serialVersionUID = 2662945560065918864L;
 
 	public FullyConnectedLayer(int[] inputShape, LayerConf conf) {
 		super(inputShape);
 		numOut = (Integer) conf.get("numNodes");
+		std = (Float) conf.get("std");
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
 	}
 
@@ -37,9 +40,9 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public Weight gradient(Tensor input,Tensor error) {
-		Tensor data = ArrayUtils.makeRowVector(input);
+		Tensor data = ArrayUtils.makeColumnVector(input);
 		Weight w = new Weight();
-		w.w = data.transpose().mmul(error);
+		w.w = data.mmul(error);
 		w.b = error;
 		return w;
 	}
@@ -52,7 +55,9 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 			dimIn *= input[i];
 
 		Weight w= new Weight();
-		w.w = Tensor.randn(dimIn, dimOut).mul((float) Math.sqrt(2.0/dimIn));
+
+		w.w = Tensor.randn(dimIn, dimOut).muli(std);
+		//w.w = Tensor.randn(dimIn, dimOut).mul((float) Math.sqrt(2.0/dimIn));
 		w.b = Tensor.zeros(dimOut);
 		return w;
 	}

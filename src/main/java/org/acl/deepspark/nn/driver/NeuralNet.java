@@ -34,7 +34,7 @@ public class NeuralNet implements Serializable {
         initNetwork(conf);
     }
 
-    public void initNetwork(final NeuralNetConf conf) {
+    private void initNetwork(final NeuralNetConf conf) {
         int size = conf.getLayerList().size();
         layers = new Layer[size];
         weights = new Weight[size];

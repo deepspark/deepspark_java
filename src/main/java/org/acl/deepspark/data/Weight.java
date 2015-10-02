@@ -3,16 +3,19 @@ package org.acl.deepspark.data;
 import java.io.Serializable;
 
 public class Weight implements Serializable {
-	/**
-	 * 
-	 */
+
+	public enum Init {
+		CONSTANT, UNIFORM, GAUSSIAN, XAVIER;
+	}
+
 	private static final long serialVersionUID = -2016361466768395491L;
 	
 	public Tensor w;
 	public Tensor b;
 
 	public Weight() {
-
+		w = null;
+		b = null;
 	}
 
 	public Weight(int weight[], int bias[]) {

@@ -34,7 +34,7 @@ public class CIFARTest {
         .set("stride", 1)
         .set("zeroPad", 2)
         .set("weight_type", WeightType.GAUSSIAN)
-        .set("weight_value", 0.0001)
+        .set("weight_value", 0.0001f)
         .set("activator", ActivatorType.RECTIFIED_LINEAR);
 
         LayerConf pool1 = new LayerConf(LayerType.POOLING)
@@ -50,7 +50,7 @@ public class CIFARTest {
         .set("stride", 1)
         .set("zeroPad", 2)
         .set("weight_type", WeightType.GAUSSIAN)
-        .set("weight_value", 0.01)
+        .set("weight_value", 0.01f)
         .set("activator", ActivatorType.RECTIFIED_LINEAR);
 
         LayerConf pool2 = new LayerConf(LayerType.POOLING)
@@ -66,7 +66,7 @@ public class CIFARTest {
         .set("stride", 1)
         .set("zeroPad", 2)
         .set("weight_type", WeightType.GAUSSIAN)
-        .set("weight_value", 0.01)
+        .set("weight_value", 0.01f)
         .set("activator", ActivatorType.RECTIFIED_LINEAR);
 
         LayerConf pool3 = new LayerConf(LayerType.POOLING)
@@ -78,7 +78,7 @@ public class CIFARTest {
         LayerConf full1 = new LayerConf(LayerType.FULLYCONN)
         .set("num_output", 10)
         .set("weight_type", WeightType.GAUSSIAN)
-        .set("weight_value", 0.01)
+        .set("weight_value", 0.01f)
         .set("activator", ActivatorType.SOFTMAX);
 
         NeuralNet net = new NeuralNetConf()

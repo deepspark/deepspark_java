@@ -1,19 +1,17 @@
 package org.acl.deepspark.data;
 
-import breeze.stats.distributions.Uniform;
 import org.jblas.FloatMatrix;
 import org.jblas.exceptions.SizeException;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * Created by Jaehong on 2015-09-02.
  */
 public class Tensor implements Serializable {
 
-    protected int[] dimShape;         // dimShape = {kernels, channels, rows, cols}
-    protected int length;
+    protected int[] dimShape;      // dimShape = {kernels, channels, rows, cols}
+    protected int length;          // length = kernels * channels
     protected FloatMatrix[] data;  // data = DoubleMatrix[kernels * channels]
 
     public enum init {
@@ -55,7 +53,6 @@ public class Tensor implements Serializable {
                 case GAUSSIAN:
                     data[i] = FloatMatrix.randn(dimShape[2], dimShape[3]);
                     break;
-
             }
         }
     }

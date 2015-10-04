@@ -6,7 +6,6 @@ import org.acl.deepspark.nn.conf.NeuralNetConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.LayerType;
 import org.acl.deepspark.utils.CIFARLoader;
-import org.acl.deepspark.utils.MnistLoader;
 
 import java.util.Date;
 

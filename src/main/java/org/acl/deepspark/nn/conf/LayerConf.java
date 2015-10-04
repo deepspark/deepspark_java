@@ -17,7 +17,10 @@ public class LayerConf {
         layerParams = new HashMap<>();
     }
 
-    public void set(String key, Object value) { layerParams.put(key, value); }
+    public LayerConf set(String key, Object value) {
+        layerParams.put(key, value);
+        return this;
+    }
     
     public Object get(String key) { return layerParams.get(key); }
     

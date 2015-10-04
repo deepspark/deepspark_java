@@ -69,7 +69,7 @@ public class ArrayUtils {
     	}
     	return new FloatMatrix(f.rows - 2* padding, f.columns - 2* padding, cropped);
 	}
-	
+
     public static FloatMatrix convolution(FloatMatrix data, FloatMatrix filter, int option) {
 		FloatMatrix result;
 		FloatMatrix input;
@@ -118,4 +118,5 @@ public class ArrayUtils {
 			output.swapColumns(k, output.getColumns() - 1 -k);
 		return output;
 	}
+
 }

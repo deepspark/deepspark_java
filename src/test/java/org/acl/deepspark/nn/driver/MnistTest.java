@@ -1,11 +1,11 @@
 package org.acl.deepspark.nn.driver;
 
 import org.acl.deepspark.data.Sample;
+import org.acl.deepspark.data.WeightType;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.LayerType;
-import org.acl.deepspark.utils.CIFARLoader;
 import org.acl.deepspark.utils.MnistLoader;
 
 import java.util.Date;
@@ -27,75 +27,64 @@ public class MnistTest {
         Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_train.txt", true);
         Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);
         System.out.println(new Date());
-        LayerConf layer1 = new LayerConf(LayerType.CONVOLUTION);
-        layer1.set("numFilters", 20);
-        layer1.set("filterRow", 5);
-        layer1.set("filterCol", 5);
-        layer1.set("stride", 1);
-        layer1.set("zeroPad", 0);
-        layer1.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
-        LayerConf layer2 = new LayerConf(LayerType.POOLING);
-        layer2.set("poolRow", 2);
-        layer2.set("poolCol", 2);
-        layer2.set("stride", 2);
-        layer2.set("activator", ActivatorType.NONE);
+        LayerConf conv1 = new LayerConf(LayerType.CONVOLUTION)
+        .set("num_output", 20)
+        .set("kernel_row", 5)
+        .set("kernel_col", 5)
+        .set("stride", 1)
+        .set("zeroPad", 0)
+        .set("weight_type", WeightType.XAVIER)
+        .set("activator", ActivatorType.RECTIFIED_LINEAR);
 
-        LayerConf layer3 = new LayerConf(LayerType.CONVOLUTION);
-        layer3.set("numFilters", 50);
-        layer3.set("filterRow", 5);
-        layer3.set("filterCol", 5);
-        layer3.set("stride", 1);
-        layer3.set("zeroPad", 0);
-        layer3.set("activator", ActivatorType.RECTIFIED_LINEAR);
+        LayerConf pool1 = new LayerConf(LayerType.POOLING)
+        .set("kernel_row", 2)
+        .set("kernel_col", 2)
+        .set("stride", 2)
+        .set("activator", ActivatorType.NONE);
 
-        LayerConf layer4 = new LayerConf(LayerType.POOLING);
-        layer4.set("poolRow", 2);
-        layer4.set("poolCol", 2);
-        layer4.set("stride", 2);
-        layer4.set("activator", ActivatorType.NONE);
-/*
-        LayerConf layer5 = new LayerConf(LayerType.CONVOLUTION);
-        layer5.set("numFilters", 64);
-        layer5.set("filterRow", 5);
-        layer5.set("filterCol", 5);
-        layer5.set("stride", 1);
-        layer5.set("zeroPad", 1);
-        layer5.set("activator", ActivatorType.RECTIFIED_LINEAR);
+        LayerConf conv2 = new LayerConf(LayerType.CONVOLUTION)
+        .set("num_output", 50)
+        .set("kernel_row", 5)
+        .set("kernel_col", 5)
+        .set("stride", 1)
+        .set("zeroPad", 0)
+        .set("weight_type", WeightType.XAVIER)
+        .set("activator", ActivatorType.RECTIFIED_LINEAR);
 
-        LayerConf layer6 = new LayerConf(LayerType.POOLING);
-        layer6.set("poolRow", 3);
-        layer6.set("poolCol", 3);
-        layer6.set("stride", 2);
-        layer6.set("activator", ActivatorType.NONE);
-*/
+        LayerConf pool2 = new LayerConf(LayerType.POOLING)
+        .set("kernel_row", 2)
+        .set("kernel_col", 2)
+        .set("stride", 2)
+        .set("activator", ActivatorType.NONE);
 
-		LayerConf layer6 = new LayerConf(LayerType.FULLYCONN);
-		layer6.set("numNodes", 500);
-		layer6.set("activator", ActivatorType.RECTIFIED_LINEAR);
+		LayerConf full1 = new LayerConf(LayerType.FULLYCONN)
+		.set("num_output", 200)
+        .set("weight_type", WeightType.XAVIER)
+		.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
-        LayerConf layer7 = new LayerConf(LayerType.FULLYCONN);
-        layer7.set("numNodes", 10);
-        layer7.set("activator", ActivatorType.SOFTMAX);
+        LayerConf full2 = new LayerConf(LayerType.FULLYCONN)
+        .set("num_output", 10)
+        .set("weight_type", WeightType.XAVIER)
+        .set("activator", ActivatorType.SOFTMAX);
 
         NeuralNet net = new NeuralNetConf()
                 .setLearningRate(learningRate)
                 .setDecayLambda(decayLambda)
                 .setMomentum(momentum)
                 .setDropOutRate(dropOut)
-                .setInputDim(new int[]{1, 28, 28})
+                .setInputDim(new int[]{1, 1, 28, 28})
                 .setOutputDim(new int[]{10})
-                .addLayer(layer1)
-                .addLayer(layer2)
-                .addLayer(layer3)
-                .addLayer(layer4)
-//                .addLayer(layer5)
-                .addLayer(layer6)
-                .addLayer(layer7)
+                .addLayer(conv1)
+                .addLayer(pool1)
+                .addLayer(conv2)
+                .addLayer(pool2)
+                .addLayer(full1)
+                .addLayer(full2)
                 .build();
 
         NeuralNetRunner driver = new NeuralNetRunner(net).setIterations(numIteration)
-                .setMiniBatchSize(minibatch);
+                                                         .setMiniBatchSize(minibatch);
 
         System.out.println("Start Learning...");
         Date startTime = new Date();

@@ -2,6 +2,8 @@ package org.acl.deepspark.nn.layers;
 
 import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
+import org.acl.deepspark.data.WeightFactory;
+import org.acl.deepspark.data.WeightType;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.functions.ActivatorFactory;
@@ -13,22 +15,19 @@ import java.io.Serializable;
 
 // Fully Connected HiddenLayer
 public class FullyConnectedLayer extends BaseLayer implements Serializable {
-	private int 		numOut;
+	private int 		dimOut;
 	private Activator 	activator;
 
-	private float std;
 	private static final long serialVersionUID = 2662945560065918864L;
 
 	public FullyConnectedLayer(int[] inputShape, LayerConf conf) {
 		super(inputShape);
-		numOut = (Integer) conf.get("numNodes");
-		std = (Float) conf.get("std");
+		dimOut = (Integer) conf.get("num_output");
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
 	}
 
 	@Override
 	public Tensor generateOutput(Weight weight, Tensor input) {
-
 		Tensor data = ArrayUtils.makeRowVector(input);
 		return data.mmul(weight.w).addi(weight.b);
 	}
@@ -41,25 +40,37 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	@Override
 	public Weight gradient(Tensor input,Tensor error) {
 		Tensor data = ArrayUtils.makeColumnVector(input);
-		Weight w = new Weight();
-		w.w = data.mmul(error);
-		w.b = error;
-		return w;
+		return new Weight(data.mmul(error), error);
 	}
 
 	@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
-		int dimOut = (Integer) conf.get("numNodes");
-		int dimIn = 1;
-		for(int i =0; i < input.length; i++)
-			dimIn *= input[i];
+		WeightType typeW, typeB;
+		float valueW, valueB;
+		int dimIn = input[1]*input[2]*input[3];					// channels * rows * columns
 
-		Weight w= new Weight();
+		typeW = (WeightType) conf.get("weight_type");
+		typeB = (WeightType) conf.get("bias_type");
 
-		w.w = Tensor.randn(dimIn, dimOut).muli(std);
-		//w.w = Tensor.randn(dimIn, dimOut).mul((float) Math.sqrt(2.0/dimIn));
-		w.b = Tensor.zeros(dimOut);
-		return w;
+		if (typeW == WeightType.XAVIER) {
+			valueW = (float) Math.sqrt(2.0/dimIn);
+		}  else {
+			valueW = (conf.get("weight_value") == null) ?
+					Weight.DEFAULT_VALUE : (Float) conf.get("weight_value");
+		}
+
+		if (typeB == WeightType.XAVIER) {
+			valueB = (float) Math.sqrt(2.0/dimIn);
+		} else {
+			valueB = (conf.get("bias_value") == null) ?
+					Weight.DEFAULT_VALUE : (Float) conf.get("bias_value");
+		}
+
+		if (typeW == null) typeW = Weight.DEFAULT_TYPE;
+		if (typeB == null) typeB = Weight.DEFAULT_TYPE;
+
+		return new Weight  (WeightFactory.create(typeW, valueW, dimIn, dimOut),
+							WeightFactory.create(typeB, valueB, dimOut));
 	}
 
 	@Override
@@ -68,13 +79,13 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	}
 
 	@Override
-	public int[] calculateOutputDimension() {
-		return new int[] { numOut };
+	public int[] calcOutputShape() {
+		return new int[] { getDimIn()[0], 1, 1, dimOut };
 	}
 
 	@Override
 	public Tensor calculateBackprop(Weight weight, Tensor delta) {
 		Tensor data = weight.w.mmul(delta.transpose());
-		return data.reshape(getInputShape());
+		return data.reshape(getDimIn());
 	}
 }

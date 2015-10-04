@@ -1,16 +1,16 @@
 package org.acl.deepspark.utils;
 
-import java.io.*;
-import java.util.ArrayList;
-
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.data.Tensor;
-import org.apache.commons.math.stat.descriptive.StatisticalSummary;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.jblas.FloatMatrix;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 public class CIFARLoader implements Serializable {
 	

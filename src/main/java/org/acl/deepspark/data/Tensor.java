@@ -1,5 +1,6 @@
 package org.acl.deepspark.data;
 
+import org.acl.deepspark.utils.GPUUtils;
 import org.jblas.FloatMatrix;
 import org.jblas.exceptions.SizeException;
 
@@ -375,6 +376,19 @@ public class Tensor implements Serializable {
             tensor.data[i] = data[i].mmul(t.data[i]);
         }
         return tensor;
+    }
+
+    public Tensor mmul(Tensor other) {
+        assertMultipliesWith(other);
+
+        Tensor result = new Tensor(dimShape[0], dimShape[1], dimShape[2], other.dimShape[3]);
+
+        for (int i = 0; i < data.length; i++) {
+            result.data[i] = new FloatMatrix(data[i].rows, other.data[i].columns);
+            GPUUtils.sgemmJCublas('n', 'n', 1, data[i], other.data[i], 0, result.data[i]);
+        }
+
+        return result;
     }
 
     public Tensor div(float d) {

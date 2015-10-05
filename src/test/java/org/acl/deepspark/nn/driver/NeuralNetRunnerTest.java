@@ -1,11 +1,12 @@
 package org.acl.deepspark.nn.driver;
 
+import jcuda.jcublas.JCublas;
+import org.acl.deepspark.utils.GPUUtils;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.LayerType;
-import org.acl.deepspark.utils.CIFARLoader;
 import org.acl.deepspark.utils.MnistLoader;
 
 import java.util.Date;
@@ -85,6 +86,9 @@ public class NeuralNetRunnerTest {
 
 		NeuralNetRunner driver = new NeuralNetRunner(net).setIterations(numIteration)
 														 .setMiniBatchSize(minibatch);
+		// JCublas initialization
+		JCublas.cublasInit();
+		GPUUtils.preAllocationMemory();
 
 		System.out.println("Start Learning...");
 		Date startTime = new Date();
@@ -92,6 +96,10 @@ public class NeuralNetRunnerTest {
 		Date endTime = new Date();
 
 		System.out.println(String.format("Accuracy: %f %%", driver.printAccuracy(test_data)));
+
+		// JCublas shutdown
+		GPUUtils.clearGPUMem();
+		JCublas.cublasShutdown();
 
 		long time = endTime.getTime() - startTime.getTime();
 		System.out.println(String.format("Training time: %f secs", (double) time / 1000));

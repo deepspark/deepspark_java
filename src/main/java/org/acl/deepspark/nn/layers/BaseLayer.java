@@ -8,14 +8,15 @@ public abstract class BaseLayer implements Layer,Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 2727430537685176806L;
-	private int[] inputShape;
+	private int[] dimIn;
 
 	
 	public BaseLayer(int[] shapes) {
-		inputShape = shapes.clone();
+		dimIn = shapes;
 	}
 	
-	public int[] getInputShape() {
-		return inputShape;
+	public int[] getDimIn() {
+		return dimIn;
 	}
+
 }

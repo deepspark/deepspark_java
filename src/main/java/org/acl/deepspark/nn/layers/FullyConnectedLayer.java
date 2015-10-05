@@ -2,6 +2,8 @@ package org.acl.deepspark.nn.layers;
 
 import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.data.Weight;
+import org.acl.deepspark.data.WeightFactory;
+import org.acl.deepspark.data.WeightType;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.functions.Activator;
 import org.acl.deepspark.nn.functions.ActivatorFactory;
@@ -13,19 +15,19 @@ import java.io.Serializable;
 
 // Fully Connected HiddenLayer
 public class FullyConnectedLayer extends BaseLayer implements Serializable {
-	private int 		numOut;
+	private int 		dimOut;
 	private Activator 	activator;
+
 	private static final long serialVersionUID = 2662945560065918864L;
 
 	public FullyConnectedLayer(int[] inputShape, LayerConf conf) {
 		super(inputShape);
-		numOut = (Integer) conf.get("numNodes");
+		dimOut = (Integer) conf.get("num_output");
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
 	}
 
 	@Override
 	public Tensor generateOutput(Weight weight, Tensor input) {
-
 		Tensor data = ArrayUtils.makeRowVector(input);
 		return data.mmul(weight.w).addi(weight.b);
 	}
@@ -37,24 +39,38 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public Weight gradient(Tensor input,Tensor error) {
-		Tensor data = ArrayUtils.makeRowVector(input);
-		Weight w = new Weight();
-		w.w = data.transpose().mmul(error);
-		w.b = error;
-		return w;
+		Tensor data = ArrayUtils.makeColumnVector(input);
+		return new Weight(data.mmul(error), error);
 	}
 
 	@Override
 	public Weight createWeight(LayerConf conf, int[] input) {
-		int dimOut = (Integer) conf.get("numNodes");
-		int dimIn = 1;
-		for(int i =0; i < input.length; i++)
-			dimIn *= input[i];
+		WeightType typeW, typeB;
+		float valueW, valueB;
+		int dimIn = input[1]*input[2]*input[3];					// channels * rows * columns
 
-		Weight w= new Weight();
-		w.w = Tensor.randn(dimIn, dimOut).mul((float) Math.sqrt(2.0/dimIn));
-		w.b = Tensor.zeros(dimOut);
-		return w;
+		typeW = (WeightType) conf.get("weight_type");
+		typeB = (WeightType) conf.get("bias_type");
+
+		if (typeW == WeightType.XAVIER) {
+			valueW = (float) Math.sqrt(2.0/dimIn);
+		}  else {
+			valueW = (conf.get("weight_value") == null) ?
+					Weight.DEFAULT_VALUE : (Float) conf.get("weight_value");
+		}
+
+		if (typeB == WeightType.XAVIER) {
+			valueB = (float) Math.sqrt(2.0/dimIn);
+		} else {
+			valueB = (conf.get("bias_value") == null) ?
+					Weight.DEFAULT_VALUE : (Float) conf.get("bias_value");
+		}
+
+		if (typeW == null) typeW = Weight.DEFAULT_TYPE;
+		if (typeB == null) typeB = Weight.DEFAULT_TYPE;
+
+		return new Weight  (WeightFactory.create(typeW, valueW, dimIn, dimOut),
+							WeightFactory.create(typeB, valueB, dimOut));
 	}
 
 	@Override
@@ -63,83 +79,13 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	}
 
 	@Override
-	public int[] calculateOutputDimension() {
-		return new int[] { numOut };
+	public int[] calcOutputShape() {
+		return new int[] { getDimIn()[0], 1, 1, dimOut };
 	}
 
 	@Override
 	public Tensor calculateBackprop(Weight weight, Tensor delta) {
 		Tensor data = weight.w.mmul(delta.transpose());
-		return data.reshape(getInputShape());
+		return data.reshape(getDimIn());
 	}
-/*
-	@Override
-	public INDArray generateOutputBatch(Weight weight, INDArray input) {
-		int numSample = input.shape()[0];
-		int length = input.slice(0).length();
-		
-		INDArray data = Nd4j.create(numSample, length);
-		INDArray bias = Nd4j.create(numSample, weight.b.length());
-		for(int i = 0; i < numSample; i++) {
-			data.putSlice(i, input.slice(i).reshape(length));
-			bias.putSlice(i, weight.b.linearView());
-		}
-		data.transposei();
-		bias.transposei();
-		
-		return weight.w.mmul(data).addi(bias);
-	}
-
-	@Override
-	public Weight gradientBatch(INDArray input, INDArray error) {
-		int numSample = input.shape()[0];
-		int inputLength = input.slice(0).length();
-		int errorLength = error.slice(0).length();
-		
-		INDArray data = Nd4j.create(numSample, inputLength);
-		INDArray delta = Nd4j.create(numSample, errorLength);
-		
-		/*
-		 * delta = sample x output
-		 * data = sample x feature
-		 *
-		for(int i = 0; i < numSample; i++) {
-			data.putSlice(i, input.slice(i).reshape(inputLength));
-			delta.putSlice(i, error.slice(i).reshape(errorLength));
-		}
-		data.transposei();
-		
-		/*
-		 * data = feature x sample
-		 * w = output x feature
-		 *
- 		
-		Weight w = new Weight();
-		w.w = data.mul(delta).transposei().div(numSample);  // output x feature
-		w.b = delta.sum(0).div(numSample); 
-		return w;
-	}
-
-	@Override
-	public INDArray calculateBackpropBatch(Weight weight, INDArray error) {
-		int numSample = error.shape()[0];
-		int errorLength = error.slice(0).length();
-		
-		// delta = output x sample
-		INDArray delta = Nd4j.create(numSample, errorLength);
-		for(int i = 0; i < numSample; i++)
-			delta.putSlice(i, error.slice(i).reshape(errorLength));
-		delta.transposei();
-		
-		// data = sample x feature
-		INDArray data = weight.w.transpose().mmul(delta).transposei();
-		
-		int dim[] = new int[getInputShape().length + 1];
-		dim[0] = numSample;
-		System.arraycopy(getInputShape(), 0, dim, 1, dim.length - 1);
-		
-		// data = sample x (input dim)
-		return data.reshape(dim);
-	}
-*/
 }

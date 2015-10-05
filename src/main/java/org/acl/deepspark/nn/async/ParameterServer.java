@@ -1,5 +1,8 @@
 package org.acl.deepspark.nn.async;
 
+import org.acl.deepspark.data.Weight;
+import org.acl.deepspark.nn.driver.NeuralNet;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,9 +10,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import org.acl.deepspark.data.Weight;
-import org.acl.deepspark.nn.driver.NeuralNet;
 
 public class ParameterServer {
 	private NeuralNet p;

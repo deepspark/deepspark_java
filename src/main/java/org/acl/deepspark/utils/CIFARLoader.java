@@ -1,14 +1,16 @@
 package org.acl.deepspark.utils;
 
-import java.io.*;
-import java.util.ArrayList;
-
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.data.Tensor;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 public class CIFARLoader implements Serializable {
 	
@@ -44,14 +46,14 @@ public class CIFARLoader implements Serializable {
 				in.read(data);
 				for (int i = 0 ; i < length; i++) {
 					value = (int) data[i]&0xff;
-					if (normalize)
-						featureVec[i] = (value - 128) / 128;
-					else
-						featureVec[i] = value;
+					featureVec[i] = (float) value;
 				}
 
 				Sample s = new Sample();
 				s.data = Tensor.create(featureVec, sampleDim);
+				if (normalize) {
+					s.data.subi(s.data.mean());
+				}
 				s.label = Tensor.create(labelVec, new int[] {dimLabel});
 				samples.add(s);
 			}
@@ -85,6 +87,7 @@ public class CIFARLoader implements Serializable {
 			in = fs.open(p);
 
 			while ((label = in.read()) != -1) {
+
 				float[] labelVec = new float [dimLabel];
 				float[] featureVec = new float [channel * dimRows * dimCols];
 				for (int i = 0; i < dimLabel; i++) {
@@ -98,9 +101,9 @@ public class CIFARLoader implements Serializable {
 				for (int i = 0 ; i < length; i++) {
 					value = (int) data[i]&0xff;
 					if (normalize)
-						featureVec[i] = (value - 128) / 128;
+						featureVec[i] = ((float) value - 128) / 128;
 					else
-						featureVec[i] = value;
+						featureVec[i] = (float) value;
 				}
 
 				Sample s = new Sample();

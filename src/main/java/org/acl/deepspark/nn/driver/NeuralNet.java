@@ -34,7 +34,7 @@ public class NeuralNet implements Serializable {
         initNetwork(conf);
     }
 
-    public void initNetwork(final NeuralNetConf conf) {
+    private void initNetwork(final NeuralNetConf conf) {
         int size = conf.getLayerList().size();
         layers = new Layer[size];
         weights = new Weight[size];
@@ -57,7 +57,7 @@ public class NeuralNet implements Serializable {
                     break;
             }
             weights[i] = layers[i].createWeight(layerConf, dimIn);
-            dimIn = layers[i].calculateOutputDimension();
+            dimIn = layers[i].calcOutputShape();
             if (weights[i] != null)
                 weightUpdates[i] = new Weight(weights[i].getWeightShape(), weights[i].getBiasShape());
         }
@@ -114,15 +114,13 @@ public class NeuralNet implements Serializable {
                     ("Number of layers mismatch; current %d, deltaWeight %d", weights.length, deltaWeight.length));
 
         for (int i = 0 ; i < weights.length; i++) {
-            if (weights[i] != null) {
+            if (deltaWeight[i] != null) {
                 weightUpdates[i].w.muli(momentum);
                 weightUpdates[i].w.subi(weights[i].w.mul(learningRate * decayLambda));
-                if (deltaWeight[i] != null)
-                    weightUpdates[i].w.subi(deltaWeight[i].w.mul(learningRate));
-                
+                weightUpdates[i].w.subi(deltaWeight[i].w.mul(learningRate));
+
                 weightUpdates[i].b.muli(momentum);
-                if (deltaWeight[i] != null)
-                    weightUpdates[i].b.subi(deltaWeight[i].b.mul(learningRate));
+                weightUpdates[i].b.subi(deltaWeight[i].b.mul(learningRate));
 
                 weights[i].w.addi(weightUpdates[i].w);
                 weights[i].b.addi(weightUpdates[i].b);

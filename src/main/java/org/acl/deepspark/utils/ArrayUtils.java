@@ -10,8 +10,64 @@ public class ArrayUtils {
 	public static final int SAME_CONV = 1;
 	public static final int VALID_CONV = 2;
 
-	public static Tensor makeRowVector(Tensor data) {
-		return data.reshape(data.length());
+	public static Tensor makeColumnVector(Tensor in) {
+		return in.reshape(in.length(), 1);
+	}
+
+	public static Tensor makeRowVector(Tensor in) {
+		return in.reshape(in.length());
+	}
+
+	public static Tensor zeroPad(Tensor in, int padding) {
+		int length = in.data().length;
+		int[] shape = in.shape();
+		Tensor ret = Tensor.zeros(shape[0], shape[1], shape[2]+2*padding, shape[3]+2*padding);
+
+		for (int i = 0 ; i < length; i++) {
+			ret.data()[i] = zeroPadMatrix(in.data()[i], padding);
+		}
+		return ret;
+	}
+	
+	private static FloatMatrix zeroPadMatrix(FloatMatrix in, int padding) {
+		FloatMatrix f = in;
+    	
+    	float[] padded = new float[(f.rows + 2*padding) * (f.columns + 2* padding)]; 
+    	    	
+    	float[] org = f.toArray();
+    	
+    	for (int i = 0; i < f.columns;i++) {
+    		int org_start_pos = i * f.rows;
+    		int dest_start_pos = (i + padding)* (f.rows + 2 * padding) + padding;
+    		System.arraycopy(org, org_start_pos, padded, dest_start_pos, f.rows);
+    	}
+    	return new FloatMatrix(f.rows + 2* padding, f.columns + 2* padding, padded);
+	}
+	
+	public static Tensor centerCrop(Tensor in, int padding) {
+		int length = in.data().length;
+		int[] shape = in.shape();
+		Tensor ret = Tensor.zeros(shape[0], shape[1], shape[2]-2*padding, shape[3]-2*padding);
+
+		for (int i = 0 ; i < length; i++) {
+			ret.data()[i] = centerCropMatrix(in.data()[i], padding);
+		}
+		return ret;
+	}
+
+	private static FloatMatrix centerCropMatrix(FloatMatrix in, int padding) {
+		FloatMatrix f = in;
+    	
+    	float[] cropped = new float[(f.rows - 2*padding) * (f.columns - 2 * padding)]; 
+    	    	
+    	float[] org = f.toArray();
+    	
+    	for (int i = padding; i < f.columns - padding;i++) {
+    		int org_start_pos = i * f.rows + padding;
+    		int dest_start_pos = (i - padding) * (f.rows - 2 * padding);
+    		System.arraycopy(org, org_start_pos, cropped, dest_start_pos, f.rows - 2 * padding);
+    	}
+    	return new FloatMatrix(f.rows - 2* padding, f.columns - 2* padding, cropped);
 	}
 
     public static FloatMatrix convolution(FloatMatrix data, FloatMatrix filter, int option) {
@@ -62,4 +118,5 @@ public class ArrayUtils {
 			output.swapColumns(k, output.getColumns() - 1 -k);
 		return output;
 	}
+
 }

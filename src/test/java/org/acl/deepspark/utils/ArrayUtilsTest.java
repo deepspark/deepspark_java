@@ -51,5 +51,23 @@ public class ArrayUtilsTest {
         /** convolution test complete **/
 
 
+        float[] data = new float[] {1, 2, 1, 5, 1, 4, 8, 3, 2, 7, 9, 3,
+                5, 8, 3, 4, 1, 12, 23, 34, 1, 4, 2, 1,
+                4, 5, 23, 2, 1, 5, 7, 23, 1, 2, 4, 7};
+
+        int[] dimIn = new int[] {4, 3, 3};
+        Tensor input = Tensor.create(data, dimIn);
+        System.out.println("input");
+        System.out.println(input);
+
+        Tensor padInput = ArrayUtils.zeroPad(input, 2);
+        System.out.println("padInput");
+        System.out.println(padInput);
+
+        Tensor cropped = ArrayUtils.centerCrop(padInput, 2);
+        System.out.println("cropped");
+        System.out.println(cropped);
+
+
     }
 }

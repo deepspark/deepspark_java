@@ -21,9 +21,11 @@ public class ConvolutionLayerTest {
 		System.out.println(input);
 
 		LayerConf layerConf = new LayerConf(LayerType.CONVOLUTION);
-		layerConf.set("numFilters", 5);
+		layerConf.set("numFilters", 6);
 		layerConf.set("filterRow", 2);
 		layerConf.set("filterCol", 2);
+		layerConf.set("stride", 1);
+		layerConf.set("zeroPad", 0);
 		layerConf.set("activator", ActivatorType.NONE);
 
 		ConvolutionLayer convLayer = new ConvolutionLayer(dimIn, layerConf);
@@ -37,6 +39,7 @@ public class ConvolutionLayerTest {
 		System.out.println(String.format("weight dim: (%d, %d, %d, %d)", weight.w.shape()[0], weight.w.shape()[1], weight.w.shape()[2], weight.w.shape()[3]));
 		System.out.println(String.format("bias dim: (%d, %d, %d, %d)", weight.b.shape()[0], weight.b.shape()[1], weight.b.shape()[2], weight.b.shape()[3]));
 		System.out.println(String.format("output dim: (%d, %d, %d, %d)", output.shape()[0], output.shape()[1], output.shape()[2], output.shape()[3]));
+		System.out.println(weight.w);
 
 		Tensor propDelta = convLayer.calculateBackprop(weight, output);
 		System.out.println(String.format("delta dim: (%d, %d, %d, %d)", propDelta.shape()[0], propDelta.shape()[1], propDelta.shape()[2], propDelta.shape()[3]));

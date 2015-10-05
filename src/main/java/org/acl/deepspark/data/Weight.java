@@ -3,22 +3,23 @@ package org.acl.deepspark.data;
 import java.io.Serializable;
 
 public class Weight implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2016361466768395491L;
-	
+
 	public Tensor w;
 	public Tensor b;
 
-	public Weight() {
+	public static final float DEFAULT_VALUE = 0.0f;
+	public static final WeightType DEFAULT_TYPE = WeightType.CONSTANT;
 
+	private static final long serialVersionUID = -2016361466768395491L;
+
+	public Weight() {
+		w = null;
+		b = null;
 	}
 
-	public Weight(int weight[], int bias[]) {
-		// Weight initialization, weight: gaussian, bias: zero
-		w = Tensor.zeros(weight);
-		b = Tensor.zeros(bias);
+	public Weight(int[] dimW, int[] dimB) {
+		this.w = WeightFactory.create(DEFAULT_TYPE, DEFAULT_VALUE, dimW);
+		this.b = WeightFactory.create(DEFAULT_TYPE, DEFAULT_VALUE, dimB);
 	}
 
 	public Weight(Tensor w, Tensor b) {

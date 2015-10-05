@@ -62,7 +62,7 @@ public class ActivatorFactory implements Serializable {
 					@Override
 					public FloatMatrix output(FloatMatrix input) {
 						if (input != null) {
-							FloatMatrix idx = input.gt(0);
+							FloatMatrix idx = input.gt(0.0f);
 							return input.mul(idx);
 						}
 						return null;
@@ -71,7 +71,7 @@ public class ActivatorFactory implements Serializable {
 					@Override
 					public FloatMatrix derivative(FloatMatrix activated) {
 						if (activated != null)
-							return activated.gt(0);
+							return activated.gt(0.0f);
 						return null;
 					}
 

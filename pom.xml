@@ -15,6 +15,7 @@
 		<spark.version>1.2.1</spark.version>
 		<junit.version>4.12</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jcuda.version>0.7.0a</jcuda.version>
 	</properties>
 	
 	<build>
@@ -96,11 +97,6 @@
 			      <version>${junit.version}</version>
 			      <scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-math3</artifactId>
-				<version>3.4.1</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	
@@ -137,5 +133,48 @@
 		      <artifactId>junit</artifactId>
 		      <scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>jcuda</groupId>
+			<artifactId>jcublas</artifactId>
+			<version>${jcuda.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jcuda</groupId>
+			<artifactId>jcuda</artifactId>
+			<version>${jcuda.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jcuda</groupId>
+			<artifactId>jcufft</artifactId>
+			<version>${jcuda.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jcuda</groupId>
+			<artifactId>jcurand</artifactId>
+			<version>${jcuda.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jcuda</groupId>
+			<artifactId>jcusparse</artifactId>
+			<version>${jcuda.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jcuda</groupId>
+			<artifactId>jcusolver</artifactId>
+			<version>${jcuda.version}</version>
+		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>jcuda.local</id>
+			<name>JCuda</name>
+			<url>file:${project.basedir}/lib</url>
+		</repository>
+	</repositories>
 </project>

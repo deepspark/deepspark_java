@@ -24,8 +24,8 @@ public class MnistTest {
 
     public static void main(String[] args) throws Exception {
 
-        Sample[] training_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_train.txt", true);
-        Sample[] test_data = MnistLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/mnist_test.txt", true);
+        Sample[] training_data = MnistLoader.loadIntoSamples("D:/mnist_train.txt", true);
+        Sample[] test_data = MnistLoader.loadIntoSamples("D:/mnist_test.txt", true);
         System.out.println(new Date());
 
         LayerConf conv1 = new LayerConf(LayerType.CONVOLUTION)

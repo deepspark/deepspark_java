@@ -16,20 +16,22 @@ import java.io.Serializable;
 // Fully Connected HiddenLayer
 public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	private int 		dimOut;
+	private boolean gpuAccel;
 	private Activator 	activator;
 
 	private static final long serialVersionUID = 2662945560065918864L;
 
-	public FullyConnectedLayer(int[] inputShape, LayerConf conf) {
+	public FullyConnectedLayer(int[] inputShape, LayerConf conf, boolean gpuAccel) {
 		super(inputShape);
 		dimOut = (Integer) conf.get("num_output");
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
+		this.gpuAccel = gpuAccel;
 	}
 
 	@Override
 	public Tensor generateOutput(Weight weight, Tensor input) {
 		Tensor data = ArrayUtils.makeRowVector(input);
-		return data.mmul(weight.w).addi(weight.b);
+		return data.mmul(weight.w, gpuAccel).addi(weight.b);
 	}
 
 	@Override
@@ -40,7 +42,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 	@Override
 	public Weight gradient(Tensor input,Tensor error) {
 		Tensor data = ArrayUtils.makeColumnVector(input);
-		return new Weight(data.mmul(error), error);
+		return new Weight(data.mmul(error, gpuAccel), error);
 	}
 
 	@Override
@@ -85,7 +87,7 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 
 	@Override
 	public Tensor calculateBackprop(Weight weight, Tensor delta) {
-		Tensor data = weight.w.mmul(delta.transpose());
+		Tensor data = weight.w.mmul(delta.transpose(), gpuAccel);
 		return data.reshape(getDimIn());
 	}
 }

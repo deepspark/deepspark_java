@@ -11,19 +11,19 @@ import java.io.Serializable;
  */
 public class Tensor implements Serializable {
 
-    protected int[] dimShape;      // dimShape = {kernels, channels, rows, cols}
-    protected int length;          // length = kernels * channels
-    protected FloatMatrix[] data;  // data = DoubleMatrix[kernels * channels]
+    private int[] dimShape;      // dimShape = {kernels, channels, rows, cols}
+    private int length;          // length = kernels * channels
+    private FloatMatrix[] data;  // data = DoubleMatrix[kernels * channels]
 
     public enum init {
         ZEROS, ONES, UNIFORM, GAUSSIAN, XAVIER
     }
 
-    protected Tensor() {
+    private Tensor() {
         dimShape = new int[] {1, 1, 1, 1};
     }
 
-    protected Tensor(int... newDim) {
+    private Tensor(int... newDim) {
         this();
         if (newDim != null) {
             if (newDim.length > 4)
@@ -35,7 +35,7 @@ public class Tensor implements Serializable {
         }
     }
 
-    protected Tensor(Tensor.init init, int[] newDim) {
+    private Tensor(Tensor.init init, int[] newDim) {
         this(newDim);
         for (int i = 0; i < length; i++) {
             switch (init) {
@@ -58,7 +58,7 @@ public class Tensor implements Serializable {
         }
     }
 
-    protected Tensor(float[] newData, int[] newDim) {
+    public Tensor(float[] newData, int[] newDim) {
         this(newDim);
         assertMatchSize(newData, newDim);
 
@@ -70,7 +70,7 @@ public class Tensor implements Serializable {
         }
     }
 
-    protected Tensor(FloatMatrix[] newData, int[] newDim) {
+    private Tensor(FloatMatrix[] newData, int[] newDim) {
         this(newDim);
         if (length != newData.length)
             throw new SizeException(String.format("Input data length(%d) must match with Tensor size(%d)", newData.length, length));
@@ -103,10 +103,6 @@ public class Tensor implements Serializable {
     }
 
     public static Tensor create(float[] newData, int[] newDim) {
-        return new Tensor(newData, newDim);
-    }
-
-    public static Tensor create(FloatMatrix[] newData, int[] newDim) {
         return new Tensor(newData, newDim);
     }
 
@@ -381,11 +377,19 @@ public class Tensor implements Serializable {
         return tensor;
     }
 
-    public Tensor mmul(Tensor t) {
+    public Tensor mmul(Tensor t, boolean gpuAccel) {
         assertMultipliesWith(t);
         Tensor tensor = new Tensor(dimShape[0], dimShape[1], dimShape[2], t.dimShape[3]);
-        for (int i = 0 ; i < length; i++)
-            tensor.data[i] = data[i].mmul(t.data[i]);
+
+        if(gpuAccel) {
+            for(int i = 0; i < data.length; i++) {
+                tensor.data[i] = new FloatMatrix(data[i].rows, t.data[i].columns);
+                GPUUtils.sgemmJCublas('n', 'n', 1, data[i], t.data[i], 0, tensor.data[i]);
+            }
+        } else {
+            for (int i = 0; i < data.length; i++)
+                tensor.data[i] = data[i].mmul(t.data[i]);
+        }
         return tensor;
     }
 
@@ -577,19 +581,19 @@ public class Tensor implements Serializable {
         return Tensor.create(toArray(), shape);
     }
 
-    protected void assertSameLength(Tensor a) {
+    private void assertSameLength(Tensor a) {
         if (length != a.length)
             throw new SizeException(String.format("Tensors must have same length (is: {%d} and {%d})", length, a.length));
     }
 
-    protected void assertSameShape(Tensor t) {
+    private void assertSameShape(Tensor t) {
         if (dimShape[0] != t.dimShape[0] || dimShape[1] != t.dimShape[1] ||
                 dimShape[2] != t.dimShape[2] || dimShape[3] != t.dimShape[3])
             throw new SizeException(String.format("Tensors must have same shape (is: {%d, %d, %d, %d} and {%d, %d, %d, %d}",
                     dimShape[0], dimShape[1], dimShape[2], dimShape[3], t.dimShape[0], t.dimShape[1], t.dimShape[2], t.dimShape[3]));
     }
 
-    protected void assertMatchSize(float[] data, int[] shape) {
+    private void assertMatchSize(float[] data, int[] shape) {
         int length = 1;
         for (int i = 0 ; i < shape.length; i++)
             length *= shape[i];
@@ -600,7 +604,7 @@ public class Tensor implements Serializable {
         }
     }
 
-    protected void assertMultipliesWith(Tensor t) {
+    private void assertMultipliesWith(Tensor t) {
         assertSameLength(t);
         if (dimShape[3] != t.dimShape[2])
             throw new SizeException(String.format("Number of columns of left matrix (%d) must be equal to number of rows of right matrix (%d).", dimShape[3], t.dimShape[2]));

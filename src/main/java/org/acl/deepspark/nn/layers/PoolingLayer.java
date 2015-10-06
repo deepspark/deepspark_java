@@ -19,7 +19,7 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 
 	private static final long serialVersionUID = -4318643106939173007L;
 
-	public PoolingLayer(int[] inputShape, LayerConf conf) {
+	public PoolingLayer(int[] inputShape, LayerConf conf, boolean gpuAccel) {
 		super(inputShape);
 		this.kernelRow = (Integer) conf.get("kernel_row");
 		this.kernelCol = (Integer) conf.get("kernel_col");

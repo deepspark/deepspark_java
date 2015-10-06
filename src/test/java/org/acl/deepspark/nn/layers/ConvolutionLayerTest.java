@@ -15,22 +15,23 @@ public class ConvolutionLayerTest {
 									 5, 8, 3, 4, 1, 12, 23, 34, 1, 4, 2, 1,
 									 4, 5, 23, 2, 1, 5, 7, 23, 1, 2, 4, 7};
 
-		int[] dimIn = new int[] {4, 3, 3};
+		int[] dimIn = new int[] {1, 4, 3, 3};
 		Tensor input = Tensor.create(data, dimIn);
 		System.out.println("input");
 		System.out.println(input);
 
 		LayerConf layerConf = new LayerConf(LayerType.CONVOLUTION);
-		layerConf.set("numFilters", 6);
-		layerConf.set("filterRow", 2);
-		layerConf.set("filterCol", 2);
+		layerConf.set("num_output", 6);
+		layerConf.set("kernel_row", 2);
+		layerConf.set("kernel_col", 2);
 		layerConf.set("stride", 1);
 		layerConf.set("zeroPad", 0);
 		layerConf.set("activator", ActivatorType.NONE);
 
-		ConvolutionLayer convLayer = new ConvolutionLayer(dimIn, layerConf);
+		ConvolutionLayer convLayer = new ConvolutionLayer(dimIn, layerConf, true);
 		Weight weight = convLayer.createWeight(layerConf, dimIn);
 
+        System.out.println(weight);
 		Tensor output = convLayer.generateOutput(weight, input);
 		System.out.println("output");
 		System.out.println(output);

@@ -21,6 +21,7 @@ public class NeuralNet implements Serializable {
     public float decayLambda;
     public float momentum;
     public float dropOutRate;
+    public boolean gpuAccel;
 
     private Layer[]     layers;
     private Weight[]    weights;
@@ -31,6 +32,7 @@ public class NeuralNet implements Serializable {
         decayLambda = (float) conf.getDecayLambda();
         momentum = (float) conf.getMomentum();
         dropOutRate = (float) conf.getDropOutRate();
+        gpuAccel = (conf.getGpuAccel() == 1.0);
         initNetwork(conf);
     }
 
@@ -47,13 +49,13 @@ public class NeuralNet implements Serializable {
             LayerConf layerConf = arr.get(i);
             switch (layerConf.getType()) {
                 case CONVOLUTION:
-                    layers[i] = new ConvolutionLayer(dimIn, layerConf);
+                    layers[i] = new ConvolutionLayer(dimIn, layerConf, gpuAccel);
                     break;
                 case POOLING:
-                    layers[i] = new PoolingLayer(dimIn, layerConf);
+                    layers[i] = new PoolingLayer(dimIn, layerConf, gpuAccel);
                     break;
                 case FULLYCONN:
-                    layers[i] = new FullyConnectedLayer(dimIn, layerConf);
+                    layers[i] = new FullyConnectedLayer(dimIn, layerConf, gpuAccel);
                     break;
             }
             weights[i] = layers[i].createWeight(layerConf, dimIn);

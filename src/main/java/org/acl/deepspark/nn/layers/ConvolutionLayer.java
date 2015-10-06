@@ -19,11 +19,12 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 	private int kernelRow,kernelCol;
 	private int stride;
 	private int padding;
+	private boolean gpuAccel;
 	private Activator activator;
 
 	private static final long serialVersionUID = 140807767171115076L;
 
-	public ConvolutionLayer(int[] shape, LayerConf conf) {
+	public ConvolutionLayer(int[] shape, LayerConf conf, boolean gpuAccel) {
 		super(shape);
 		kernels = (Integer) conf.get("num_output");
 		kernelRow = (Integer) conf.get("kernel_row");
@@ -31,6 +32,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		stride = (Integer) conf.get("stride");
 		padding = (Integer) conf.get("zeroPad");
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
+		this.gpuAccel = gpuAccel;
 	}
 
 	@Override
@@ -88,7 +90,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		}
 
 		Tensor reshaped = Tensor.create(reshapeArr, new int[]{kernelRow*kernelCol*channels, rowKernels*colKernels}).transpose();
-		return reshaped.mmul(weight.w).addiRowTensor(weight.b).reshape(kernels, rowKernels, colKernels);
+		return reshaped.mmul(weight.w, gpuAccel).addiRowTensor(weight.b).reshape(kernels, rowKernels, colKernels);
 	}
 
 	@Override
@@ -118,7 +120,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		Tensor reshaped = Tensor.create(reshapeArr, new int[]{kernelRow*kernelCol*channels, rowKernels*colKernels});
 		error = error.reshape(rowKernels*colKernels, kernels);
 
-		return new Weight(reshaped.mmul(error), error.columnSums());
+		return new Weight(reshaped.mmul(error, gpuAccel), error.columnSums());
 	}
 
 	@Override
@@ -150,7 +152,7 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		int colKernels = calcOutputShape()[3];
 		error = error.reshape(rowKernels*colKernels, kernels).transpose();
 
-		float[] backPropArr = weight.w.mmul(error).toArray();
+		float[] backPropArr = weight.w.mmul(error, gpuAccel).toArray();
 		float[] reshapeArr = new float[kernelRow*kernelCol];
 		int startPos = 0;
 

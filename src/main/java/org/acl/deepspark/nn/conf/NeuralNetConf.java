@@ -59,6 +59,11 @@ public class NeuralNetConf implements Serializable {
 		return this;
 	}
 
+	public NeuralNetConf setGpuAccel(Double gpuAccel) {
+		params.put("gpuAccel", gpuAccel);
+		return this;
+	}
+
 	public int[] getDimIn() {
 		return dimIn;
 	}
@@ -89,6 +94,10 @@ public class NeuralNetConf implements Serializable {
 
 	public double getDropOutRate() {
 		return params.get("dropOutRate");
+	}
+
+	public double getGpuAccel() {
+		return params.get("gpuAccel");
 	}
 
 	public NeuralNetConf addLayer(LayerConf l) {

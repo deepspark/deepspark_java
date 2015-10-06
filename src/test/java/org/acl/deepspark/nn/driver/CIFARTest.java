@@ -1,5 +1,6 @@
 package org.acl.deepspark.nn.driver;
 
+import jcuda.jcublas.JCublas;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.data.WeightType;
 import org.acl.deepspark.nn.conf.LayerConf;
@@ -7,6 +8,7 @@ import org.acl.deepspark.nn.conf.NeuralNetConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.LayerType;
 import org.acl.deepspark.utils.CIFARLoader;
+import org.acl.deepspark.utils.GPUUtils;
 
 import java.util.Date;
 
@@ -21,11 +23,15 @@ public class CIFARTest {
     public static final double decayLambda = 0.004;
     public static final double momentum = 0.9;
     public static final double dropOut = 0.0;
+    public static final double gpuAccel = 1.0;
 
     public static void main(String[] args) throws Exception {
-
-        Sample[] training_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/train_batch.bin", true);
-        Sample[] test_data = CIFARLoader.loadIntoSamples("C:/Users/Jaehong/Downloads/test_batch.bin", true);
+        if(gpuAccel == 1.0) {
+            JCublas.cublasInit();
+            GPUUtils.preAllocationMemory();
+        }
+        Sample[] training_data = CIFARLoader.loadIntoSamples("D:/CIFAR-10/train_batch.bin", true);
+        Sample[] test_data = CIFARLoader.loadIntoSamples("D:/CIFAR-10/test_batch.bin", true);
         System.out.println(new Date());
         LayerConf conv1 = new LayerConf(LayerType.CONVOLUTION)
         .set("num_output", 64)
@@ -82,6 +88,7 @@ public class CIFARTest {
         .set("activator", ActivatorType.SOFTMAX);
 
         NeuralNet net = new NeuralNetConf()
+                .setGpuAccel(gpuAccel)
                 .setLearningRate(learningRate)
                 .setDecayLambda(decayLambda)
                 .setMomentum(momentum)
@@ -106,6 +113,11 @@ public class CIFARTest {
         Date endTime = new Date();
 
         System.out.println(String.format("Accuracy: %f %%", driver.printAccuracy(test_data)));
+
+        if(gpuAccel == 1.0) {
+            GPUUtils.clearGPUMem();
+            JCublas.cublasShutdown();
+        }
 
         long time = endTime.getTime() - startTime.getTime();
         System.out.println(String.format("Training time: %f secs", (double) time / 1000));

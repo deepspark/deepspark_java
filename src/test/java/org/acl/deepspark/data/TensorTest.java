@@ -1,5 +1,7 @@
 package org.acl.deepspark.data;
 
+import javax.xml.bind.SchemaOutputResolver;
+
 /**
  * Created by Jaehong on 2015-09-02.
  */
@@ -44,6 +46,8 @@ public class TensorTest {
                 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
                 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48};
         int[] dim44 = new int[] {2, 2, 4, 3};
+
+        boolean gpuAccel = false;
 
         // create data
         System.out.println("create data");
@@ -117,7 +121,7 @@ public class TensorTest {
 //        System.out.println(ret);
 //        ret = t3.mmul(t33);
 //        System.out.println(ret);
-        ret = t3.mmul(t4);
+        ret = t3.mmul(t4, false);
         System.out.println(ret);
 
         System.out.println("div");

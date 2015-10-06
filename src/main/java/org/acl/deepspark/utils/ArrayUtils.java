@@ -28,14 +28,14 @@ public class ArrayUtils {
 		}
 		return ret;
 	}
-	
+
 	private static FloatMatrix zeroPadMatrix(FloatMatrix in, int padding) {
 		FloatMatrix f = in;
-    	
-    	float[] padded = new float[(f.rows + 2*padding) * (f.columns + 2* padding)]; 
-    	    	
+
+    	float[] padded = new float[(f.rows + 2*padding) * (f.columns + 2* padding)];
+
     	float[] org = f.toArray();
-    	
+
     	for (int i = 0; i < f.columns;i++) {
     		int org_start_pos = i * f.rows;
     		int dest_start_pos = (i + padding)* (f.rows + 2 * padding) + padding;
@@ -43,7 +43,7 @@ public class ArrayUtils {
     	}
     	return new FloatMatrix(f.rows + 2* padding, f.columns + 2* padding, padded);
 	}
-	
+
 	public static Tensor centerCrop(Tensor in, int padding) {
 		int length = in.data().length;
 		int[] shape = in.shape();
@@ -57,11 +57,11 @@ public class ArrayUtils {
 
 	private static FloatMatrix centerCropMatrix(FloatMatrix in, int padding) {
 		FloatMatrix f = in;
-    	
-    	float[] cropped = new float[(f.rows - 2*padding) * (f.columns - 2 * padding)]; 
-    	    	
+
+    	float[] cropped = new float[(f.rows - 2*padding) * (f.columns - 2 * padding)];
+
     	float[] org = f.toArray();
-    	
+
     	for (int i = padding; i < f.columns - padding;i++) {
     		int org_start_pos = i * f.rows + padding;
     		int dest_start_pos = (i - padding) * (f.rows - 2 * padding);

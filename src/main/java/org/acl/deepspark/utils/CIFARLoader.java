@@ -134,8 +134,6 @@ public class CIFARLoader implements Serializable {
 		ArrayList<Sample> samples = new ArrayList<Sample>();
 		float[] featureVec = new float[channel*dimRows*dimCols];
 
-
-
 		try {
 			Path p = new Path(path);
 			FileSystem fs = FileSystem.get(new Configuration());

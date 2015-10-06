@@ -110,6 +110,7 @@ public class AsyncCIFARTest {
                 .setDecayLambda(decayLambda)
                 .setMomentum(momentum)
                 .setDropOutRate(dropOut)
+                .setGpuAccel(gpuAccel)
                 .setInputDim(new int[]{1, 3, 32, 32})
                 .setOutputDim(new int[]{10})
                 .addLayer(conv1)

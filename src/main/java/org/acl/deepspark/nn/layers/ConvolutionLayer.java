@@ -33,6 +33,13 @@ public class ConvolutionLayer extends BaseLayer implements Serializable {
 		padding = (Integer) conf.get("zeroPad");
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
 		this.gpuAccel = gpuAccel;
+
+		System.out.println(String.format("kernels: %d", kernels));
+		System.out.println(String.format("kernelRow: %d", kernelRow));
+		System.out.println(String.format("kernelCol: %d", kernelCol));
+		System.out.println(String.format("stride: %d", stride));
+		System.out.println(String.format("padding: %d", padding));
+		System.out.println(String.format("gpuAccel: %s", gpuAccel ? "true" : "false"));
 	}
 
 	@Override

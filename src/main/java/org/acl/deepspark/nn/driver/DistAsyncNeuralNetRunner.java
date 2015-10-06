@@ -7,6 +7,7 @@ import org.acl.deepspark.nn.async.ParameterClient;
 import org.acl.deepspark.nn.async.ParameterServer;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.VoidFunction;
+import org.jblas.util.Random;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -55,8 +56,9 @@ public class DistAsyncNeuralNetRunner implements Serializable {
         System.out.println(String.format("momentum: %4f", net.momentum));
         System.out.println(String.format("decayLambda: %4f", net.decayLambda));
         System.out.println(String.format("dropOutRate: %4f", net.dropOutRate));
+        System.out.println(String.format("gpuAccel: %s", net.gpuAccel ? "true" : "false"));
 
-        int numPartition = (int) data.cache().count() / batchSize;
+        final int dataSize = (int) data.cache().count();
 
         ParameterServer server = new ParameterServer(net, batchSize, port);
         server.startServer();
@@ -68,13 +70,14 @@ public class DistAsyncNeuralNetRunner implements Serializable {
             public void call(Iterator<Sample> samples) throws Exception {
                 Accumulator w = new Accumulator(net.getNumLayers());
                 List<Sample> sampleList = new ArrayList<Sample>();
-                while (samples.hasNext()) {
+                while (samples.hasNext())
                     sampleList.add(samples.next());
-                }
+                int listSize = sampleList.size();
 
-                for (int i = 0; i < iteration; i++) {
+                int localIter = iteration * listSize / dataSize;
+                for (int i = 0; i < localIter; i++) {
                     System.out.println(String.format("%d th iteration", i));
-
+/*
                     Iterator<Sample> iter = sampleList.iterator();
                     net.setWeights(ParameterClient.getWeights(host, port[1]));
                     while (iter.hasNext()) {
@@ -90,6 +93,12 @@ public class DistAsyncNeuralNetRunner implements Serializable {
                         ParameterClient.sendDelta(host, port[0], w.getAverage());
                         w.clear();
                     }
+*/
+                    for (int j = 0; j < batchSize; j++)
+                        w.accumulate(net.train(sampleList.get(Random.nextInt(listSize))));
+                    ParameterClient.sendDelta(host, port[0], w.getAverage());
+                    net.setWeights(ParameterClient.getWeights(host, port[1]));
+                    w.clear();
                 }
             }
         });

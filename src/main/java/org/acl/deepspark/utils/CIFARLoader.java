@@ -6,10 +6,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.jblas.FloatMatrix;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
 
 public class CIFARLoader implements Serializable {
@@ -100,14 +99,13 @@ public class CIFARLoader implements Serializable {
 				in.read(data);
 				for (int i = 0 ; i < length; i++) {
 					value = (int) data[i]&0xff;
-					if (normalize)
-						featureVec[i] = ((float) value - 128) / 128;
-					else
-						featureVec[i] = (float) value;
+					featureVec[i] = (float) value;
 				}
 
 				Sample s = new Sample();
 				s.data = Tensor.create(featureVec, sampleDim);
+				if (normalize)
+					s.data.subi(s.data.mean());
 				s.label = Tensor.create(labelVec, new int[] {dimLabel});
 				samples.add(s);
 			}
@@ -117,6 +115,60 @@ public class CIFARLoader implements Serializable {
 			if (in != null) {
 				try {
 					in.close();
+				} catch (IOException e) {}
+			}
+		}
+
+		Sample[] arr = new Sample[samples.size()];
+		arr = samples.toArray(arr);
+
+		System.out.println(String.format("Loaded %d samples from %s", samples.size(), path));
+		return arr;
+	}
+
+	public static Sample[] loadFromHDFSText(String path, boolean normalize) {
+		System.out.println("Data Loading...");
+		float label;
+		int[] dimData = {channel, dimRows, dimCols};
+		BufferedReader reader = null;
+		ArrayList<Sample> samples = new ArrayList<Sample>();
+		float[] featureVec = new float[channel*dimRows*dimCols];
+
+
+
+		try {
+			Path p = new Path(path);
+			FileSystem fs = FileSystem.get(new Configuration());
+			reader = new BufferedReader(new InputStreamReader(fs.open(p)));
+			String line = null;
+			String[] feature = null;
+
+			while ((line = reader.readLine()) != null) {
+				feature = line.split("\t");
+				float[] labelVec = new float[dimLabel];
+				label = Float.parseFloat(feature[channel*dimRows*dimRows]);
+				for (int i = 0; i < dimLabel; i++) {
+					labelVec[i] = (label == i) ? 1 : 0;
+				}
+
+				for (int i = 0; i < feature.length -1; i++)
+					featureVec[i] = Float.parseFloat(feature[i]);
+
+				Sample s = new Sample();
+				s.data = Tensor.create(featureVec, dimData).transpose();
+				if (normalize)
+					s.data.subi(s.data.mean());
+				s.label = Tensor.create(labelVec, new int[] {dimLabel});
+
+				samples.add(s);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
 				} catch (IOException e) {}
 			}
 		}

@@ -1,11 +1,13 @@
 package org.acl.deepspark.nn.driver;
 
+import jcuda.jcublas.JCublas;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.data.WeightType;
 import org.acl.deepspark.nn.conf.LayerConf;
 import org.acl.deepspark.nn.conf.NeuralNetConf;
 import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.LayerType;
+import org.acl.deepspark.utils.GPUUtils;
 import org.acl.deepspark.utils.MnistLoader;
 
 import java.util.Date;
@@ -21,11 +23,15 @@ public class MnistTest {
     public static final double decayLambda = 0.0005;
     public static final double momentum = 0.9;
     public static final double dropOut = 0.0;
+    public static final double gpuAccel = 0.0;
 
     public static void main(String[] args) throws Exception {
-
-        Sample[] training_data = MnistLoader.loadIntoSamples("D:/mnist_train.txt", true);
-        Sample[] test_data = MnistLoader.loadIntoSamples("D:/mnist_test.txt", true);
+        if(gpuAccel == 1.0) {
+            JCublas.cublasInit();
+            GPUUtils.preAllocationMemory();
+        }
+        Sample[] training_data = MnistLoader.loadIntoSamples("C:\\Users\\Jaehong\\Downloads\\mnist_train.txt", true);
+        Sample[] test_data = MnistLoader.loadIntoSamples("C:\\Users\\Jaehong\\Downloads\\mnist_test.txt", true);
         System.out.println(new Date());
 
         LayerConf conv1 = new LayerConf(LayerType.CONVOLUTION)
@@ -59,7 +65,7 @@ public class MnistTest {
         .set("activator", ActivatorType.NONE);
 
 		LayerConf full1 = new LayerConf(LayerType.FULLYCONN)
-		.set("num_output", 200)
+		.set("num_output", 500)
         .set("weight_type", WeightType.XAVIER)
 		.set("activator", ActivatorType.RECTIFIED_LINEAR);
 
@@ -73,6 +79,7 @@ public class MnistTest {
                 .setDecayLambda(decayLambda)
                 .setMomentum(momentum)
                 .setDropOutRate(dropOut)
+                .setGpuAccel(gpuAccel)
                 .setInputDim(new int[]{1, 1, 28, 28})
                 .setOutputDim(new int[]{10})
                 .addLayer(conv1)
@@ -92,6 +99,11 @@ public class MnistTest {
         Date endTime = new Date();
 
         System.out.println(String.format("Accuracy: %f %%", driver.printAccuracy(test_data)));
+
+        if(gpuAccel == 1.0) {
+            GPUUtils.clearGPUMem();
+            JCublas.cublasShutdown();
+        }
 
         long time = endTime.getTime() - startTime.getTime();
         System.out.println(String.format("Training time: %f secs", (double) time / 1000));

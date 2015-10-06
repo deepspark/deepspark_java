@@ -18,13 +18,14 @@ public class MnistLoader implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 4845357475294611873L;
+	private static final int channel = 1;
 	private static final int dimRows = 28;
 	private static final int dimLabel = 10;
 
 	public static Sample[] loadIntoSamples(String path, boolean normalize) {
 		System.out.println("Data Loading...");
 		float label;
-		int[] dimData = {1, dimRows, dimRows};
+		int[] dimData = {channel, dimRows, dimRows};
 		BufferedReader reader = null;
 		ArrayList<Sample> samples = new ArrayList<Sample>();
 		
@@ -107,7 +108,7 @@ public class MnistLoader implements Serializable {
 	public static Sample[] loadFromHDFS(String path, boolean normalize) {
 		System.out.println("Data Loading...");
 		float label;
-		int[] dimData = {1, dimRows, dimRows};
+		int[] dimData = {channel, dimRows, dimRows};
 		BufferedReader reader = null;
 		ArrayList<Sample> samples = new ArrayList<Sample>();
 		float[] featureVec = new float[dimRows * dimRows];

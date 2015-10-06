@@ -24,6 +24,10 @@ public class PoolingLayer extends BaseLayer implements Serializable, Layer {
 		this.kernelRow = (Integer) conf.get("kernel_row");
 		this.kernelCol = (Integer) conf.get("kernel_col");
 		this.stride = (Integer) conf.get("stride");
+
+		System.out.println(String.format("kernelRow: %d", kernelRow));
+		System.out.println(String.format("kernelCol: %d", kernelCol));
+		System.out.println(String.format("stride: %d", stride));
 	}
 
 	@Override

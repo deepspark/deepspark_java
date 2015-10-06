@@ -26,6 +26,9 @@ public class FullyConnectedLayer extends BaseLayer implements Serializable {
 		dimOut = (Integer) conf.get("num_output");
 		activator = ActivatorFactory.get((ActivatorType) conf.get("activator"));
 		this.gpuAccel = gpuAccel;
+
+		System.out.println(String.format("dimOut: %d", dimOut));
+		System.out.println(String.format("gpuAccel: %s", gpuAccel ? "true" : "false"));
 	}
 
 	@Override

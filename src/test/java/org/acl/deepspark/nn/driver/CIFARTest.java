@@ -23,7 +23,7 @@ public class CIFARTest {
     public static final double decayLambda = 0.004;
     public static final double momentum = 0.9;
     public static final double dropOut = 0.0;
-    public static final double gpuAccel = 1.0;
+    public static final double gpuAccel = 0.0;
 
     public static void main(String[] args) throws Exception {
         if(gpuAccel == 1.0) {
@@ -88,11 +88,11 @@ public class CIFARTest {
         .set("activator", ActivatorType.SOFTMAX);
 
         NeuralNet net = new NeuralNetConf()
-                .setGpuAccel(gpuAccel)
                 .setLearningRate(learningRate)
                 .setDecayLambda(decayLambda)
                 .setMomentum(momentum)
                 .setDropOutRate(dropOut)
+                .setGpuAccel(gpuAccel)
                 .setInputDim(new int[]{1, 3, 32, 32})
                 .setOutputDim(new int[]{10})
                 .addLayer(conv1)

@@ -142,39 +142,43 @@
 			<groupId>jcuda</groupId>
 			<artifactId>jcublas</artifactId>
 			<version>${jcuda.version}</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jcublas-${jcuda.version}.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>jcuda</groupId>
 			<artifactId>jcuda</artifactId>
 			<version>${jcuda.version}</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jcuda-${jcuda.version}.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>jcuda</groupId>
 			<artifactId>jcufft</artifactId>
 			<version>${jcuda.version}</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jcufft-${jcuda.version}.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>jcuda</groupId>
 			<artifactId>jcurand</artifactId>
 			<version>${jcuda.version}</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jcurand-${jcuda.version}.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>jcuda</groupId>
 			<artifactId>jcusparse</artifactId>
 			<version>${jcuda.version}</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jcusparse-${jcuda.version}.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>jcuda</groupId>
 			<artifactId>jcusolver</artifactId>
 			<version>${jcuda.version}</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jcusolver-${jcuda.version}.jar</systemPath>
 		</dependency>
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>jcuda.local</id>
-			<name>JCuda</name>
-			<url>file:${project.basedir}/lib</url>
-		</repository>
-	</repositories>
 </project>

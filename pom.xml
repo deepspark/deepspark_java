@@ -15,7 +15,7 @@
 		<spark.version>1.2.1</spark.version>
 		<junit.version>4.12</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jcuda.version>0.7.0a</jcuda.version>
+		<jcuda.version>0.7.5</jcuda.version>
 	</properties>
 	
 	<build>

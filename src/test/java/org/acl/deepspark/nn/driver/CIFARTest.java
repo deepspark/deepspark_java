@@ -23,7 +23,7 @@ public class CIFARTest {
     public static final double decayLambda = 0.004;
     public static final double momentum = 0.9;
     public static final double dropOut = 0.0;
-    public static final double gpuAccel = 0.0;
+    public static final double gpuAccel = 1.0;
 
     public static void main(String[] args) throws Exception {
         if(gpuAccel == 1.0) {
@@ -34,7 +34,7 @@ public class CIFARTest {
         Sample[] test_data = CIFARLoader.loadIntoSamples("D:/CIFAR-10/test_batch.bin", true);
         System.out.println(new Date());
         LayerConf conv1 = new LayerConf(LayerType.CONVOLUTION)
-        .set("num_output", 64)
+        .set("num_output", 128)
         .set("kernel_row", 5)
         .set("kernel_col", 5)
         .set("stride", 1)
@@ -50,7 +50,7 @@ public class CIFARTest {
         .set("activator", ActivatorType.NONE);
 
         LayerConf conv2 = new LayerConf(LayerType.CONVOLUTION)
-        .set("num_output", 64)
+        .set("num_output", 128)
         .set("kernel_row", 5)
         .set("kernel_col", 5)
         .set("stride", 1)
@@ -66,7 +66,7 @@ public class CIFARTest {
         .set("activator", ActivatorType.NONE);
 
         LayerConf conv3 = new LayerConf(LayerType.CONVOLUTION)
-        .set("num_output", 64)
+        .set("num_output", 128)
         .set("kernel_row", 5)
         .set("kernel_col", 5)
         .set("stride", 1)

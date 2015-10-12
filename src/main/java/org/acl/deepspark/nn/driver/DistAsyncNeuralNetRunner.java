@@ -1,10 +1,13 @@
 package org.acl.deepspark.nn.driver;
 
+import jcuda.jcublas.JCublas;
 import org.acl.deepspark.data.Accumulator;
 import org.acl.deepspark.data.Sample;
 import org.acl.deepspark.data.Tensor;
 import org.acl.deepspark.nn.async.ParameterClient;
 import org.acl.deepspark.nn.async.ParameterServer;
+import org.acl.deepspark.utils.GPUUtils;
+import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.jblas.util.Random;
@@ -68,6 +71,10 @@ public class DistAsyncNeuralNetRunner implements Serializable {
 
             @Override
             public void call(Iterator<Sample> samples) throws Exception {
+                if(net.gpuAccel) {
+                    JCublas.cublasInit();
+                    GPUUtils.preAllocationMemory();
+                }
                 Accumulator w = new Accumulator(net.getNumLayers());
                 List<Sample> sampleList = new ArrayList<Sample>();
                 while (samples.hasNext())
@@ -99,6 +106,10 @@ public class DistAsyncNeuralNetRunner implements Serializable {
                     ParameterClient.sendDelta(host, port[0], w.getAverage());
                     net.setWeights(ParameterClient.getWeights(host, port[1]));
                     w.clear();
+                }
+                if(net.gpuAccel) {
+                    GPUUtils.clearGPUMem();
+                    JCublas.cublasShutdown();
                 }
             }
         });

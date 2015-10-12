@@ -10,6 +10,7 @@ import org.acl.deepspark.nn.functions.ActivatorType;
 import org.acl.deepspark.nn.layers.*;
 import org.acl.deepspark.utils.CIFARLoader;
 import org.acl.deepspark.utils.GPUUtils;
+import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -23,19 +24,18 @@ import java.util.Date;
  */
 public class AsyncCIFARTest {
     public static final int minibatch = 100;
-    public static final int numIteration = 5000;
+    public static int numIteration = 5000;
 
-    public static final double learningRate = 0.001;
+    public static double learningRate = 0.0001;
     public static final double decayLambda = 0.004;
     public static final double momentum = 0.9;
     public static final double dropOut = 0.0;
-    public static final double gpuAccel = 0.0;
+    public static final double gpuAccel = 1.0;
 
     public static void main(String[] args) throws Exception {
-        if(gpuAccel == 1.0) {
-            JCublas.cublasInit();
-            GPUUtils.preAllocationMemory();
-        }
+        int num_output = Integer.parseInt(args[0]);
+        learningRate = Double.parseDouble(args[1]);
+        numIteration = Integer.parseInt(args[2]);
 
         SparkConf conf = new SparkConf().setAppName("AsyncCIFARTest")
                 .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -46,13 +46,13 @@ public class AsyncCIFARTest {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         System.out.println("Data Loading...");
-        Sample[] train_sample = CIFARLoader.loadFromHDFSText("data/cifar-10/train_batch.txt", true);
-        Sample[] test_sample = CIFARLoader.loadFromHDFSText("data/cifar-10/test_batch.txt", true);
+        Sample[] train_sample = CIFARLoader.loadFromHDFSText("/data/cifar-10/train_batch.txt", true);
+        Sample[] test_sample = CIFARLoader.loadFromHDFSText("/data/cifar-10/test_batch.txt", true);
 
         JavaRDD<Sample> train_data = sc.parallelize(Arrays.asList(train_sample)).cache();
 
         LayerConf conv1 = new LayerConf(LayerType.CONVOLUTION)
-                .set("num_output", 64)
+                .set("num_output", num_output)
                 .set("kernel_row", 5)
                 .set("kernel_col", 5)
                 .set("stride", 1)
@@ -68,7 +68,7 @@ public class AsyncCIFARTest {
                 .set("activator", ActivatorType.NONE);
 
         LayerConf conv2 = new LayerConf(LayerType.CONVOLUTION)
-                .set("num_output", 64)
+                .set("num_output", num_output)
                 .set("kernel_row", 5)
                 .set("kernel_col", 5)
                 .set("stride", 1)
@@ -84,7 +84,7 @@ public class AsyncCIFARTest {
                 .set("activator", ActivatorType.NONE);
 
         LayerConf conv3 = new LayerConf(LayerType.CONVOLUTION)
-                .set("num_output", 64)
+                .set("num_output", num_output)
                 .set("kernel_row", 5)
                 .set("kernel_col", 5)
                 .set("stride", 1)
@@ -135,11 +135,6 @@ public class AsyncCIFARTest {
         Date endTime = new Date();
 
         System.out.println(String.format("Accuracy: %f %%", driver.printAccuracy(test_sample)));
-
-        if(gpuAccel == 1.0) {
-            GPUUtils.clearGPUMem();
-            JCublas.cublasShutdown();
-        }
 
         long time = endTime.getTime() - startTime.getTime();
         System.out.println(String.format("Training time: %f secs", (double) time / 1000));

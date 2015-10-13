@@ -98,7 +98,7 @@
             <url>file:${project.basedir}/lib</url>
         </repository>
     </repositories>
-    <profiles>
+<!--    <profiles>
         <profile>
             <id>windows-x86_64</id>
             <activation>
@@ -111,7 +111,7 @@
                 <dllJ.version>windows-x86_64</dllJ.version>
             </properties>
             <dependencies>
-                <!--JCuda native dll libs-->
+                &lt;!&ndash;JCuda native dll libs&ndash;&gt;
                 <dependency>
                     <groupId>jcuda</groupId>
                     <artifactId>JCublas2</artifactId>
@@ -170,7 +170,7 @@
                 </dependency>
             </dependencies>
         </profile>
-    </profiles>
+    </profiles>-->
     <dependencyManagement>
         <dependencies>
 

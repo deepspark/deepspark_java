@@ -71,9 +71,9 @@
   </build>
   <repositories>
     <repository>
-      <id>jcuda.local</id>
-      <name>JCuda</name>
-      <url>file:${project.basedir}/lib</url>
+      <id>jcuda</id>
+      <name>jcuda local</name>
+      <url>file://${project.basedir}/lib</url>
     </repository>
   </repositories>
   <dependencies>
@@ -314,7 +314,7 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <jcuda.version>0.7.0a</jcuda.version>
+    <jcuda.version>0.7.5</jcuda.version>
     <scala.binary.version>2.10</scala.binary.version>
     <jblas.version>1.2.3</jblas.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

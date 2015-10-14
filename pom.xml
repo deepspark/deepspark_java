@@ -14,7 +14,7 @@
         <spark.version>1.2.1</spark.version>
         <junit.version>4.12</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jcuda.version>0.7.0a</jcuda.version>
+        <jcuda.version>0.7.5</jcuda.version>
     </properties>
     <build>
         <plugins>
@@ -93,9 +93,9 @@
     </build>
     <repositories>
         <repository>
-            <id>jcuda.local</id>
-            <name>JCuda</name>
-            <url>file:${project.basedir}/lib</url>
+            <id>jcuda</id>
+            <name>jcuda local</name>
+            <url>file://${project.basedir}/lib</url>
         </repository>
     </repositories>
 <!--    <profiles>
@@ -251,26 +251,6 @@
         <dependency>
             <groupId>jcuda</groupId>
             <artifactId>jcuda</artifactId>
-            <version>${jcuda.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jcuda</groupId>
-            <artifactId>jcufft</artifactId>
-            <version>${jcuda.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jcuda</groupId>
-            <artifactId>jcurand</artifactId>
-            <version>${jcuda.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jcuda</groupId>
-            <artifactId>jcusparse</artifactId>
-            <version>${jcuda.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jcuda</groupId>
-            <artifactId>jcusolver</artifactId>
             <version>${jcuda.version}</version>
         </dependency>
     </dependencies>

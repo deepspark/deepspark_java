@@ -1,5 +1,5 @@
 # Deepspark_java
-Pure Java Convolutional Neural Network (CNN) package combined with Apache Spark framework
+Java Convolutional Neural Network (CNN) package combined with Apache Spark framework
 
 DeepSpark_java is an early version of ongoing DeepSpark project (https://github.com/deepspark/deepspark) implemented in pure java and jBlas. It provides GPU Acceleration using jCublas. (<code>gpuAccel</code> option)
 
@@ -31,7 +31,7 @@ We provide built-in Mnist/CIFAR/ImageNet loader (See examples on <code>src/main/
 | PoolingLayer     | Pooling (subsampling) layer |
 | FullyConnectedLayer | Normal fully connected layer |
 
-Users should use <code>LayerConf</code> to specify layer spec (LayerType, kernel width/height, stride, padding etc.)
+Users should define <code>LayerConf</code> to specify layer details (LayerType, kernel width/height, stride, padding etc.)
 
 To add more options, check on <code>src/main/java/org/acl/deepspark/nn/conf/LayerConf</code>
 
@@ -43,7 +43,7 @@ To add more options, check on <code>src/main/java/org/acl/deepspark/nn/conf/Laye
 | DistNeuralNetRunner     | Runner of <code>NeuralNet</code> in **synchronous** distributed setting |
 | DistAsyncNeuralNetRunner | Runner of <code>NeuralNet</code> in **asynchronous** distributed setting |
 
-Users should use <code>NeuralNetConf</code> to specify training spec (lr, l2_lambda, momentum, gpuAccel etc.)
+Users should define <code>NeuralNetConf</code> to specify training details (lr, l2_lambda, momentum, gpuAccel etc.)
 
 To add more options, check on <code>src/main/java/org/acl/deepspark/nn/conf/NeuralNetConf</code>
 

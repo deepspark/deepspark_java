@@ -55,7 +55,7 @@ For actual usage code, see examples on <code>src/test/java/org/acl/deepspark/nn/
 | Type | Path                                  |
 | -------------- | -------------------------------------------- |
 | Single Machine | MnistTest.java / CIFARTest.java |
-| Distributed (sync) | DistNeuralNetRunnerTest.java |
+| Distributed (sync) | SyncMnistTest.java |
 | Distributed (async)| AsyncMnistTest.java | AsyncCIFARTest.java |
 
 ## **Publications**

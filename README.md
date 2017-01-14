@@ -1,5 +1,5 @@
 # Deepspark_java
-Java based Convolutional Neural Network package combined with Apache Spark framework
+Pure Java Convolutional Neural Network (CNN) package combined with Apache Spark framework
 
 DeepSpark_java is an early version of ongoing DeepSpark project (https://github.com/deepspark/deepspark) implemented in pure java and jBlas. It provides GPU Acceleration using jCublas. (<code>gpuAccel</code> option)
 
@@ -12,7 +12,7 @@ DeepSpark_java also supports local training running on **single machine** and **
 | Class | Description                                  |
 | -------------- | -------------------------------------------- |
 | Tensor         | Base class for Tensor. Implemented using jBlas |
-| Weight         | Class for representing Network parameter |
+| Weight         | Class for representing Network parameters |
 | Sample         | Class for representing Data container |
 
 <code>Weight</code> and <code>Sample</code> class are implemented using <code>Tensor</code>.
@@ -27,7 +27,7 @@ We provide built-in Mnist/CIFAR/ImageNet loader (See examples on <code>src/main/
 | -------------- | -------------------------------------------- |
 | Layer          | Base interface for layers                         |
 | BaseLayer      | Abstract class implementing Layer interface   |
-| ConvolutionLayer | Convolutional layer supporting stride and zero padding |
+| ConvolutionLayer | Convolutional layer |
 | PoolingLayer     | Pooling (subsampling) layer |
 | FullyConnectedLayer | Normal fully connected layer |
 
@@ -38,7 +38,7 @@ To add more options, check on <code>src/main/java/org/acl/deepspark/nn/conf/Laye
 ## **Training**
 | Layer | Description                                  |
 | -------------- | -------------------------------------------- |
-| NeuralNet      | Class for representing overall Network. Provides methods for initializaing, training and inference |
+| NeuralNet      | Class for representing overall Network. <br/> Provides methods for initializing, training and inference |
 | NeuralNetRunner | Runner of <code>NeuralNet</code> on local machine |
 | DistNeuralNetRunner     | Runner of <code>NeuralNet</code> in **synchronous** distributed setting |
 | DistAsyncNeuralNetRunner | Runner of <code>NeuralNet</code> in **asynchronous** distributed setting |

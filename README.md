@@ -45,7 +45,7 @@ To add more options, check on <code>src/main/java/org/acl/deepspark/nn/conf/Laye
 
 Users should use <code>NeuralNetConf</code> to specify training spec (lr, l2_lambda, momentum, gpuAccel etc.)
 
-To add more options, check on <code>src/main/java/org/acl/deepspark/nn/conf/LayerConf</code>
+To add more options, check on <code>src/main/java/org/acl/deepspark/nn/conf/NeuralNetConf</code>
 
 For asynchronous update, simple ParameterServer/Client class are implemented. Check on <code>src/main/java/org/acl/deepspark/nn/async</code>
 

@@ -1,4 +1,4 @@
-# Deepspark_java
+# DeepSpark_java
 Java Convolutional Neural Network (CNN) package combined with Apache Spark framework
 
 DeepSpark_java is an early version of ongoing DeepSpark project (https://github.com/deepspark/deepspark) implemented in pure java and jBlas. It provides GPU Acceleration using jCublas. (<code>gpuAccel</code> option)
@@ -57,6 +57,9 @@ For actual usage code, see examples on <code>src/test/java/org/acl/deepspark/nn/
 | Single Machine | MnistTest.java / CIFARTest.java |
 | Distributed (sync) | SyncMnistTest.java |
 | Distributed (async)| AsyncMnistTest.java | AsyncCIFARTest.java |
+
+![DeepSpark_results](https://cloud.githubusercontent.com/assets/6487834/21956033/75668bb6-daba-11e6-98c1-e98da5dbd5a3.png)
+![DeepSpark_speedup](https://cloud.githubusercontent.com/assets/6487834/21956038/8570631a-daba-11e6-9e99-106dbaea8255.png)
 
 ## **Publications**
 Kim, Hanjoo, Jaehong Park, Jaehee Jang, and Sungroh Yoon. "DeepSpark: Spark-Based Deep Learning Supporting Asynchronous Updates and Caffe Compatibility." arXiv preprint arXiv:1602.08191 (2016).
